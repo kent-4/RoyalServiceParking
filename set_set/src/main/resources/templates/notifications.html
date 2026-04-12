@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Royal Service Parking</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        .notification {
+            border-left: 5px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+        .notification:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .notification.unread {
+            border-left-color: #d4af37;
+            background-color: #fff8e1;
+        }
+        .notification.unread:hover {
+            background-color: #fff3cd;
+        }
+        .notification-time {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        .notification-type {
+            font-size: 0.85rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .notification-type.booking {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        .notification-type.reminder {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+        .notification-type.blocklist {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+        .notification-type.unblock {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        .notification-content {
+            margin-top: 10px;
+            color: #333;
+            line-height: 1.5;
+        }
+        .btn-mark-read {
+            background-color: #d4af37;
+            color: #fff;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        .btn-mark-read:hover {
+            background-color: #b38f2a;
+            color: #fff;
+        }
+        .btn-mark-all {
+            background-color: #d4af37;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        .btn-mark-all:hover {
+            background-color: #b38f2a;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Include appropriate navbar based on role -->
+    <div th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+        <div th:replace="admin/fragments/navbar :: navbar"></div>
+    </div>
+    <div th:if="${#authorization.expression('hasRole(''CASHIER'')')}">
+        <div th:replace="cashier/fragments/navbar :: navbar"></div>
+    </div>
+    <div th:if="${#authorization.expression('hasRole(''USER'')')}">
+        <div th:replace="user/fragments/navbar :: navbar"></div>
+    </div>
+    
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-luxury-red">
+                        <i class="fas fa-bell text-luxury-gold me-2"></i> Notifications
+                    </h2>
+                    <button id="mark-all-read" class="btn btn-mark-all" th:if="${notifications != null && !notifications.isEmpty() && notifications.?[!read].size() > 0}">
+                        <i class="fas fa-check-double me-1"></i> Mark All as Read
+                    </button>
+                </div>
+                
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}"></span>
+                </div>
+                
+                <div th:if="${notifications == null || notifications.isEmpty()}" class="text-center p-5">
+                    <i class="fas fa-bell-slash fa-4x text-luxury-gold mb-3"></i>
+                    <h4 class="text-luxury-red">No notifications yet</h4>
+                    <p class="text-muted">We'll notify you about important updates and changes.</p>
+                </div>
+                
+                <div th:if="${notifications != null && !notifications.isEmpty()}" class="notification-list">
+                    <div th:each="notification : ${notifications}" th:id="'notification-' + ${notification.id}" 
+                         th:class="'notification ' + (${!notification.read} ? 'unread' : '')">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span th:class="'notification-type ' + (${notification.type == 'BOOKING_CONFIRMATION' || notification.type == 'BOOKING_REMINDER'} ? 'booking' : '') + 
+                                              (${notification.type == 'BLOCKLIST'} ? 'blocklist' : '') + 
+                                              (${notification.type == 'UNBLOCK'} ? 'unblock' : '')">
+                                    <i th:class="'fas ' + 
+                                                (${notification.type == 'BOOKING_CONFIRMATION'} ? 'fa-check-circle' : '') + 
+                                                (${notification.type == 'BOOKING_REMINDER'} ? 'fa-clock' : '') + 
+                                                (${notification.type == 'BLOCKLIST'} ? 'fa-ban' : '') + 
+                                                (${notification.type == 'UNBLOCK'} ? 'fa-unlock' : '')"></i>
+                                    <span th:text="${notification.type == 'BOOKING_CONFIRMATION'} ? 'Booking' : 
+                                                    (${notification.type == 'BOOKING_REMINDER'} ? 'Reminder' : 
+                                                    (${notification.type == 'BLOCKLIST'} ? 'Blocklist' : 
+                                                    (${notification.type == 'UNBLOCK'} ? 'Unblock' : 'System')))"></span>
+                                </span>
+                                <span class="notification-time ms-2" th:text="${#temporals.format(notification.createdAt, 'MMM d, yyyy h:mm a')}"></span>
+                            </div>
+                            <button th:if="${!notification.read}" class="btn btn-mark-read mark-read" th:data-id="${notification.id}">
+                                <i class="fas fa-check"></i> Mark as Read
+                            </button>
+                        </div>
+                        <div class="notification-content mt-3" th:text="${notification.message}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mark individual notification as read
+            document.querySelectorAll('.mark-read').forEach(button => {
+                button.addEventListener('click', function() {
+                    const notificationId = this.getAttribute('data-id');
+                    markAsRead(notificationId);
+                });
+            });
+            
+            // Mark all notifications as read
+            const markAllBtn = document.getElementById('mark-all-read');
+            if (markAllBtn) {
+                markAllBtn.addEventListener('click', markAllAsRead);
+            }
+        });
+        
+        function markAsRead(id) {
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+            let headers = {
+                'Content-Type': 'application/json'
+            };
+            if (csrfToken && csrfHeader) {
+                headers[csrfHeader] = csrfToken;
+            }
+            fetch(`/notifications/${id}/read`, {
+                method: 'POST',
+                headers: headers
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const notification = document.getElementById(`notification-${id}`);
+                    notification.classList.remove('unread');
+                    notification.querySelector('.mark-read').style.display = 'none';
+                    updateUnreadCount();
+                }
+            })
+            .catch(error => console.error('Error marking notification as read:', error));
+        }
+        
+        function markAllAsRead() {
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+            let headers = {
+                'Content-Type': 'application/json'
+            };
+            if (csrfToken && csrfHeader) {
+                headers[csrfHeader] = csrfToken;
+            }
+            fetch('/notifications/read-all', {
+                method: 'POST',
+                headers: headers
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelectorAll('.notification.unread').forEach(notification => {
+                        notification.classList.remove('unread');
+                    });
+                    document.querySelectorAll('.mark-read').forEach(button => {
+                        button.style.display = 'none';
+                    });
+                    document.getElementById('mark-all-read').style.display = 'none';
+                    updateUnreadCount();
+                }
+            })
+            .catch(error => console.error('Error marking all notifications as read:', error));
+        }
+        
+        function updateUnreadCount() {
+            fetch('/notifications/unread-count')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('notification-badge');
+                    if (badge) {
+                        if (data.count > 0) {
+                            badge.textContent = data.count;
+                            badge.style.display = 'inline';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching notifications:', error));
+        }
+    </script>
+</body>
+</html>

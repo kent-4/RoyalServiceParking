@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Blocklisted - Royal Service Parking</title>
+    <style>
+        /* Include the base email styles */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #b71c1c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+            background-color: #fff;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+        .warning {
+            background-color: #ffebee;
+            border: 1px solid #ef5350;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .info {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 th:text="${headerText}">Account Blocklisted</h1>
+        </div>
+        
+        <div class="content">
+            <p>Dear <span th:text="${user.fullName}">User</span>,</p>
+            
+            <div class="warning">
+                <p th:text="${blocklistMessage}">Your booking was auto-cancelled due to no-show.</p>
+            </div>
+            
+            <div class="info">
+                <p><strong>Blocklist Details:</strong></p>
+                <ul>
+                    <li>Blocklist Duration: Until <span th:text="${#temporals.format(blocklistUntil, 'MMMM dd, yyyy')}">Date</span></li>
+                    <li>Missed Bookings Count: <span th:text="${user.missedBookingsCount}">0</span></li>
+                </ul>
+            </div>
+            
+            <p>During this period, you will not be able to make new parking reservations. This measure is in place to ensure fair usage of our parking facilities for all users.</p>
+            
+            <p>If you believe this is a mistake or have any questions, please contact our support team.</p>
+            
+            <p>Best regards,<br>Royal Service Parking Team</p>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated message. Please do not reply to this email.</p>
+            <p>Royal Service Parking © 2024. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html> 

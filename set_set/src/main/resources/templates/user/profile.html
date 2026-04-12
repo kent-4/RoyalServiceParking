@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Royal Service Parking</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom Theme CSS -->
+    <link rel="stylesheet" th:href="@{/styles/styles.css}">
+</head>
+<body>
+    <!-- Navbar Fragment -->
+    <div th:replace="~{user/fragments/navbar :: navbar}"></div>
+
+    <!-- Page Content -->
+    <div class="container mt-4">
+        <h2 class="mb-4 text-luxury-red">
+            <i class="fas fa-user-circle me-2"></i>My Profile
+        </h2>
+
+        <!-- Success Alert -->
+        <div th:if="${success}" class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+        </div>
+
+        <!-- Account Status Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-luxury-black text-luxury-gold">
+                <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>Account Status</h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${user.isCurrentlyBlocklisted()}" class="alert alert-danger">
+                    <i class="fas fa-ban me-2"></i>
+                    <strong>Account Restricted:</strong> You are currently blocklisted until 
+                    <span th:text="${#temporals.format(user.blocklistUntil, 'MMM dd, yyyy')}"></span>
+                    <p class="mt-2 mb-0" th:text="${user.getBlocklistMessage()}"></p>
+                </div>
+                <div th:unless="${user.isCurrentlyBlocklisted()}" class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Account in Good Standing:</strong> Your account has no restrictions.
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Form -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <form th:action="@{/user/profile/update}" th:object="${user}" method="post">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" th:field="*{fullName}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" th:field="*{email}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phoneNumber" th:field="*{phoneNumber}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="plateNumber" class="form-label">Plate Number</label>
+                            <input type="text" class="form-control" id="plateNumber" th:field="*{plateNumber}" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="vehicleType" class="form-label">Vehicle Type</label>
+                            <select class="form-control" id="vehicleType" th:field="*{vehicleType}" required>
+                                <option value="">Select Vehicle Type</option>
+                                <option value="SUV">SUV</option>
+                                <option value="Sedan">Sedan</option>
+                                <option value="CUV">CUV</option>
+                                <option value="Van">Van</option>
+                                <option value="Hatchback">Hatchback</option>
+                                <option value="Pick Up Car">Pick Up Car</option>
+                                <option value="Convertible">Convertible</option>
+                                <option value="Wagon">Wagon</option>
+                                <option value="Sportscars">Sportscars</option>
+                                <option value="Coupe">Coupe</option>
+                                <option value="Jeep">Jeep</option>
+                                <option value="Motorcycles">Motorcycles</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="vehicleModel" class="form-label">Vehicle Model</label>
+                            <input type="text" class="form-control" id="vehicleModel" th:field="*{vehicleModel}" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="vehicleColor" class="form-label">Vehicle Color</label>
+                            <input type="text" class="form-control" id="vehicleColor" th:field="*{vehicleColor}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" rows="2" th:field="*{address}"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Update Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a th:href="@{/user/dashboard}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

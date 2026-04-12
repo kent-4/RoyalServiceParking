@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Successful - Royal Service Parking</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url([[@{/images/user-login.png}]]) no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Frosted glass effect */
+        .card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 100px;
+        }
+
+        /* Success color theme */
+        .bg-success {
+            background-color: #28a745 !important;
+        }
+
+        /* Improved button styles */
+        .btn-primary {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .btn-primary:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-check-circle success-icon"></i>
+                        <h2 class="mb-4">Registration Successful!</h2>
+                        
+                        <div class="alert alert-success" th:if="${success}" th:text="${success}">
+                            Registration successful! Please check your email to verify your account.
+                        </div>
+                        
+                        <p class="mb-4">Thank you for registering with Royal Service Parking. We've sent a verification link to your email address. Please check your inbox and click the link to activate your account.</p>
+                        
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/login}" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Proceed to Login
+                            </a>          
+                            <a th:href="@{/}" class="btn btn-outline-secondary">
+                                <i class="fas fa-home me-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

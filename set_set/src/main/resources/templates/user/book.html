@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Parking - Royal Service Parking</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/styles/styles.css}">
+    <!-- Add Flatpickr for better date/time pickers -->
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_red.css">
+    <style>
+        /* --- Parking Slot Availability Compact Styles --- */
+        .psa-card {
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(60,60,120,0.08);
+            border: 1.5px solid #e0e7ff;
+            padding: 18px 18px 10px 18px;
+            margin-bottom: 24px;
+            background: #fff;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .psa-header {
+            background: #2563eb;
+            color: #fff;
+            border-radius: 8px 8px 0 0;
+            padding: 8px 16px;
+            font-size: 1.08rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .psa-content {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0 18px;
+            padding-top: 10px;
+        }
+        .psa-total {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .psa-total .fa-car-side {
+            font-size: 1.7rem;
+            color: #2563eb;
+        }
+        .psa-total-numbers {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .psa-total-label {
+            font-size: 0.98rem;
+            color: #444;
+            margin-bottom: 2px;
+        }
+        .psa-total-value {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #2563eb;
+            line-height: 1;
+        }
+        .psa-levels {
+            display: flex;
+            gap: 16px;
+        }
+        .psa-level {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+        }
+        .psa-level .fa-level-up-alt {
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+        }
+        .psa-level-label {
+            font-size: 0.93rem;
+            color: #444;
+        }
+        .psa-level-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #16a34a;
+            line-height: 1;
+        }
+        .psa-level-value.text-danger {
+            color: #dc2626 !important;
+        }
+        @media (max-width: 600px) {
+            .psa-card { padding: 12px 6px 6px 6px; }
+            .psa-content { flex-direction: column; align-items: stretch; gap: 10px 0; }
+            .psa-levels { justify-content: space-between; gap: 8px; }
+            .psa-level { min-width: 48px; }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{user/fragments/navbar :: navbar}"></div>
+
+<div class="booking-container d-flex flex-column align-items-center justify-content-center" style="min-height: 80vh; position: relative;">
+    <div class="booking-watermark"><i class="fas fa-parking"></i></div>
+    <h2 class="mb-2 text-center fw-bold" style="color:#2a3a8c; font-size:2.3rem;"><i class="fas fa-calendar-plus me-2"></i>Book a Parking Slot</h2>
+    <p class="text-center text-muted mb-4" style="font-size:1.15rem;">Reserve your parking slot in advance and arrive on time!</p>
+    <div class="booking-card w-100" style="max-width:900px; background:#fff; border-radius:18px; box-shadow:0 8px 32px rgba(60,60,120,0.12); border:2px solid #ffb3b3; padding:32px 24px 24px 24px; position:relative;">
+        <div th:if="${error}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+        
+        <div th:if="${param.slotSelected}" class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i>
+            Slot selected successfully! Please complete your booking.
+        </div>
+        
+        <!-- Blocklist Warning -->
+        <div th:if="${blocklisted}" class="alert alert-danger mb-4">
+            <i class="fas fa-ban me-2"></i>
+            <strong>You are blocklisted!</strong>
+            <p th:if="${blocklistMessage}" th:text="${blocklistMessage}" class="mb-1 mt-2"></p>
+            <p class="mb-0">
+                You cannot make any bookings until <strong th:text="${#temporals.format(blocklistUntil, 'MMMM dd, yyyy')}">date</strong>.
+            </p>
+        </div>
+        
+        <!-- Important Notice -->
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Important:</strong> Please arrive by your selected time. Booking will be canceled automatically if you do not arrive within 1 hour.
+        </div>
+        
+        <!-- Parking Slot Availability -->
+        <div class="psa-card">
+            <div class="psa-header">
+                <i class="fas fa-parking"></i> Parking Slot Availability
+            </div>
+            <div class="psa-content">
+                <div class="psa-total">
+                    <i class="fas fa-car-side"></i>
+                    <div class="psa-total-numbers">
+                        <span class="psa-total-label">Total Available</span>
+                        <span class="psa-total-value" th:text="${totalAvailableSlots}">0</span>
+                    </div>
+                </div>
+                <div class="psa-levels">
+                    <div class="psa-level" th:each="level : ${availableSlotsPerLevel}">
+                        <i class="fas fa-level-up-alt" th:classappend="${level.value > 0 ? 'text-success' : 'text-danger'}"></i>
+                        <span class="psa-level-label" th:text="${level.key}">Level</span>
+                        <span class="psa-level-value" th:classappend="${level.value > 0 ? 'text-success' : 'text-danger'}" th:text="${level.value}">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <form th:action="@{/user/book}" th:object="${booking}" method="post" id="bookingForm">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="date" class="form-label">
+                        <i class="fas fa-calendar me-2"></i>Date
+                    </label>
+                    <div class="input-group">
+                        <input type="text" class="form-control date-picker" id="date" th:field="*{date}" 
+                               th:value="${param.date != null ? param.date : ''}" required
+                               th:disabled="${blocklisted}">
+                        <span class="input-group-text">
+                            <i class="fas fa-calendar-alt"></i>
+                        </span>
+                    </div>
+                    <small class="form-text text-muted">
+                        You can book up to 3 days in advance.
+                    </small>
+                </div>
+                <div class="col-md-6">
+                    <label for="startTime" class="form-label">
+                        <i class="fas fa-clock me-2"></i>Start Time
+                    </label>
+                    <div class="input-group">
+                        <input type="text" class="form-control time-picker" id="startTimeDisplay" name="startTimeDisplay" 
+                               th:value="${param.formattedTime != null ? param.formattedTime : ''}" required
+                               th:disabled="${blocklisted}">
+                        <span class="input-group-text">
+                            <i class="fas fa-clock"></i>
+                        </span>
+                    </div>
+                    <input type="hidden" id="startTimeHidden" name="startTime" th:field="*{startTime}" 
+                           th:value="${param.time != null ? param.time : ''}">
+                </div>
+            </div>
+            
+            <!-- Hidden fields for parkingHours, parkingCost, and paymentMode -->
+            <input type="hidden" id="parkingHours" th:field="*{parkingHours}" value="1">
+            <input type="hidden" id="parkingCost" th:field="*{parkingCost}" value="0">
+            <input type="hidden" id="paymentMode" th:field="*{paymentMode}" value="Cash">
+            
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fas fa-parking me-2"></i>Select Level
+                </label>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="javascript:void(0)" onclick="saveFormData('Level 1')" 
+                       class="btn btn-outline-primary" th:classappend="${blocklisted ? 'disabled' : ''}">
+                        <i class="fas fa-level-up-alt me-1"></i>Level 1
+                    </a>
+                    <a href="javascript:void(0)" onclick="saveFormData('Level 2')" 
+                       class="btn btn-outline-primary" th:classappend="${blocklisted ? 'disabled' : ''}">
+                        <i class="fas fa-level-up-alt me-1"></i>Level 2
+                    </a>
+                    <a href="javascript:void(0)" onclick="saveFormData('Level 3')" 
+                       class="btn btn-outline-primary" th:classappend="${blocklisted ? 'disabled' : ''}">
+                        <i class="fas fa-level-up-alt me-1"></i>Level 3
+                    </a>
+                    <a href="javascript:void(0)" onclick="saveFormData('Level 4')" 
+                       class="btn btn-outline-primary" th:classappend="${blocklisted ? 'disabled' : ''}">
+                        <i class="fas fa-level-up-alt me-1"></i>Level 4
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mb-3" th:if="${param.level != null}">
+                <label class="form-label">
+                    <i class="fas fa-check-circle me-2 text-success"></i>Selected Level: 
+                    <span class="fw-bold" th:text="${param.level}"></span>
+                </label>
+                <input type="hidden" name="level" th:value="${param.level}">
+            </div>
+            
+            <div class="mb-3" th:if="${param.slotName != null}">
+                <label class="form-label">
+                    <i class="fas fa-check-circle me-2 text-success"></i>Selected Slot: 
+                    <span class="fw-bold" th:text="${param.slotName}"></span>
+                </label>
+                <input type="hidden" name="slotName" th:value="${param.slotName}">
+            </div>
+            
+            <!-- Display selected date and time if passed from slot selection -->
+            <div class="mb-3" th:if="${param.formattedDate != null && param.formattedTime != null}">
+                <label class="form-label">
+                    <i class="fas fa-check-circle me-2 text-success"></i>Selected Date and Time: 
+                    <span class="fw-bold" th:text="${param.formattedDate + ' at ' + param.formattedTime}"></span>
+                </label>
+                <!-- Hidden inputs to preserve the values -->
+                <input type="hidden" name="date" th:value="${param.date}">
+                <input type="hidden" name="time" th:value="${param.time}">
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary" 
+                        th:disabled="${blocklisted || (param.level == null || param.slotName == null)}">
+                    <i class="fas fa-check-circle me-2"></i>Book Now
+                </button>
+                <a th:href="@{/user/dashboard}" class="btn btn-secondary">
+                    <i class="fas fa-times-circle me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const startTimeHidden = document.getElementById('startTimeHidden');
+        // Fix: Properly escape boolean value
+        const isBlocklisted = /*[[${blocklisted}]]*/ false;
+        
+        // If user is blocklisted, disable form interactions
+        if (isBlocklisted) {
+            document.querySelectorAll('a.btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    return false;
+                });
+            });
+        }
+        
+        // Get current date and time in Philippines (UTC+8)
+        const now = new Date();
+        const philippinesOffset = 8 * 60; // Philippines is UTC+8 (8 hours * 60 minutes)
+        const userOffset = now.getTimezoneOffset(); // User's timezone offset in minutes
+        const offsetDiff = philippinesOffset + userOffset; // Difference between user's timezone and Philippines
+        
+        // Adjust the current time to Philippines time
+        const philippinesTime = new Date(now.getTime() + offsetDiff * 60 * 1000);
+        
+        // Check if we have date and time from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlDate = urlParams.get('date');
+        const urlTime = urlParams.get('time');
+        const formattedTime = urlParams.get('formattedTime');
+        
+        // Set up date picker with Philippines time
+        const datePicker = flatpickr(".date-picker", {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            maxDate: new Date().fp_incr(3), // 3 days from now
+            defaultDate: urlDate || "today",
+            locale: {
+                firstDayOfWeek: 1 // Monday
+            },
+            theme: "material_red",
+            // Ensure the date is not modified by timezone
+            parseDate: (datestr) => {
+                if (datestr === "today") return new Date();
+                return new Date(datestr + "T00:00:00");
+            }
+        });
+        
+        // Set up time picker with Philippines time and 12-hour format with AM/PM
+        const timePicker = flatpickr(".time-picker", {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "h:i K", // 12-hour format with AM/PM
+            time_24hr: false, // Use 12-hour format
+            minuteIncrement: 15,
+            defaultHour: formattedTime ? parseInt(formattedTime.split(':')[0]) : philippinesTime.getHours(),
+            defaultMinute: formattedTime ? parseInt(formattedTime.split(':')[1].split(' ')[0]) : Math.ceil(philippinesTime.getMinutes() / 15) * 15,
+            theme: "material_red",
+            onChange: function(selectedDates, dateStr) {
+                // Convert the 12-hour format to 24-hour format for the server
+                if (selectedDates.length > 0) {
+                    const date = selectedDates[0];
+                    const hours = date.getHours().toString().padStart(2, '0');
+                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                    const time24 = `${hours}:${minutes}`;
+                    
+                    // Update the hidden field with the time in the correct format for the server
+                    document.getElementById('startTimeHidden').value = time24;
+                    validateDateTime();
+                }
+            }
+        });
+        
+        // If we have time from URL, set it in the hidden field
+        if (urlTime) {
+            startTimeHidden.value = urlTime;
+        }
+        
+        // Function to validate date and time
+        function validateDateTime() {
+            const selectedDate = datePicker.selectedDates[0];
+            const selectedTime = timePicker.selectedDates[0];
+            
+            if (!selectedDate || !selectedTime) return;
+            
+            // Get current date and time in Philippines (UTC+8)
+            const now = new Date();
+            const philippinesOffset = 8 * 60; // Philippines is UTC+8 (8 hours * 60 minutes)
+            const userOffset = now.getTimezoneOffset(); // User's timezone offset in minutes
+            const offsetDiff = philippinesOffset + userOffset; // Difference between user's timezone and Philippines
+            
+            // Adjust the current time to Philippines time
+            const philippinesTime = new Date(now.getTime() + offsetDiff * 60 * 1000);
+            
+            // Create date objects for comparison using Philippines time
+            const selectedDateTime = new Date(
+                selectedDate.getFullYear(),
+                selectedDate.getMonth(),
+                selectedDate.getDate(),
+                selectedTime.getHours(),
+                selectedTime.getMinutes()
+            );
+            
+            // Only validate time if the selected date is today
+            const isToday = selectedDate.toDateString() === philippinesTime.toDateString();
+            if (isToday) {
+                // Add a 5-minute buffer to account for form filling time
+                const bufferedPhilippinesTime = new Date(philippinesTime.getTime() - 5 * 60 * 1000);
+                
+                if (selectedDateTime < bufferedPhilippinesTime) {
+                    alert("Please select a future time. The selected time has already passed.");
+                    
+                    // Reset time to current time + 30 minutes (rounded to nearest 15)
+                    const newMinutes = Math.ceil((philippinesTime.getMinutes() + 30) / 15) * 15;
+                    const newHours = philippinesTime.getHours() + Math.floor(newMinutes / 60);
+                    
+                    const newTime = new Date(
+                        philippinesTime.getFullYear(),
+                        philippinesTime.getMonth(),
+                        philippinesTime.getDate(),
+                        newHours,
+                        newMinutes % 60
+                    );
+                    
+                    timePicker.setDate(newTime);
+                    
+                    // Update the hidden field with the new time
+                    const hours = newTime.getHours().toString().padStart(2, '0');
+                    const minutes = newTime.getMinutes().toString().padStart(2, '0');
+                    document.getElementById('startTimeHidden').value = `${hours}:${minutes}`;
+                }
+            }
+        }
+        
+        // Add event listener to date picker to validate date/time combination
+        datePicker.config.onChange.push(function() {
+            validateDateTime();
+        });
+        
+        // Restore form data from localStorage if available
+        const savedData = localStorage.getItem('bookingFormData');
+        if (savedData) {
+            const formData = JSON.parse(savedData);
+            
+            if (formData.date) datePicker.setDate(formData.date);
+            if (formData.startTime) {
+                timePicker.setDate(formData.startTime);
+                startTimeHidden.value = formData.startTime;
+            }
+        
+            // Clear storage after restoring
+            localStorage.removeItem('bookingFormData');
+        }
+        
+        // Initialize with current values
+        validateDateTime();
+    });
+
+    // Function to save form data before redirecting to select slot
+    function saveFormData(level) {
+        // Check if user is blocklisted
+        const isBlocklisted = /*[[${blocklisted}]]*/ false;
+        if (isBlocklisted) {
+            alert("You are currently blocklisted and cannot make any bookings.");
+            return false;
+        }
+        
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('startTimeHidden').value;
+        const timeDisplay = document.getElementById('startTimeDisplay').value;
+        
+        // Validate that time is not empty
+        if (!time || time.trim() === '') {
+            alert("Please select a valid time before proceeding.");
+            return false;
+        }
+        
+        // Get the selected date object
+        const selectedDate = new Date(date);
+        
+        // Format the date for display with full weekday, month, day, and year
+        const formattedDate = selectedDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // Keep the original date format (YYYY-MM-DD) for the server
+        const isoDate = date;
+        
+        // Redirect with all necessary parameters using Thymeleaf URL
+        const baseUrl = /*[[@{/user/select-slot}]]*/ '/user/select-slot';
+        window.location.href = `${baseUrl}?level=${encodeURIComponent(level)}&date=${encodeURIComponent(isoDate)}&time=${encodeURIComponent(time)}&formattedDate=${encodeURIComponent(formattedDate)}&formattedTime=${encodeURIComponent(timeDisplay)}`;
+    }
+
+    // Add form submission handler to ensure time is properly formatted
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        // Check if user is blocklisted
+        const isBlocklisted = /*[[${blocklisted}]]*/ false;
+        if (isBlocklisted) {
+            e.preventDefault();
+            alert("You are currently blocklisted and cannot make any bookings.");
+            return false;
+        }
+        
+        const startTimeHidden = document.getElementById('startTimeHidden');
+        if (!startTimeHidden.value) {
+            e.preventDefault();
+            alert('Please select a valid time');
+            return false;
+        }
+    });
+</script>
+
+</body>
+</html>

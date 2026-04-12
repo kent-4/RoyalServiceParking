@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Royal Service Parking</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/styles/cashier.css}">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .profile-section {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .profile-header {
+            background-color: #b71c1c;
+            color: white;
+            padding: 16px 20px;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 4px 4px 0 0;
+        }
+        .profile-content {
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        .info-label {
+            font-weight: 500;
+            color: #b71c1c;
+            min-width: 150px;
+            display: inline-block;
+        }
+        .info-value {
+            color: #333;
+            font-weight: 400;
+        }
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .status-badge.verified {
+            background-color: #28a745;
+            color: white;
+        }
+        .status-badge.blocklisted {
+            background-color: #dc3545;
+            color: white;
+        }
+        .vehicle-info {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 20px;
+            border-radius: 4px;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0;
+            color: #fff;
+        }
+        .back-button {
+            border: 1px solid #b71c1c;
+            color: #b71c1c;
+            background-color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .back-button:hover {
+            background-color: #b71c1c;
+            color: white;
+            border-color: #b71c1c;
+        }
+        .info-row {
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .page-title {
+            color: #b71c1c;
+            font-weight: 500;
+        }
+        .section-icon {
+            margin-right: 10px;
+            color: rgba(255,255,255,0.9);
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="cashier/fragments/navbar :: navbar"></div>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="page-title h4 mb-0">User Profile Information</h2>
+            <a th:href="@{/cashier/users}" class="back-button">
+                <i class="fas fa-arrow-left me-2"></i>Back to Users List
+            </a>
+        </div>
+
+        <!-- Account Status Section -->
+        <div class="profile-section">
+            <div class="profile-header">
+                <h5 class="section-title">
+                    <i class="fas fa-user-shield section-icon"></i>Account Status
+                </h5>
+            </div>
+            <div class="profile-content">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span th:if="${user.isCurrentlyBlocklisted()}" class="status-badge blocklisted">
+                            <i class="fas fa-ban me-2"></i>Blocklisted until 
+                            <span th:text="${#temporals.format(user.blocklistUntil, 'MMMM dd, yyyy')}"></span>
+                        </span>
+                        <span th:unless="${user.isCurrentlyBlocklisted()}" class="status-badge verified">
+                            <i class="fas fa-check-circle me-2"></i>Active Account
+                        </span>
+                    </div>
+                    <div th:if="${user.isCurrentlyBlocklisted()}" class="text-danger">
+                        <span class="fw-500">Missed Bookings:</span> 
+                        <span th:text="${user.missedBookingsCount}" class="fw-bold"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="profile-section">
+            <div class="profile-header">
+                <h5 class="section-title">
+                    <i class="fas fa-info-circle section-icon"></i>Personal Information
+                </h5>
+            </div>
+            <div class="profile-content">
+                <div class="info-row">
+                    <span class="info-label">Full Name:</span>
+                    <span class="info-value" th:text="${user.fullName}"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email Address:</span>
+                    <span class="info-value" th:text="${user.email}"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Phone Number:</span>
+                    <span class="info-value" th:text="${user.phoneNumber}"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Address:</span>
+                    <span class="info-value" th:text="${user.address != null && !user.address.isEmpty() ? user.address : 'Not provided'}"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicle Information Section -->
+        <div class="profile-section">
+            <div class="profile-header">
+                <h5 class="section-title">
+                    <i class="fas fa-car section-icon"></i>Vehicle Information
+                </h5>
+            </div>
+            <div class="profile-content">
+                <div class="vehicle-info">
+                    <div class="info-row">
+                        <span class="info-label">Plate Number:</span>
+                        <span class="info-value" th:text="${user.plateNumber}"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Vehicle Type:</span>
+                        <span class="info-value" th:text="${user.vehicleType}"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Vehicle Model:</span>
+                        <span class="info-value" th:text="${user.vehicleModel}"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Vehicle Color:</span>
+                        <span class="info-value" th:text="${user.vehicleColor}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

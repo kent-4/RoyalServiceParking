@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{email/base-template :: head}"></head>
+<body>
+    <div class="email-container">
+        <div th:replace="~{email/base-template :: .email-header}">
+            <h1>Royal Service Parking</h1>
+            <p>Important Notification</p>
+        </div>
+        
+        <div class="email-content">
+            <h2>Important Notification</h2>
+            <p>Dear <span th:text="${user.fullName}">User</span>,</p>
+            
+            <div class="highlight-box">
+                <p th:text="${notificationMessage}">Notification message goes here.</p>
+            </div>
+            
+            <p>If you have any questions or concerns, please don't hesitate to contact our support team.</p>
+            
+            <p>Best regards,<br>Royal Service Parking Team</p>
+        </div>
+        
+        <div th:replace="~{email/base-template :: .email-footer}"></div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - Royal Service Parking</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #f4f4f4;">
+    <div style="max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div style="background: #B71C1C; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 600;">Royal Service Parking</h1>
+            <p style="margin: 10px 0 0 0;">Email Verification</p>
+        </div>
+        
+        <div style="padding: 30px; background: #ffffff;">
+            <h2 style="color: #333; margin-bottom: 20px;">Welcome to Royal Service Parking!</h2>
+            <p style="margin-bottom: 15px;">Dear <span th:text="${user.fullName}" style="font-weight: bold;">User</span>,</p>
+            
+            <p style="margin-bottom: 20px;">Thank you for registering with Royal Service Parking. To complete your registration and activate your account, please click the verification button below:</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a th:href="${verificationUrl}" style="display: inline-block; padding: 12px 24px; background: #B71C1C; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">Verify Email Address</a>
+            </div>
+            
+            <div style="background: #f8f8f8; border-left: 4px solid #B71C1C; padding: 15px; margin: 20px 0;">
+                <p style="margin: 0 0 10px 0;">If the button doesn't work, copy and paste this link into your browser:</p>
+                <p style="word-break: break-all; margin: 0; color: #0066cc;" th:text="${verificationUrl}">https://example.com/verify</p>
+            </div>
+            
+            <p style="margin-bottom: 10px;">This verification link will expire in 24 hours. If you did not create an account, please ignore this email.</p>
+            
+            <p style="margin-top: 30px;">Best regards,<br>Royal Service Parking Team</p>
+        </div>
+        
+        <div style="background: #f8f8f8; padding: 20px; text-align: center; font-size: 14px; color: #666;">
+            <p style="margin: 0 0 10px 0;">© 2024 Royal Service Parking. All rights reserved.</p>
+            <p style="margin: 0 0 10px 0;">If you have any questions, please contact our support team.</p>
+            <div style="margin-top: 20px;">
+                <a href="#" style="color: #666; text-decoration: none; margin: 0 10px;">Facebook</a> |
+                <a href="#" style="color: #666; text-decoration: none; margin: 0 10px;">Twitter</a> |
+                <a href="#" style="color: #666; text-decoration: none; margin: 0 10px;">Instagram</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

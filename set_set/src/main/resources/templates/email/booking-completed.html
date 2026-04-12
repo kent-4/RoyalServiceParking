@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{email/base-template :: head}"></head>
+<body>
+    <div class="email-container">
+        <div th:replace="~{email/base-template :: .email-header}">
+            <h1>Royal Service Parking</h1>
+            <p>Booking Completed</p>
+        </div>
+        
+        <div class="email-content">
+            <h2>Thank You for Parking with Us!</h2>
+            <p>Dear <span th:text="${booking.user.fullName}">User</span>,</p>
+            
+            <p>Your parking session has been completed. Here's a summary of your parking details:</p>
+            
+            <table class="details-table">
+                <tr>
+                    <td>Booking ID:</td>
+                    <td th:text="${booking.id}">#12345</td>
+                </tr>
+                <tr>
+                    <td>Vehicle:</td>
+                    <td>
+                        <span th:text="${booking.vehicleType}">Sedan</span> - 
+                        <span th:text="${booking.plateNumber}">ABC 123</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Location:</td>
+                    <td th:text="${booking.level + ' - ' + booking.slotName}">Level 1 - A1</td>
+                </tr>
+                <tr>
+                    <td>Date:</td>
+                    <td th:text="${#temporals.format(booking.date, 'MMMM dd, yyyy')}">May 25, 2025</td>
+                </tr>
+                <tr>
+                    <td>Start Time:</td>
+                    <td th:text="${#temporals.format(booking.startTime, 'hh:mm a')}">08:00 PM</td>
+                </tr>
+                <tr>
+                    <td>Exit Time:</td>
+                    <td th:text="${#temporals.format(booking.exitTime, 'hh:mm a')}">09:00 PM</td>
+                </tr>
+                <tr>
+                    <td>Duration:</td>
+                    <td>
+                        <span th:if="${parkingDays > 0}" th:text="${parkingDays} + ' days '"></span>
+                        <span th:text="${parkingHours} + ' hours'"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Rate:</td>
+                    <td>₱<span th:text="${#numbers.formatDecimal(parkingCost.hourlyRate, 1, 2)}">150.00</span> per hour</td>
+                </tr>
+                <tr>
+                    <td>Total Amount Paid:</td>
+                    <td>₱<span th:text="${#numbers.formatDecimal(booking.parkingCost, 1, 2)}">150.00</span></td>
+                </tr>
+            </table>
+            
+            <div class="highlight-box" style="background: #d4edda; border-color: #c3e6cb;">
+                <p style="color: #155724; text-align: center;">
+                    <strong>Payment Status: COMPLETED</strong>
+                </p>
+            </div>
+            
+            <p>We hope you enjoyed our parking service. Please don't hesitate to provide feedback about your experience.</p>
+            
+            <p>Best regards,<br>Royal Service Parking Team</p>
+        </div>
+        
+        <div th:replace="~{email/base-template :: .email-footer}"></div>
+    </div>
+</body>
+</html> 

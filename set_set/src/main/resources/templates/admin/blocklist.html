@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blocklisted Users - Royal Service Parking</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/styles/admin.css}">
+</head>
+<body>
+    <div th:replace="~{admin/fragments/navbar :: navbar}"></div>
+    
+    <div class="container mt-4">
+        <h2 class="mb-4 text-luxury-red"><i class="fas fa-ban me-2"></i>Blocklisted Users</h2>
+        
+        <div th:if="${success}" class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <div th:if="${blocklisted == null || blocklisted.empty}" class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>There are no blocklisted users at the moment.
+                </div>
+                
+                <div th:if="${blocklisted != null && !blocklisted.empty}" class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Plate Number</th>
+                                <th>Missed Bookings</th>
+                                <th>Blocklisted Until</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${blocklisted}">
+                                <td th:text="${user.id}">1</td>
+                                <td th:text="${user.fullName}">John Doe</td>
+                                <td th:text="${user.email}">john@example.com</td>
+                                <td th:text="${user.phoneNumber}">123-456-7890</td>
+                                <td th:text="${user.plateNumber}">ABC-123</td>
+                                <td th:text="${user.missedBookingsCount}">1</td>
+                                <td th:text="${#temporals.format(user.blocklistUntil, 'dd-MM-yyyy HH:mm')}">01-01-2025 12:00</td>
+                                <td>
+                                    <form th:action="@{/admin/blocklist/{id}/remove(id=${user.id})}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-user-check me-1"></i>Remove from Blocklist
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

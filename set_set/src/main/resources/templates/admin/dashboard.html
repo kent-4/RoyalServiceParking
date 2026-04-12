@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Royal Service Parking</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/styles/admin.css}">
+</head>
+<body>
+    <div th:replace="~{admin/fragments/navbar :: navbar}"></div>
+    
+    <div class="container mt-4">
+        <h2>Admin Dashboard</h2>
+        
+        <!-- Error Message -->
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${error}">Error message</span>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card dashboard-card card-primary">
+                    <div class="card-body">
+                        <h5 class="card-title text-luxury-gold">Total Users</h5>
+                        <p class="card-value display-4" th:text="${totalUsers != null ? totalUsers : '0'}">0</p>
+                        <p class="card-label">Registered Users</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card dashboard-card card-secondary">
+                    <div class="card-body">
+                        <h5 class="card-title text-luxury-gold">Total Parking Reserved</h5>
+                        <p class="card-value display-4" th:text="${totalReserved != null ? totalReserved : '0'}">0</p>
+                        <p class="card-label">Active Reservations</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card dashboard-card card-gold">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Parking Available</h5>
+                        <p class="card-value display-4" th:text="${totalAvailable != null ? totalAvailable : '0'}">0</p>
+                        <p class="card-label">Available Slots</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card dashboard-card card-success">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Parked</h5>
+                        <p class="card-value display-4" th:text="${totalParked != null ? totalParked : '0'}">0</p>
+                        <p class="card-label">Currently Parked</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Quick Actions</h5>
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/admin/parking-cost}" class="btn btn-primary">Update Parking Cost</a>
+                            <a th:href="@{/admin/users}" class="btn btn-primary">Manage Users</a>
+                            <a th:href="@{/admin/bookings}" class="btn btn-primary">View Bookings</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">System Information</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                System Status
+                                <span class="badge bg-success">Online</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Database Status
+                                <span class="badge bg-success">Connected</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Email Service
+                                <span class="badge bg-success">Active</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+/* Global Styles */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(120deg, #ffdde1 0%, #fffde4 100%);
+}
+
+/* Homepage Styles */
+.homepage {
+  background: url("https://via.placeholder.com/1920x1080?text=Parking+Background") no-repeat center center fixed;
+  background-size: cover;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.homepage-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.homepage-content {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 2rem;
+  border-radius: 10px;
+  color: white;
+}
+
+/* Parking Slot Styles */
+.parking-layout {
+  margin: 20px 0;
+}
+
+.parking-slot {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  height: 100%;
+}
+
+.parking-slot:hover:not(.unavailable) {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.parking-slot.unavailable {
+  background-color: #f8d7da;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.slot-icon {
+  font-size: 1.5rem;
+}
+
+/* Dashboard Cards */
+.card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Tables */
+.table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Navbar */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Controls */
+.form-control,
+.form-select {
+  border-radius: 8px;
+  padding: 10px 15px;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 8px 16px;
+}
+
+/* Status Badges */
+.badge {
+  padding: 8px 12px;
+  border-radius: 20px;
+}
+
+/* Booking Status Colors */
+.status-pending {
+  color: #ffc107;
+}
+
+.status-reserved {
+  color: #28a745;
+}
+
+.status-completed {
+  color: #6c757d;
+}
+
+/* Admin Dashboard */
+.admin-stat-card {
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.admin-stat-card .stat-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.admin-stat-card .stat-label {
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+.admin-stat-card .stat-icon {
+  font-size: 3rem;
+  opacity: 0.5;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+
+/* --- Parking Cost Page Styles --- */
+.parking-cost-container {
+  max-width: 900px;
+  margin: 40px auto 0 auto;
+  padding: 40px 32px 32px 32px;
+  background: #f4f8ff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(60,60,120,0.15);
+  border: 2px solid #4f8cff;
+  position: relative;
+}
+.parking-cost-container h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+  color: #2a3a8c;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.parking-cost-container .card {
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #e3e3e3;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border-left: 6px solid #4f8cff;
+  box-shadow: 0 2px 12px rgba(79,140,255,0.08);
+}
+.parking-cost-container .card-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #222;
+}
+.parking-cost-container .card-text strong {
+  color: #388e3c;
+  font-size: 1.3rem;
+}
+.parking-cost-container .alert-info {
+  background: #d6f6ff;
+  color: #0d4a6a;
+  border: none;
+  border-left: 5px solid #29b6f6;
+  border-radius: 0.5rem;
+  padding: 1.2rem 1.5rem;
+  margin-top: 1.5rem;
+  font-size: 1rem;
+}
+.parking-cost-container .form-text {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 500;
+}
+.parking-cost-container .btn-primary {
+  background: linear-gradient(90deg, #4f8cff 0%, #1976d2 100%);
+  border: none;
+  color: #fff;
+  font-weight: 700;
+  transition: background 0.3s;
+  font-size: 1.1rem;
+  padding: 10px 28px;
+  margin-right: 10px;
+}
+.parking-cost-container .btn-primary i {
+  margin-right: 6px;
+}
+.parking-cost-container .btn-primary:hover {
+  background: linear-gradient(90deg, #1976d2 0%, #4f8cff 100%);
+}
+.parking-cost-container .btn-secondary {
+  background: #616161;
+  border: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 10px 28px;
+}
+.parking-cost-container label.col-form-label {
+  font-weight: 500;
+  color: #333;
+}
+@media (max-width: 768px) {
+  .parking-cost-container {
+    padding: 16px 4px 16px 4px;
+  }
+  .parking-cost-container h2 {
+    font-size: 1.3rem;
+  }
+}
+
+/* Watermark icon style */
+.parking-cost-watermark {
+  position: absolute;
+  right: 30px;
+  top: 30px;
+  opacity: 0.07;
+  font-size: 120px;
+  pointer-events: none;
+  color: #2a3a8c;
+  z-index: 0;
+}
+
+/* --- Book Parking Page Styles --- */
+.booking-container {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.booking-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(60,60,120,0.12);
+  border: 2px solid #ffb3b3;
+  padding: 32px 24px 24px 24px;
+  position: relative;
+  max-width: 900px;
+  width: 100%;
+}
+.booking-watermark {
+  position: absolute;
+  right: 40px;
+  top: 30px;
+  opacity: 0.07;
+  font-size: 120px;
+  pointer-events: none;
+  color: #b71c1c;
+  z-index: 0;
+}
+
+/* --- Book Parking Page Enhanced Inner Styles --- */
+.booking-card .alert {
+  border-radius: 10px;
+  font-size: 1.05rem;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px rgba(255,179,179,0.08);
+}
+.booking-card label.form-label {
+  font-weight: 600;
+  color: #2a3a8c;
+  margin-bottom: 6px;
+}
+.booking-card .input-group {
+  box-shadow: 0 1px 4px rgba(60,60,120,0.06);
+  border-radius: 8px;
+  background: #f9f9fb;
+  margin-bottom: 8px;
+}
+.booking-card .form-control {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  background: #f9f9fb;
+  font-size: 1.08rem;
+}
+.booking-card .form-control:focus {
+  border-color: #ffb3b3;
+  box-shadow: 0 0 0 2px #ffdde1;
+}
+.booking-card .form-text {
+  color: #888;
+  font-size: 0.98rem;
+  margin-bottom: 8px;
+}
+.booking-card .d-flex.flex-wrap.gap-2 {
+  margin-bottom: 10px;
+}
+.booking-card .btn-outline-primary {
+  border-radius: 20px;
+  border-width: 2px;
+  font-weight: 600;
+  background: #fff;
+  color: #1976d2;
+  border-color: #1976d2;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.booking-card .btn-outline-primary:hover, .booking-card .btn-outline-primary:focus {
+  background: #1976d2;
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(25,118,210,0.10);
+}
+.booking-card .d-grid.gap-2 {
+  margin-top: 18px;
+}
+.booking-card .btn-primary {
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  background: linear-gradient(90deg, #ffb3b3 0%, #ffdde1 100%);
+  color: #2a3a8c;
+  border: none;
+  box-shadow: 0 2px 8px rgba(255,179,179,0.10);
+}
+.booking-card .btn-primary:hover {
+  background: linear-gradient(90deg, #ffdde1 0%, #ffb3b3 100%);
+  color: #b71c1c;
+}
+.booking-card .btn-secondary {
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  background: #888;
+  color: #fff;
+  border: none;
+}
+.booking-card .btn-secondary:hover {
+  background: #b71c1c;
+  color: #fff;
+}
+.booking-card .section-divider {
+  border-top: 2px dashed #ffb3b3;
+  margin: 24px 0 18px 0;
+}

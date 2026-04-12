@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Reset Success - Royal Service Parking</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <style>
+        body {
+            background: url([[@{/images/admin-login.png}]]) no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 2rem;
+        }
+
+        .card-header {
+            background-color: #c0392b;
+            color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+
+        .card-body h4,
+        .card-body p {
+            color: #900000;
+        }
+
+        .fa-lock-open {
+            animation: popIn 0.4s ease-out;
+            color: #c0392b;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .btn-custom-red {
+            background-color: #c0392b;
+            color: white;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-custom-red:hover {
+            background-color: #a93226;
+            color: white;
+        }
+
+        .btn-outline-white {
+            background-color: transparent;
+            color: white;
+            border: 1px solid white;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn-outline-white:hover {
+            background-color: white;
+            color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card form-container text-center">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="fas fa-check-circle me-2"></i>Password Reset Successful</h3>
+                    </div>
+                    <div class="card-body">
+                        <i class="fas fa-lock-open fa-4x mb-3"></i>
+
+                        <h4>Your Password Has Been Reset</h4>
+                        <p class="mb-4" th:text="${message}">Password reset successfully! You can now login with your new password.</p>
+
+                        <div class="d-grid gap-2 mt-4">
+                       
+                            <a th:href="@{/login?type=user&reset=true}" class="btn btn-custom-red">
+                                <i class="fas fa-sign-in-alt me-2"></i>Proceed to Login
+                            </a>
+                            <a th:href="@{/}" class="btn btn-outline-white">
+                                <i class="fas fa-home me-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Royal Service Parking</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/styles/cashier.css}">
+    <style>
+        .notification-card {
+            border-left: 4px solid #B71C1C;
+            margin-bottom: 15px;
+            transition: transform 0.2s ease;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .notification-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .notification-time {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .notification-message {
+            color: #333;
+            margin-bottom: 0;
+            line-height: 1.5;
+        }
+        .notification-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        .filter-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .notification-card.booking {
+            border-left-color: #1976D2;
+        }
+        .notification-card.booking .notification-icon {
+            color: #1976D2;
+            background-color: rgba(25, 118, 210, 0.1);
+        }
+        .notification-card.booking .notification-title {
+            color: #1976D2;
+        }
+        .notification-card.booking.present {
+            border-left-color: #f57c00;
+            background-color: #fff3e0;
+            animation: pulse 2s infinite;
+        }
+        .notification-card.booking.present .notification-icon {
+            color: #f57c00;
+            background-color: rgba(245, 124, 0, 0.1);
+        }
+        .notification-card.booking.present .notification-title {
+            color: #f57c00;
+        }
+        .notification-card.booking.present .notification-time {
+            color: #f57c00;
+            font-weight: bold;
+        }
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(245, 124, 0, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(245, 124, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(245, 124, 0, 0);
+            }
+        }
+        .notification-card.blocklist {
+            border-left-color: #D32F2F;
+        }
+        .notification-card.blocklist .notification-icon {
+            color: #D32F2F;
+            background-color: rgba(211, 47, 47, 0.1);
+        }
+        .notification-card.blocklist .notification-title {
+            color: #D32F2F;
+        }
+        .filter-btn[data-filter="booking"] {
+            border: 1px solid #1976D2;
+            color: #1976D2;
+        }
+        .filter-btn[data-filter="booking"]:hover,
+        .filter-btn[data-filter="booking"].active {
+            background-color: #1976D2;
+            color: white;
+        }
+        .filter-btn[data-filter="blocklist"] {
+            border: 1px solid #D32F2F;
+            color: #D32F2F;
+        }
+        .filter-btn[data-filter="blocklist"]:hover,
+        .filter-btn[data-filter="blocklist"].active {
+            background-color: #D32F2F;
+            color: white;
+        }
+        .filter-btn[data-filter="all"] {
+            border: 1px solid #424242;
+            color: #424242;
+        }
+        .filter-btn[data-filter="all"]:hover,
+        .filter-btn[data-filter="all"].active {
+            background-color: #424242;
+            color: white;
+        }
+        .notification-card.booking.arrived {
+            border-left-color: #2196F3;
+            background-color: #E3F2FD;
+        }
+        .notification-card.booking.arrived .notification-icon {
+            color: #2196F3;
+            background-color: rgba(33, 150, 243, 0.1);
+        }
+        .notification-card.booking.arrived .notification-title {
+            color: #2196F3;
+        }
+        .notification-card.booking.arrived .notification-time {
+            color: #2196F3;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="cashier/fragments/navbar :: navbar"></div>
+    
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-bell me-2 text-danger"></i>
+                <span class="text-danger">Notifications</span>
+            </h2>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="mb-4">
+            <button class="btn filter-btn active" data-filter="all">
+                <i class="fas fa-list me-1"></i> All
+            </button>
+            <button class="btn filter-btn" data-filter="booking">
+                <i class="fas fa-car-side me-1"></i> Bookings
+            </button>
+            <button class="btn filter-btn" data-filter="blocklist">
+                <i class="fas fa-ban me-1"></i> Blocklisted
+            </button>
+        </div>
+
+        <!-- Notifications List -->
+        <div class="notifications-list">
+            <div th:if="${notifications.empty}" class="text-center py-5">
+                <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                <h4>No notifications</h4>
+                <p class="text-muted">There are no active bookings or blocklisted users at the moment.</p>
+            </div>
+            
+            <div th:each="notification : ${notifications}" 
+                 th:class="'card notification-card ' + ${notification.type} + 
+                          (${notification.isPresent && !notification.isArrived} ? ' present' : '') +
+                          (${notification.isArrived} ? ' arrived' : '')"
+                 th:data-type="${notification.type}">
+                <div class="card-body">
+                    <div class="d-flex align-items-start">
+                        <div class="notification-icon">
+                            <i th:class="'fas ' + ${notification.icon}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="notification-title" th:text="${notification.title}">Title</h6>
+                                <span class="notification-time" 
+                                      th:if="${notification.type == 'booking'}"
+                                      th:text="${#temporals.format(notification.bookingTime, 'E, MMM d h:mm a')}">Time</span>
+                                <span class="notification-time" 
+                                      th:if="${notification.type == 'blocklist'}"
+                                      th:text="${#temporals.format(notification.time, 'MMM d, yyyy')}">Time</span>
+                            </div>
+                            <p class="notification-message" th:text="${notification.message}">Message</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                const filter = button.getAttribute('data-filter');
+                document.querySelectorAll('.notification-card').forEach(card => {
+                    if (filter === 'all' || card.getAttribute('data-type') === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

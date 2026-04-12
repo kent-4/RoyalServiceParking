@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Cost - Royal Service Parking</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/styles/styles.css}">
+</head>
+<body>
+   <div th:replace="~{user/fragments/navbar :: navbar}"></div>
+    
+    <div class="parking-cost-container d-flex flex-column align-items-center justify-content-center" style="min-height: 80vh;">
+        <div class="parking-cost-watermark"><i class="fas fa-parking"></i></div>
+        <h2 class="text-center w-100 mb-2"><i class="fas fa-money-bill-wave me-2"></i>Parking Cost Information</h2>
+        <p class="text-center text-muted mb-4" style="font-size:1.15rem;">Easily calculate your parking fee before booking your slot.</p>
+        <div class="card w-100 mb-4" style="max-width:700px;">
+            <div class="card-body">
+                <h5 class="card-title text-center mb-3">Current Parking Rate</h5>
+                <p class="card-text text-center mb-4">The current hourly rate is: <strong>₱<span th:text="${parkingCost.hourlyRate}">5.00</span></strong></p>
+                <div class="alert alert-info mb-4">
+                    <h6 class="mb-2"><i class="fas fa-info-circle me-2"></i>Parking Cost Calculation</h6>
+                    <p class="mb-1">The total cost of your parking is calculated based on the number of hours you book:</p>
+                    <p class="mb-1"><strong>Total Cost = Hourly Rate × Number of Hours</strong></p>
+                    <p class="mb-0">For example, if you book for 3 hours, your total cost will be: ₱<span th:text="${parkingCost.hourlyRate * 3}">15.00</span></p>
+                </div>
+                <div class="mt-4">
+                    <h5 class="mb-3"><i class="fas fa-calculator me-2"></i>Parking Cost Calculator</h5>
+                    <div class="row justify-content-center g-3 align-items-center mb-2">
+                        <div class="col-auto">
+                            <label for="hours" class="col-form-label">Number of Hours:</label>
+                        </div>
+                        <div class="col-auto">
+                            <input type="number" id="hours" class="form-control" min="1" max="24" value="1" style="width:90px;">
+                        </div>
+                        <div class="col-auto">
+                            <span class="form-text">
+                                Total Cost: ₱<span id="totalCost">0.00</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-row justify-content-center gap-3 w-100" style="max-width:700px;">
+            <a th:href="@{/user/book}" class="btn btn-primary"><i class="fas fa-calendar-plus me-2"></i>Book Parking Now</a>
+            <a th:href="@{/user/dashboard}" class="btn btn-secondary"><i class="fas fa-home me-2"></i>Back to Dashboard</a>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fix: Properly escape numeric value
+            const hourlyRate = /*[[${parkingCost.hourlyRate}]]*/ 0;
+            const hoursInput = document.getElementById('hours');
+            const totalCostSpan = document.getElementById('totalCost');
+            
+            function updateTotalCost() {
+                const hours = parseInt(hoursInput.value) || 0;
+                const totalCost = (hourlyRate * hours).toFixed(2);
+                totalCostSpan.textContent = totalCost;
+            }
+            
+            hoursInput.addEventListener('input', updateTotalCost);
+            updateTotalCost();
+        });
+    </script>
+</body>
+</html>
