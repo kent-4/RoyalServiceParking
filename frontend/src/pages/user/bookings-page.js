@@ -1,24 +1,16 @@
 import { renderInlineAlert } from "../../components/alert/inline-alert.js";
+import { renderButton } from "../../components/button/action-button.js";
+import { renderKpiCard, renderPanelCard } from "../../components/card/panel-card.js";
+import { renderEmptyState } from "../../components/feedback/empty-state.js";
+import { renderErrorState } from "../../components/feedback/error-state.js";
+import { renderLoadingPanelCards } from "../../components/feedback/loading-state.js";
+import { renderFieldGroup, renderInputField, renderSelectField } from "../../components/form/form-field.js";
 import { renderStatusBadge } from "../../components/badge/status-badge.js";
 import { openConfirmDialog } from "../../components/dialog/confirm-dialog.js";
 import { cancelUserBooking, fetchUserBookings } from "../../services/booking-service.js";
 import { pushToast } from "../../state/ui-store.js";
 import { formatCurrency, formatDate, formatTime } from "../../utils/formatters.js";
 import { bindUserShell, renderUserShell } from "./user-shell.js";
-
-function renderBookingsSkeleton() {
-  return Array.from({ length: 3 })
-    .map(
-      () => `
-        <article class="panel-card panel-card--loading">
-          <div class="loading-block loading-block--title"></div>
-          <div class="loading-block loading-block--line"></div>
-          <div class="loading-block loading-block--line"></div>
-        </article>
-      `
-    )
-    .join("");
-}
 
 function renderBookingRecord(booking) {
   return `
@@ -42,7 +34,11 @@ function renderBookingRecord(booking) {
         <span class="booking-record__meta">Customer: ${booking.fullName || "Unknown user"}</span>
         ${
           booking.cancellable
-            ? `<button class="button button--danger" type="button" data-cancel-booking="${booking.id}">Cancel booking</button>`
+            ? renderButton({
+                label: "Cancel booking",
+                tone: "danger",
+                attributes: { "data-cancel-booking": booking.id }
+              })
             : ""
         }
       </div>
@@ -67,61 +63,77 @@ export function createUserBookingsPage({ session, pathname, query }) {
         "Review active and past bookings, filter by status or date, and cancel reserved bookings before arrival.",
       content: `
         <section class="dashboard-grid dashboard-grid--kpi" data-bookings-summary>
-          ${renderBookingsSkeleton()}
+          ${renderLoadingPanelCards({ count: 3 })}
         </section>
         <section class="dashboard-grid booking-flow-grid">
-          <article class="panel-card booking-form-card">
-            <div class="booking-form-card__header">
-              <h2>Filter bookings</h2>
-              <p class="page-copy">Search by booking ID, plate number, level, or slot name.</p>
-            </div>
-            <form class="stack-sm" data-bookings-filter-form>
-              <div class="field-row">
-                <div class="field-group">
-                  <label for="booking-filter-status">Status</label>
-                  <select id="booking-filter-status" name="status">
-                    <option value="">All statuses</option>
-                    <option value="RESERVED" ${initialFilters.status === "RESERVED" ? "selected" : ""}>Reserved</option>
-                    <option value="ARRIVED" ${initialFilters.status === "ARRIVED" ? "selected" : ""}>Arrived</option>
-                    <option value="COMPLETED" ${initialFilters.status === "COMPLETED" ? "selected" : ""}>Completed</option>
-                    <option value="CANCELED" ${initialFilters.status === "CANCELED" ? "selected" : ""}>Canceled</option>
-                  </select>
+          ${renderPanelCard({
+            className: "booking-form-card",
+            title: "Filter bookings",
+            description: "Search by booking ID, plate number, level, or slot name.",
+            content: `
+              <form class="stack-sm" data-bookings-filter-form>
+                <div class="field-row">
+                  ${renderFieldGroup({
+                    label: "Status",
+                    inputId: "booking-filter-status",
+                    input: renderSelectField({
+                      id: "booking-filter-status",
+                      name: "status",
+                      value: initialFilters.status,
+                      options: [
+                        { value: "", label: "All statuses" },
+                        { value: "RESERVED", label: "Reserved" },
+                        { value: "ARRIVED", label: "Arrived" },
+                        { value: "COMPLETED", label: "Completed" },
+                        { value: "CANCELED", label: "Canceled" }
+                      ]
+                    })
+                  })}
+                  ${renderFieldGroup({
+                    label: "Date",
+                    inputId: "booking-filter-date",
+                    input: renderInputField({
+                      id: "booking-filter-date",
+                      name: "date",
+                      type: "date",
+                      value: initialFilters.date
+                    })
+                  })}
                 </div>
-                <div class="field-group">
-                  <label for="booking-filter-date">Date</label>
-                  <input id="booking-filter-date" name="date" type="date" value="${initialFilters.date}" />
+                ${renderFieldGroup({
+                  label: "Search",
+                  inputId: "booking-filter-search",
+                  input: renderInputField({
+                    id: "booking-filter-search",
+                    name: "search",
+                    type: "search",
+                    value: initialFilters.search,
+                    placeholder: "Booking ID, plate number, level, or slot"
+                  })
+                })}
+                <div class="auth-support-links">
+                  ${renderButton({ label: "Apply filters", type: "submit", tone: "primary" })}
+                  ${renderButton({ label: "Clear", href: "/user/bookings", tone: "secondary" })}
+                  ${renderButton({ label: "Book new parking", href: "/user/book", tone: "ghost" })}
                 </div>
-              </div>
-              <div class="field-group">
-                <label for="booking-filter-search">Search</label>
-                <input
-                  id="booking-filter-search"
-                  name="search"
-                  type="search"
-                  value="${initialFilters.search}"
-                  placeholder="Booking ID, plate number, level, or slot"
-                />
-              </div>
-              <div class="auth-support-links">
-                <button class="button button--primary" type="submit">Apply filters</button>
-                <a class="button button--secondary" href="/user/bookings" data-link>Clear</a>
-                <a class="button button--ghost" href="/user/book" data-link>Book new parking</a>
-              </div>
-            </form>
-          </article>
-          <article class="panel-card">
-            <h2>Booking rules</h2>
-            <ul class="journey-list">
-              <li>Only reserved bookings can be canceled from the user portal.</li>
-              <li>Users must arrive within one hour of the scheduled start time to avoid automatic cancellation.</li>
-              <li>The current backend logic still allows only one active reserved or arrived booking per user.</li>
-            </ul>
-          </article>
+              </form>
+            `
+          })}
+          ${renderPanelCard({
+            title: "Booking rules",
+            content: `
+              <ul class="journey-list">
+                <li>Only reserved bookings can be canceled from the user portal.</li>
+                <li>Users must arrive within one hour of the scheduled start time to avoid automatic cancellation.</li>
+                <li>The current backend logic still allows only one active reserved or arrived booking per user.</li>
+              </ul>
+            `
+          })}
         </section>
         <section class="stack-sm">
           <div data-bookings-alerts></div>
           <div class="booking-results-grid" data-bookings-results>
-            ${renderBookingsSkeleton()}
+            ${renderLoadingPanelCards({ count: 3 })}
           </div>
         </section>
       `
@@ -162,20 +174,11 @@ export function createUserBookingsPage({ session, pathname, query }) {
           return;
         }
 
-        summaryRoot.innerHTML = `
-          <article class="panel-card kpi-card">
-            <span class="metric-card__label">Matching results</span>
-            <strong>${currentResponse.totalResults}</strong>
-          </article>
-          <article class="panel-card kpi-card">
-            <span class="metric-card__label">Reserved</span>
-            <strong>${currentResponse.reservedCount}</strong>
-          </article>
-          <article class="panel-card kpi-card">
-            <span class="metric-card__label">Completed</span>
-            <strong>${currentResponse.completedCount}</strong>
-          </article>
-        `;
+        summaryRoot.innerHTML = [
+          renderKpiCard({ label: "Matching results", value: currentResponse.totalResults }),
+          renderKpiCard({ label: "Reserved", value: currentResponse.reservedCount }),
+          renderKpiCard({ label: "Completed", value: currentResponse.completedCount })
+        ].join("");
       }
 
       function renderResults() {
@@ -184,12 +187,10 @@ export function createUserBookingsPage({ session, pathname, query }) {
         }
 
         if (!currentResponse.bookings.length) {
-          resultsRoot.innerHTML = `
-            <article class="panel-card booking-empty-state">
-              <h2>No bookings match the current filter</h2>
-              <p class="page-copy">Clear one or more filters, or create a new booking to start the reservation history.</p>
-            </article>
-          `;
+          resultsRoot.innerHTML = renderEmptyState({
+            title: "No bookings match the current filter",
+            message: "Clear one or more filters, or create a new booking to start the reservation history."
+          });
           return;
         }
 
@@ -198,10 +199,10 @@ export function createUserBookingsPage({ session, pathname, query }) {
 
       async function loadBookings(filters) {
         if (summaryRoot) {
-          summaryRoot.innerHTML = renderBookingsSkeleton();
+          summaryRoot.innerHTML = renderLoadingPanelCards({ count: 3 });
         }
         if (resultsRoot) {
-          resultsRoot.innerHTML = renderBookingsSkeleton();
+          resultsRoot.innerHTML = renderLoadingPanelCards({ count: 3 });
         }
 
         try {
@@ -211,8 +212,7 @@ export function createUserBookingsPage({ session, pathname, query }) {
           renderResults();
         } catch (error) {
           if (alertsRoot) {
-            alertsRoot.innerHTML = renderInlineAlert({
-              tone: "danger",
+            alertsRoot.innerHTML = renderErrorState({
               title: "Bookings unavailable",
               message: error.message || "Your booking history could not be loaded."
             });

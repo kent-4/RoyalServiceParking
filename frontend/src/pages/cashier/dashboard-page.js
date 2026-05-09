@@ -33,14 +33,14 @@ export function createCashierDashboardPage({ session, pathname }) {
           <article class="panel-card">
             <h2>Quick actions</h2>
             <div class="action-stack">
-              <article class="action-card action-card--disabled">
+              <a class="action-card" href="/cashier/users" data-link>
                 <strong>User desk</strong>
-                <p>Verified-user search and customer details are the next cashier module in the rebuild queue.</p>
-              </article>
-              <article class="action-card action-card--disabled">
+                <p>Open verified-user search and inspect account or vehicle details before on-site operations.</p>
+              </a>
+              <a class="action-card" href="/cashier/bookings" data-link>
                 <strong>Booking desk</strong>
-                <p>Arrival, completion, and receipt actions will land after the shared cashier shell stabilizes.</p>
-              </article>
+                <p>Review operational bookings, apply filters, and confirm on-site arrivals before payment work begins.</p>
+              </a>
               <article class="action-card action-card--disabled">
                 <strong>Operations feed</strong>
                 <p>Cashier notifications still need a final contract decision because the legacy feed is booking-derived.</p>

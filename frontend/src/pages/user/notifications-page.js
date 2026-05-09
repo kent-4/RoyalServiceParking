@@ -1,4 +1,9 @@
 import { renderInlineAlert } from "../../components/alert/inline-alert.js";
+import { renderButton } from "../../components/button/action-button.js";
+import { renderKpiCard, renderPanelCard } from "../../components/card/panel-card.js";
+import { renderEmptyState } from "../../components/feedback/empty-state.js";
+import { renderErrorState } from "../../components/feedback/error-state.js";
+import { renderLoadingPanelCards } from "../../components/feedback/loading-state.js";
 import { markAllUserNotificationsRead, markUserNotificationRead, fetchUserNotifications } from "../../services/notification-service.js";
 import { pushToast } from "../../state/ui-store.js";
 import { formatIsoDateTime } from "../../utils/dates.js";
@@ -28,7 +33,11 @@ function renderNotificationItem(notification) {
         ${
           notification.read
             ? '<span class="notification-card__read-state">Read</span>'
-            : `<button class="button button--secondary" type="button" data-mark-notification-read="${notification.id}">Mark as read</button>`
+            : renderButton({
+                label: "Mark as read",
+                tone: "secondary",
+                attributes: { "data-mark-notification-read": notification.id }
+              })
         }
       </div>
       <div class="notification-card__content">
@@ -37,20 +46,6 @@ function renderNotificationItem(notification) {
       </div>
     </article>
   `;
-}
-
-function renderNotificationSkeleton() {
-  return Array.from({ length: 4 })
-    .map(
-      () => `
-        <article class="panel-card panel-card--loading">
-          <div class="loading-block loading-block--title"></div>
-          <div class="loading-block loading-block--line"></div>
-          <div class="loading-block loading-block--line"></div>
-        </article>
-      `
-    )
-    .join("");
 }
 
 export function createUserNotificationsPage({ session, pathname }) {
@@ -64,22 +59,27 @@ export function createUserNotificationsPage({ session, pathname }) {
         "Review booking confirmations, reminders, restriction notices, and completion updates from the backend notification pipeline.",
       content: `
         <section class="dashboard-grid dashboard-grid--kpi" data-notifications-summary>
-          ${renderNotificationSkeleton()}
+          ${renderLoadingPanelCards({ count: 3 })}
         </section>
         <section class="stack-sm">
           <div data-notifications-alerts></div>
-          <div class="notification-toolbar panel-card">
-            <div>
-              <h2>Inbox actions</h2>
-              <p class="page-copy">Unread notifications stay highlighted until you mark them read.</p>
-            </div>
-            <div class="auth-support-links">
-              <button class="button button--primary" type="button" data-mark-all-read>Mark all as read</button>
-              <a class="button button--secondary" href="/user/dashboard" data-link>Back to dashboard</a>
-            </div>
-          </div>
+          ${renderPanelCard({
+            className: "notification-toolbar",
+            title: "Inbox actions",
+            description: "Unread notifications stay highlighted until you mark them read.",
+            content: `
+              <div class="auth-support-links">
+                ${renderButton({
+                  label: "Mark all as read",
+                  tone: "primary",
+                  attributes: { "data-mark-all-read": true }
+                })}
+                ${renderButton({ label: "Back to dashboard", href: "/user/dashboard", tone: "secondary" })}
+              </div>
+            `
+          })}
           <div class="notification-list-grid" data-notifications-list>
-            ${renderNotificationSkeleton()}
+            ${renderLoadingPanelCards({ count: 4 })}
           </div>
         </section>
       `
@@ -101,20 +101,11 @@ export function createUserNotificationsPage({ session, pathname }) {
         }
 
         const readCount = response.totalCount - response.unreadCount;
-        summaryRoot.innerHTML = `
-          <article class="panel-card kpi-card">
-            <span class="metric-card__label">Total notifications</span>
-            <strong>${response.totalCount}</strong>
-          </article>
-          <article class="panel-card kpi-card">
-            <span class="metric-card__label">Unread</span>
-            <strong>${response.unreadCount}</strong>
-          </article>
-          <article class="panel-card kpi-card">
-            <span class="metric-card__label">Read</span>
-            <strong>${readCount}</strong>
-          </article>
-        `;
+        summaryRoot.innerHTML = [
+          renderKpiCard({ label: "Total notifications", value: response.totalCount }),
+          renderKpiCard({ label: "Unread", value: response.unreadCount }),
+          renderKpiCard({ label: "Read", value: readCount })
+        ].join("");
       }
 
       function renderList() {
@@ -123,12 +114,10 @@ export function createUserNotificationsPage({ session, pathname }) {
         }
 
         if (!response.notifications.length) {
-          listRoot.innerHTML = `
-            <article class="panel-card booking-empty-state">
-              <h2>No notifications yet</h2>
-              <p class="page-copy">Booking confirmations, reminders, restrictions, and other user updates will appear here when they are created by the backend.</p>
-            </article>
-          `;
+          listRoot.innerHTML = renderEmptyState({
+            title: "No notifications yet",
+            message: "Booking confirmations, reminders, restrictions, and other user updates will appear here when they are created by the backend."
+          });
           if (markAllButton) {
             markAllButton.disabled = true;
           }
@@ -143,10 +132,10 @@ export function createUserNotificationsPage({ session, pathname }) {
 
       async function loadNotifications() {
         if (summaryRoot) {
-          summaryRoot.innerHTML = renderNotificationSkeleton();
+          summaryRoot.innerHTML = renderLoadingPanelCards({ count: 3 });
         }
         if (listRoot) {
-          listRoot.innerHTML = renderNotificationSkeleton();
+          listRoot.innerHTML = renderLoadingPanelCards({ count: 4 });
         }
 
         try {
@@ -156,8 +145,7 @@ export function createUserNotificationsPage({ session, pathname }) {
           await refreshUserNotificationBadge();
         } catch (error) {
           if (alertsRoot) {
-            alertsRoot.innerHTML = renderInlineAlert({
-              tone: "danger",
+            alertsRoot.innerHTML = renderErrorState({
               title: "Notifications unavailable",
               message: error.message || "The notification inbox could not be loaded."
             });

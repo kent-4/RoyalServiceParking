@@ -1,10 +1,24 @@
 import { dismissToast, subscribeUiStore } from "../../state/ui-store.js";
 
+function getToastIcon(tone) {
+  switch (tone) {
+    case "success":
+      return "OK";
+    case "warning":
+      return "WARN";
+    case "danger":
+      return "ERR";
+    default:
+      return "INFO";
+  }
+}
+
 function renderToastList(toasts) {
   return toasts
     .map(
       (toast) => `
         <article class="toast toast--${toast.tone}">
+          <span class="toast__icon" aria-hidden="true">${getToastIcon(toast.tone)}</span>
           <div>
             <strong>${toast.title}</strong>
             <p>${toast.message}</p>

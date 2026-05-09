@@ -1,5 +1,8 @@
 import { createAdminDashboardPage } from "../pages/admin/dashboard-page.js";
 import { createCashierDashboardPage } from "../pages/cashier/dashboard-page.js";
+import { createCashierBookingsPage } from "../pages/cashier/bookings-page.js";
+import { createCashierUserDetailsPage } from "../pages/cashier/user-details-page.js";
+import { createCashierUsersPage } from "../pages/cashier/users-page.js";
 import { createForgotPasswordPage } from "../pages/public/forgot-password-page.js";
 import { createPublicHomePage } from "../pages/public/home-page.js";
 import { createLoginPage } from "../pages/public/login-page.js";
@@ -187,6 +190,24 @@ export const routes = [
     title: "Cashier Dashboard",
     access: { role: "CASHIER" },
     createPage: createCashierDashboardPage
+  },
+  {
+    path: "/cashier/users",
+    title: "Cashier Users",
+    access: { role: "CASHIER" },
+    createPage: createCashierUsersPage
+  },
+  {
+    path: "/cashier/users/detail",
+    title: "Cashier User Details",
+    access: { role: "CASHIER" },
+    createPage: createCashierUserDetailsPage
+  },
+  {
+    path: "/cashier/bookings",
+    title: "Cashier Bookings",
+    access: { role: "CASHIER" },
+    createPage: createCashierBookingsPage
   },
   {
     path: "/admin/dashboard",

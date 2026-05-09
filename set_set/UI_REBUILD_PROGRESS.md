@@ -28,7 +28,7 @@ When a task changes state, update:
 ## 2. Current Snapshot
 
 - Current phase: `[/] In progress`
-- Current focus: `Cashier users, bookings, and operational actions after the first cashier shell/dashboard slice`
+- Current focus: `Cashier payment, completion, and receipt flows after the bookings and arrival slice`
 - Last updated: `2026-05-10`
 - Current owner: `Codex + project owner`
 
@@ -103,24 +103,24 @@ When a task changes state, update:
 
 ## 5. Shared Components
 
-- [ ] Navbar component
-- [ ] Sidebar component
-- [ ] Button styles and states
-- [ ] Form field patterns
-- [ ] Validation message patterns
+- [x] Navbar component
+- [x] Sidebar component
+- [x] Button styles and states
+- [x] Form field patterns
+- [x] Validation message patterns
 - [x] Status badge component
-- [ ] Card and KPI widget patterns
-- [ ] Table patterns
-- [ ] Alert component
-- [ ] Toast component
+- [x] Card and KPI widget patterns
+- [x] Table patterns
+- [x] Alert component
+- [x] Toast component
 - [x] Modal / dialog component
-- [ ] Loading state patterns
-- [ ] Empty state patterns
-- [ ] Error state patterns
+- [x] Loading state patterns
+- [x] Empty state patterns
+- [x] Error state patterns
 
-Owner: `Unassigned`
+Owner: `Codex`
 Last updated: `2026-05-10`
-Notes / blockers: `Public auth work plus the rebuilt user booking pages now actively use shared navbar, button, alert, toast, form, status-badge, and confirmation-dialog foundations, but the checklist stays open until table/list and loading/empty/error patterns are formalized across more routes.`
+Notes / blockers: `The shared UI layer now includes generic app-navbar/app-sidebar primitives, shared button rendering, field-group helpers, panel/KPI cards, responsive data tables, alert/toast/dialog surfaces, and reusable loading/empty/error patterns. Public, user, and cashier routes have been refactored onto these foundations so cashier/admin pages can reuse them directly.`
 
 ## 6. Phase 2: Public and Auth Pages
 
@@ -164,11 +164,11 @@ Notes / blockers: `Phase 3 user routes are now fully rebuilt in the JavaScript f
 
 - [x] Cashier shell and navigation
 - [x] Cashier dashboard
- - [ ] Cashier users page
- - [ ] Cashier user details page
- - [ ] Cashier bookings page
- - [ ] Booking filters and search
-- [ ] Mark-arrived action
+- [x] Cashier users page
+- [x] Cashier user details page
+- [x] Cashier bookings page
+- [x] Booking filters and search
+- [x] Mark-arrived action
 - [ ] Edit/payment page
 - [ ] Booking completion flow
 - [ ] Receipt page
@@ -178,7 +178,7 @@ Notes / blockers: `Phase 3 user routes are now fully rebuilt in the JavaScript f
 
 Owner: `Codex`
 Last updated: `2026-05-10`
-Notes / blockers: `The rebuilt frontend now includes a cashier role shell with operational sidebar navigation and a JSON-backed cashier dashboard. Users, bookings, arrival, payment, receipt, notifications, and parking-rate screens remain to be rebuilt. Tablet usability should stay part of the completion criteria for the remaining cashier flows.`
+Notes / blockers: `The rebuilt frontend now includes the cashier shell, dashboard, verified-customer search/list, cashier user detail view, and operational bookings table with filter/search plus arrival actions backed by explicit JSON APIs. Payment, completion, receipt, notifications, and parking-rate screens remain to be rebuilt. Tablet usability should stay part of the completion criteria for the remaining cashier flows.`
 
 ## 9. Phase 5: Admin Portal
 
@@ -231,7 +231,7 @@ Notes / blockers: `This phase depends on stable reporting APIs and final chartin
 
 Owner: `Codex + project owner`
 Last updated: `2026-05-10`
-Notes / blockers: `Added /api/auth/me, /api/auth/login, /api/auth/logout, /api/auth/register, /api/auth/verify, /api/auth/forgot-password, /api/auth/reset-token, /api/auth/reset-password, /api/user/dashboard, /api/user/booking-context, /api/user/bookings/slots, /api/user/bookings, /api/user/bookings/{id}/cancel, /api/user/notifications, /api/user/notifications/unread-count, /api/user/notifications/{id}/read, /api/user/notifications/read-all, /api/cashier/dashboard, /api/profile/me, and /api/parking-rates/current plus local frontend CORS support. Cashier users/bookings/notifications/payment plus admin/reporting APIs still need review.`
+Notes / blockers: `Added /api/auth/me, /api/auth/login, /api/auth/logout, /api/auth/register, /api/auth/verify, /api/auth/forgot-password, /api/auth/reset-token, /api/auth/reset-password, /api/user/dashboard, /api/user/booking-context, /api/user/bookings/slots, /api/user/bookings, /api/user/bookings/{id}/cancel, /api/user/notifications, /api/user/notifications/unread-count, /api/user/notifications/{id}/read, /api/user/notifications/read-all, /api/cashier/dashboard, /api/cashier/users, /api/cashier/users/{id}, /api/cashier/bookings, /api/cashier/bookings/{id}/arrive, /api/profile/me, and /api/parking-rates/current plus local frontend CORS support. Cashier payment/receipt/notifications plus admin/reporting APIs still need review.`
 
 ## 12. QA and Verification Checklist
 
@@ -257,15 +257,15 @@ Notes / blockers: `Frontend npm install, lint, and production build passed. Back
 
 ## 13. Current Next Tasks
 
-- [ ] Review cashier MVC actions for users, bookings, notifications, payment, and receipt JSON contracts
-- [ ] Build the cashier users page and user-details flow against explicit backend APIs
-- [ ] Build the cashier bookings page with filters plus status-aware action slots for arrival and completion
-- [ ] Continue formalizing shared table/list, loading, empty, and error primitives from the now-shipping public and user routes
+- [ ] Review remaining cashier MVC actions for payment, receipt, notifications, and parking-rate JSON contracts
+- [x] Build the cashier users page and user-details flow against explicit backend APIs
+- [/] Build the cashier bookings page with filters plus status-aware action slots for arrival and completion
+- [x] Continue formalizing shared table/list, loading, empty, and error primitives from the now-shipping public and user routes
 - [ ] Decide whether the cashier notification feed should stay booking-derived or move to a unified API model before full Phase 4 implementation
 
 ## 14. Session Handoff Notes
 
 Use this section to record where work stopped so the next session can resume quickly.
 
-- Current handoff note: `The first Phase 4 slice is now implemented. The frontend has a rebuilt cashier role shell/sidebar and a JSON-backed /cashier/dashboard route using /api/cashier/dashboard for verified-user, reserved-booking, available-slot, parked-vehicle, and current-rate metrics. Frontend lint and production build passed. Backend compile verification is still blocked by the local JDK not supporting Java 21.`
-- Next recommended starting point: `Review the remaining cashier controller flows and rebuild the cashier users list, user details, and bookings table with explicit JSON contracts before moving into arrival, payment, and receipt actions.`
+- Current handoff note: `The cashier bookings slice is now in place. The frontend has rebuilt /cashier/bookings with shared table/form/card primitives, status-aware KPI summaries, filters by status/date/slot plus free-text search, and a working mark-arrived action backed by /api/cashier/bookings and /api/cashier/bookings/{id}/arrive. The cashier sidebar and dashboard quick actions now expose the bookings route. ARRIVED and COMPLETED rows intentionally surface payment/receipt as the next rebuild step instead of linking to legacy Thymeleaf pages. Frontend lint and production build passed. Backend compile verification is still blocked by the local JDK not supporting Java 21.`
+- Next recommended starting point: `Build the cashier edit/payment page and booking completion flow on top of explicit JSON endpoints, then add the rebuilt receipt page and print styling.`
