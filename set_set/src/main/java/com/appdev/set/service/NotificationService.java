@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NotificationService {
@@ -55,12 +56,24 @@ public class NotificationService {
     public long getUnreadCount(User user) {
         return notificationRepository.countByUserAndIsReadFalse(user);
     }
+
+    public Optional<Notification> getUserNotificationById(User user, Long notificationId) {
+        return notificationRepository.findByIdAndUser(notificationId, user);
+    }
     
     @Transactional
     public void markAsRead(Long notificationId) {
         notificationRepository.findById(notificationId).ifPresent(notification -> {
             notification.setRead(true);
             notificationRepository.save(notification);
+        });
+    }
+
+    @Transactional
+    public Optional<Notification> markAsReadForUser(User user, Long notificationId) {
+        return notificationRepository.findByIdAndUser(notificationId, user).map(notification -> {
+            notification.setRead(true);
+            return notificationRepository.save(notification);
         });
     }
     
@@ -71,6 +84,16 @@ public class NotificationService {
             notification.setRead(true);
             notificationRepository.save(notification);
         }
+    }
+
+    @Transactional
+    public int markAllAsReadForUser(User user) {
+        List<Notification> unreadNotifications = notificationRepository.findByUserAndIsReadFalseOrderByCreatedAtDesc(user);
+        for (Notification notification : unreadNotifications) {
+            notification.setRead(true);
+            notificationRepository.save(notification);
+        }
+        return unreadNotifications.size();
     }
     
     @Transactional

@@ -4,5 +4,15 @@ export function formatIsoDateTime(value) {
   }
 
   const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? value : date.toLocaleString();
+  if (Number.isNaN(date.valueOf())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-PH", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(date);
 }

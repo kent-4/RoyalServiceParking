@@ -2,6 +2,7 @@ const navItems = [
   { href: "/user/dashboard", label: "Dashboard", match: ["/user/dashboard"] },
   { href: "/user/book", label: "Book Parking", match: ["/user/book", "/user/select-slot"] },
   { href: "/user/bookings", label: "My Bookings", match: ["/user/bookings"] },
+  { href: "/user/notifications", label: "Notifications", match: ["/user/notifications"], badge: true },
   { href: "/user/profile", label: "Profile", match: ["/user/profile"] },
   { href: "/user/parking-cost", label: "Parking Cost", match: ["/user/parking-cost"] }
 ];
@@ -23,6 +24,7 @@ export function renderUserNavbar({ session, currentPath }) {
               (item) => `
                 <a class="${item.match.includes(currentPath) ? "is-active" : ""}" href="${item.href}" data-link>
                   ${item.label}
+                  ${item.badge ? '<span class="nav-badge" data-notification-badge hidden>0</span>' : ""}
                 </a>
               `
             )

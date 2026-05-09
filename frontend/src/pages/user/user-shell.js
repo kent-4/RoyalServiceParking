@@ -1,6 +1,7 @@
 import { renderInlineAlert } from "../../components/alert/inline-alert.js";
 import { renderUserNavbar } from "../../components/navbar/user-navbar.js";
 import { logout } from "../../services/auth-service.js";
+import { fetchUserUnreadNotificationCount } from "../../services/notification-service.js";
 import { setAuthState } from "../../state/auth-store.js";
 
 export function renderUserShell({ session, currentPath, eyebrow, title, description, content }) {
@@ -42,4 +43,22 @@ export function bindUserShell({ navigate }) {
     });
     navigate("/", { replace: true });
   });
+
+  refreshUserNotificationBadge();
+}
+
+export async function refreshUserNotificationBadge() {
+  const badge = document.querySelector("[data-notification-badge]");
+  if (!badge) {
+    return;
+  }
+
+  try {
+    const data = await fetchUserUnreadNotificationCount();
+    const count = Number(data?.count ?? 0);
+    badge.textContent = String(count);
+    badge.hidden = count <= 0;
+  } catch {
+    badge.hidden = true;
+  }
 }

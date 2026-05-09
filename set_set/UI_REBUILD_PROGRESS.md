@@ -28,7 +28,7 @@ When a task changes state, update:
 ## 2. Current Snapshot
 
 - Current phase: `[/] In progress`
-- Current focus: `User notifications and the last remaining user-portal gaps before moving into cashier screens`
+- Current focus: `Cashier users, bookings, and operational actions after the first cashier shell/dashboard slice`
 - Last updated: `2026-05-10`
 - Current owner: `Codex + project owner`
 
@@ -152,22 +152,22 @@ Notes / blockers: `Phase 2 public/auth routes are now implemented in the JavaScr
 - [x] User bookings/history page
 - [x] Booking filters and search
 - [x] Booking cancellation flow
-- [ ] User notifications inbox
-- [ ] Read/unread notification actions
+- [x] User notifications inbox
+- [x] Read/unread notification actions
 - [x] Blocklist warning and restriction UI
 
 Owner: `Codex`
 Last updated: `2026-05-10`
-Notes / blockers: `The rebuilt frontend now includes the user booking setup page, slot-selection page, reservation confirmation path, bookings/history filters, reserved-only cancellation, and repeated blocklist/restriction messaging on top of explicit JSON contracts. The current backend slot logic still preserves the existing active-slot conflict behavior rather than true time-overlap scheduling, and user notifications remain the main unfinished Phase 3 slice.`
+Notes / blockers: `Phase 3 user routes are now fully rebuilt in the JavaScript frontend, including notifications inbox and read/unread actions on top of explicit JSON endpoints. The current backend slot logic still preserves the existing active-slot conflict behavior rather than true time-overlap scheduling, which remains a product decision rather than a user-portal blocker.`
 
 ## 8. Phase 4: Cashier Portal
 
-- [ ] Cashier shell and navigation
-- [ ] Cashier dashboard
-- [ ] Cashier users page
-- [ ] Cashier user details page
-- [ ] Cashier bookings page
-- [ ] Booking filters and search
+- [x] Cashier shell and navigation
+- [x] Cashier dashboard
+ - [ ] Cashier users page
+ - [ ] Cashier user details page
+ - [ ] Cashier bookings page
+ - [ ] Booking filters and search
 - [ ] Mark-arrived action
 - [ ] Edit/payment page
 - [ ] Booking completion flow
@@ -176,9 +176,9 @@ Notes / blockers: `The rebuilt frontend now includes the user booking setup page
 - [ ] Cashier notifications page
 - [ ] Parking rate view
 
-Owner: `Unassigned`
+Owner: `Codex`
 Last updated: `2026-05-10`
-Notes / blockers: `Tablet usability should be part of completion criteria for this phase.`
+Notes / blockers: `The rebuilt frontend now includes a cashier role shell with operational sidebar navigation and a JSON-backed cashier dashboard. Users, bookings, arrival, payment, receipt, notifications, and parking-rate screens remain to be rebuilt. Tablet usability should stay part of the completion criteria for the remaining cashier flows.`
 
 ## 9. Phase 5: Admin Portal
 
@@ -221,8 +221,8 @@ Notes / blockers: `This phase depends on stable reporting APIs and final chartin
 - [x] Define frontend-friendly login/logout integration
 - [/] Review current controllers for JSON API readiness
 - [x] Add missing JSON endpoints for public/auth flows
-- [/] Add missing JSON endpoints for user flows
-- [ ] Add missing JSON endpoints for cashier flows
+- [x] Add missing JSON endpoints for user flows
+- [/] Add missing JSON endpoints for cashier flows
 - [ ] Add missing JSON endpoints for admin flows
 - [ ] Add missing JSON endpoints for reports/exports
 - [ ] Standardize API error payload shape
@@ -231,7 +231,7 @@ Notes / blockers: `This phase depends on stable reporting APIs and final chartin
 
 Owner: `Codex + project owner`
 Last updated: `2026-05-10`
-Notes / blockers: `Added /api/auth/me, /api/auth/login, /api/auth/logout, /api/auth/register, /api/auth/verify, /api/auth/forgot-password, /api/auth/reset-token, /api/auth/reset-password, /api/user/dashboard, /api/user/booking-context, /api/user/bookings/slots, /api/user/bookings, /api/user/bookings/{id}/cancel, /api/profile/me, and /api/parking-rates/current plus local frontend CORS support. User notifications plus all cashier/admin/reporting APIs still need review.`
+Notes / blockers: `Added /api/auth/me, /api/auth/login, /api/auth/logout, /api/auth/register, /api/auth/verify, /api/auth/forgot-password, /api/auth/reset-token, /api/auth/reset-password, /api/user/dashboard, /api/user/booking-context, /api/user/bookings/slots, /api/user/bookings, /api/user/bookings/{id}/cancel, /api/user/notifications, /api/user/notifications/unread-count, /api/user/notifications/{id}/read, /api/user/notifications/read-all, /api/cashier/dashboard, /api/profile/me, and /api/parking-rates/current plus local frontend CORS support. Cashier users/bookings/notifications/payment plus admin/reporting APIs still need review.`
 
 ## 12. QA and Verification Checklist
 
@@ -257,14 +257,15 @@ Notes / blockers: `Frontend npm install, lint, and production build passed. Back
 
 ## 13. Current Next Tasks
 
-- [ ] Review the legacy notification MVC/controller paths and define explicit user notification JSON contracts
-- [ ] Build the rebuilt user notifications inbox with unread-count and read-state actions
+- [ ] Review cashier MVC actions for users, bookings, notifications, payment, and receipt JSON contracts
+- [ ] Build the cashier users page and user-details flow against explicit backend APIs
+- [ ] Build the cashier bookings page with filters plus status-aware action slots for arrival and completion
 - [ ] Continue formalizing shared table/list, loading, empty, and error primitives from the now-shipping public and user routes
-- [ ] Start cashier portal API review once the user notification slice is stable
+- [ ] Decide whether the cashier notification feed should stay booking-derived or move to a unified API model before full Phase 4 implementation
 
 ## 14. Session Handoff Notes
 
 Use this section to record where work stopped so the next session can resume quickly.
 
-- Current handoff note: `The main user booking slice is now implemented. The frontend has rebuilt /user/book, /user/select-slot, and /user/bookings routes with booking context, slot selection, reservation confirmation, filters, and reserved-only cancellation. Supporting backend APIs were added for /api/user/booking-context, /api/user/bookings/slots, /api/user/bookings, and /api/user/bookings/{id}/cancel, and SecurityConfig now explicitly permits /api/auth/** while protecting user APIs. Frontend lint and production build passed. Backend compile verification is still blocked by the local JDK not supporting Java 21.`
-- Next recommended starting point: `Review the existing notification flows and rebuild the user notifications inbox plus read/unread actions on top of explicit JSON endpoints, then move into cashier portal API extraction.`
+- Current handoff note: `The first Phase 4 slice is now implemented. The frontend has a rebuilt cashier role shell/sidebar and a JSON-backed /cashier/dashboard route using /api/cashier/dashboard for verified-user, reserved-booking, available-slot, parked-vehicle, and current-rate metrics. Frontend lint and production build passed. Backend compile verification is still blocked by the local JDK not supporting Java 21.`
+- Next recommended starting point: `Review the remaining cashier controller flows and rebuild the cashier users list, user details, and bookings table with explicit JSON contracts before moving into arrival, payment, and receipt actions.`

@@ -10,6 +10,7 @@ import { createVerifyPage } from "../pages/public/verify-page.js";
 import { createUserDashboardPage } from "../pages/user/dashboard-page.js";
 import { createUserBookPage } from "../pages/user/book-page.js";
 import { createUserBookingsPage } from "../pages/user/bookings-page.js";
+import { createUserNotificationsPage } from "../pages/user/notifications-page.js";
 import { createUserParkingCostPage } from "../pages/user/parking-cost-page.js";
 import { createUserProfilePage } from "../pages/user/profile-page.js";
 import { createUserSelectSlotPage } from "../pages/user/select-slot-page.js";
@@ -168,6 +169,12 @@ export const routes = [
     title: "My Bookings",
     access: { role: "USER" },
     createPage: createUserBookingsPage
+  },
+  {
+    path: "/user/notifications",
+    title: "Notifications",
+    access: { role: "USER" },
+    createPage: createUserNotificationsPage
   },
   {
     path: "/user/parking-cost",

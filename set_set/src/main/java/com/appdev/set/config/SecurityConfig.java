@@ -61,9 +61,10 @@ public class SecurityConfig {
                                  "/css/**", "/js/**", "/images/**", "/styles/**", "/scripts/**", "/static/**",
                                  "/login-error", "/reset-success", "/forgot-password-confirmation").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/login-user").permitAll()
-                .requestMatchers("/login-cashier").permitAll()
-                .requestMatchers("/login-admin").permitAll()
+                 .requestMatchers("/login-user").permitAll()
+                 .requestMatchers("/login-cashier").permitAll()
+                 .requestMatchers("/login-admin").permitAll()
+                .requestMatchers("/api/cashier/**").hasRole("CASHIER")
                 .requestMatchers("/api/profile/**", "/api/user/**").hasRole("USER")
                 .requestMatchers("/api/parking-rates/current").hasAnyRole("USER", "CASHIER", "ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")

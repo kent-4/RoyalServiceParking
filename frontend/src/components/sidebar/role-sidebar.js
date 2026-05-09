@@ -5,7 +5,11 @@ const navItems = {
     { href: "/user/dashboard", label: "Dashboard" }
   ],
   CASHIER: [
-    { href: "/cashier/dashboard", label: "Dashboard" }
+    { href: "/cashier/dashboard", label: "Dashboard" },
+    { label: "Users", disabled: true },
+    { label: "Bookings", disabled: true },
+    { label: "Notifications", disabled: true },
+    { label: "Parking Rate", disabled: true }
   ],
   ADMIN: [
     { href: "/admin/dashboard", label: "Dashboard" }
@@ -26,13 +30,17 @@ export function renderRoleSidebar(session, currentPath) {
         ${items
           .map(
             (item) => `
-              <a
-                class="${item.href === currentPath ? "is-active" : ""}"
-                href="${item.href}"
-                data-link
-              >
-                ${item.label}
-              </a>
+              ${
+                item.disabled
+                  ? `<span class="role-sidebar__item role-sidebar__item--disabled">${item.label}<small>Coming next</small></span>`
+                  : `<a
+                      class="${item.href === currentPath ? "is-active" : ""}"
+                      href="${item.href}"
+                      data-link
+                    >
+                      ${item.label}
+                    </a>`
+              }
             `
           )
           .join("")}
