@@ -41,28 +41,31 @@ public class SecurityConfig {
         // Configure database authentication for regular users
         authManagerBuilder.userDetailsService(userDetailsService)
                           .passwordEncoder(passwordEncoder());
-        
+
         // Add fixed admin user with credentials: admin/admin123
         authManagerBuilder.inMemoryAuthentication()
                           .withUser("admin")
                           .password(passwordEncoder().encode("admin123"))
                           .roles("ADMIN");
-        
+
         // Add fixed cashier user with credentials: cashier/cashier123
         authManagerBuilder.inMemoryAuthentication()
                           .withUser("cashier")
                           .password(passwordEncoder().encode("cashier123"))
                           .roles("CASHIER");
-        
+
         http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/register", "/verify", "/forgot-password", "/reset-password", 
-                               "/css/**", "/js/**", "/images/**", "/styles/**", "/scripts/**", "/static/**",
-                               "/login-error", "/reset-success", "/forgot-password-confirmation").permitAll()
+             .csrf(csrf -> csrf.disable())
+             .authorizeHttpRequests(authorize -> authorize
+                 .requestMatchers("/", "/register", "/verify", "/forgot-password", "/reset-password", 
+                                 "/css/**", "/js/**", "/images/**", "/styles/**", "/scripts/**", "/static/**",
+                                 "/login-error", "/reset-success", "/forgot-password-confirmation").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/login-user").permitAll()
                 .requestMatchers("/login-cashier").permitAll()
                 .requestMatchers("/login-admin").permitAll()
+                .requestMatchers("/api/profile/**", "/api/user/**").hasRole("USER")
+                .requestMatchers("/api/parking-rates/current").hasAnyRole("USER", "CASHIER", "ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/cashier/**").hasRole("CASHIER")
                 .requestMatchers("/user/**").hasRole("USER")

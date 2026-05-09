@@ -1,0 +1,18 @@
+{
+  "name": "royal-service-parking-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^9.12.0",
+    "globals": "^15.9.0",
+    "vite": "^5.4.8"
+  }
+}

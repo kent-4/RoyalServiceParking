@@ -28,14 +28,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             // This will be handled by inMemoryAuthentication
             throw new UsernameNotFoundException("Admin user is handled separately");
         }
-        
+
         // For regular users, look up in the database by email
         Optional<User> userOpt = userRepository.findByEmail(username);
-        
+
         if (userOpt.isEmpty()) {
             throw new UsernameNotFoundException("User not found with email: " + username);
         }
-        
+
         User user = userOpt.get();
 
         if (!user.isVerified()) {

@@ -27,22 +27,22 @@ When a task changes state, update:
 
 ## 2. Current Snapshot
 
-- Current phase: `[ ] Not started`
-- Current focus: `Frontend scaffold and shared foundations`
+- Current phase: `[/] In progress`
+- Current focus: `User notifications and the last remaining user-portal gaps before moving into cashier screens`
 - Last updated: `2026-05-10`
 - Current owner: `Codex + project owner`
 
 ## 3. Open Product / Architecture Decisions
 
-- [ ] Confirm final frontend tooling choice
-  Owner: `Project owner`
+- [x] Confirm final frontend tooling choice
+  Owner: `Codex + project owner`
   Last updated: `2026-05-10`
-  Notes / blockers: `Docs recommend Vite for plain JavaScript, but the scaffold is not created yet.`
+  Notes / blockers: `Phase 1 scaffold was implemented with Vite in line with FRONTEND_ARCHITECTURE.md.`
 
-- [ ] Confirm auth integration approach for the frontend
-  Owner: `Project owner`
+- [x] Confirm auth integration approach for the frontend
+  Owner: `Codex + project owner`
   Last updated: `2026-05-10`
-  Notes / blockers: `Recommended direction is Spring Security session-based auth with frontend route guards.`
+  Notes / blockers: `Session-based auth bootstrap plus frontend-oriented login, registration, verification, forgot-password, reset-token validation, and reset-password APIs are now implemented. Staff-account modeling remains a separate product decision.`
 
 - [ ] Confirm slot conflict behavior for the rebuilt system
   Owner: `Project owner`
@@ -66,40 +66,40 @@ When a task changes state, update:
 
 ## 4. Phase 1: Frontend Foundation
 
-- [ ] Create `frontend/` application scaffold
-  Owner: `Unassigned`
+- [x] Create `frontend/` application scaffold
+  Owner: `Codex`
   Last updated: `2026-05-10`
-  Notes / blockers: `Set up package.json, dev/build scripts, and base app entry.`
+  Notes / blockers: `Created Vite-based plain JavaScript workspace with package.json, .env.example, index.html, main entry, and local build tooling.`
 
-- [ ] Create frontend folder structure from `FRONTEND_ARCHITECTURE.md`
-  Owner: `Unassigned`
+- [x] Create frontend folder structure from `FRONTEND_ARCHITECTURE.md`
+  Owner: `Codex`
   Last updated: `2026-05-10`
-  Notes / blockers: `Create app, pages, components, modules, services, state, styles, and utils folders.`
+  Notes / blockers: `Added app, pages, components, modules, services, state, styles, utils, assets, and public folders. Empty architecture folders are persisted with .gitkeep placeholders.`
 
-- [ ] Create shared CSS token system
-  Owner: `Unassigned`
+- [x] Create shared CSS token system
+  Owner: `Codex`
   Last updated: `2026-05-10`
-  Notes / blockers: `Start with colors, spacing, radius, shadows, typography, breakpoints, and z-index tokens.`
+  Notes / blockers: `Added tokens for brand colors, status colors, spacing, radius, shadows, typography, and z-index layers in frontend/src/styles/tokens.css.`
 
-- [ ] Create global base styles and layout primitives
-  Owner: `Unassigned`
+- [x] Create global base styles and layout primitives
+  Owner: `Codex`
   Last updated: `2026-05-10`
-  Notes / blockers: `Base reset, typography, containers, sections, grid helpers, and accessibility-focused defaults.`
+  Notes / blockers: `Added reset/base styles, focus-visible defaults, shells, hero/auth layouts, role shell layout, cards, buttons, forms, alerts, and toast presentation styles.`
 
-- [ ] Create app bootstrap and router
-  Owner: `Unassigned`
+- [x] Create app bootstrap and router
+  Owner: `Codex`
   Last updated: `2026-05-10`
-  Notes / blockers: `Set up route registration, shell mounting, and not-found handling.`
+  Notes / blockers: `Implemented application bootstrap, client-side route registry, guarded navigation, redirect handling, and not-found rendering.`
 
-- [ ] Create auth guard and session bootstrap flow
-  Owner: `Unassigned`
+- [x] Create auth guard and session bootstrap flow
+  Owner: `Codex`
   Last updated: `2026-05-10`
-  Notes / blockers: `Frontend should be able to determine current user and role on app load.`
+  Notes / blockers: `Frontend now checks backend session state on load and uses role-aware client guards. Backend auth JSON endpoints were added for bootstrap/login/logout.`
 
-- [ ] Create shared UI utilities
-  Owner: `Unassigned`
+- [x] Create shared UI utilities
+  Owner: `Codex`
   Last updated: `2026-05-10`
-  Notes / blockers: `Formatters, validators, DOM helpers, date utilities.`
+  Notes / blockers: `Added shared formatter, validator, DOM, and date utility modules for the new app shell.`
 
 ## 5. Shared Components
 
@@ -108,57 +108,57 @@ When a task changes state, update:
 - [ ] Button styles and states
 - [ ] Form field patterns
 - [ ] Validation message patterns
-- [ ] Status badge component
+- [x] Status badge component
 - [ ] Card and KPI widget patterns
 - [ ] Table patterns
 - [ ] Alert component
 - [ ] Toast component
-- [ ] Modal / dialog component
+- [x] Modal / dialog component
 - [ ] Loading state patterns
 - [ ] Empty state patterns
 - [ ] Error state patterns
 
 Owner: `Unassigned`
 Last updated: `2026-05-10`
-Notes / blockers: `These should be built before deep page work to avoid repeating layout and interaction logic.`
+Notes / blockers: `Public auth work plus the rebuilt user booking pages now actively use shared navbar, button, alert, toast, form, status-badge, and confirmation-dialog foundations, but the checklist stays open until table/list and loading/empty/error patterns are formalized across more routes.`
 
 ## 6. Phase 2: Public and Auth Pages
 
-- [ ] Public landing page
-- [ ] User login page
-- [ ] Cashier login page
-- [ ] Admin login page
-- [ ] Register page
-- [ ] Register success page
-- [ ] Verify result page
-- [ ] Forgot-password page
-- [ ] Forgot-password confirmation page
-- [ ] Reset-password page
-- [ ] Reset-success page
+- [x] Public landing page
+- [x] User login page
+- [x] Cashier login page
+- [x] Admin login page
+- [x] Register page
+- [x] Register success page
+- [x] Verify result page
+- [x] Forgot-password page
+- [x] Forgot-password confirmation page
+- [x] Reset-password page
+- [x] Reset-success page
 
-Owner: `Unassigned`
+Owner: `Codex`
 Last updated: `2026-05-10`
-Notes / blockers: `These pages should be the first visible milestone after the shared frontend foundation.`
+Notes / blockers: `Phase 2 public/auth routes are now implemented in the JavaScript frontend, including registration, verification result handling, forgot-password request, reset-token validation, and reset-password success states. End-to-end email delivery and token lifecycle still depend on backend runtime configuration and manual verification outside the frontend build checks.`
 
 ## 7. Phase 3: User Portal
 
-- [ ] User shell and navigation
-- [ ] User dashboard
-- [ ] User profile
-- [ ] Parking cost page
-- [ ] Booking page
-- [ ] Slot selection page
-- [ ] Booking confirmation flow
-- [ ] User bookings/history page
-- [ ] Booking filters and search
-- [ ] Booking cancellation flow
+- [x] User shell and navigation
+- [x] User dashboard
+- [x] User profile
+- [x] Parking cost page
+- [x] Booking page
+- [x] Slot selection page
+- [x] Booking confirmation flow
+- [x] User bookings/history page
+- [x] Booking filters and search
+- [x] Booking cancellation flow
 - [ ] User notifications inbox
 - [ ] Read/unread notification actions
-- [ ] Blocklist warning and restriction UI
+- [x] Blocklist warning and restriction UI
 
-Owner: `Unassigned`
+Owner: `Codex`
 Last updated: `2026-05-10`
-Notes / blockers: `Booking flow should not be marked done until it is connected to real backend validation behavior.`
+Notes / blockers: `The rebuilt frontend now includes the user booking setup page, slot-selection page, reservation confirmation path, bookings/history filters, reserved-only cancellation, and repeated blocklist/restriction messaging on top of explicit JSON contracts. The current backend slot logic still preserves the existing active-slot conflict behavior rather than true time-overlap scheduling, and user notifications remain the main unfinished Phase 3 slice.`
 
 ## 8. Phase 4: Cashier Portal
 
@@ -217,21 +217,21 @@ Notes / blockers: `This phase depends on stable reporting APIs and final chartin
 
 ## 11. Backend/API Support Checklist
 
-- [ ] Define auth status endpoint for frontend bootstrap
-- [ ] Define frontend-friendly login/logout integration
-- [ ] Review current controllers for JSON API readiness
-- [ ] Add missing JSON endpoints for public/auth flows
-- [ ] Add missing JSON endpoints for user flows
+- [x] Define auth status endpoint for frontend bootstrap
+- [x] Define frontend-friendly login/logout integration
+- [/] Review current controllers for JSON API readiness
+- [x] Add missing JSON endpoints for public/auth flows
+- [/] Add missing JSON endpoints for user flows
 - [ ] Add missing JSON endpoints for cashier flows
 - [ ] Add missing JSON endpoints for admin flows
 - [ ] Add missing JSON endpoints for reports/exports
 - [ ] Standardize API error payload shape
 - [ ] Standardize validation error payload shape
-- [ ] Confirm CORS / cookie strategy for local development
+- [/] Confirm CORS / cookie strategy for local development
 
-Owner: `Unassigned`
+Owner: `Codex + project owner`
 Last updated: `2026-05-10`
-Notes / blockers: `Frontend page work should move with API readiness, not drift too far ahead of backend contracts.`
+Notes / blockers: `Added /api/auth/me, /api/auth/login, /api/auth/logout, /api/auth/register, /api/auth/verify, /api/auth/forgot-password, /api/auth/reset-token, /api/auth/reset-password, /api/user/dashboard, /api/user/booking-context, /api/user/bookings/slots, /api/user/bookings, /api/user/bookings/{id}/cancel, /api/profile/me, and /api/parking-rates/current plus local frontend CORS support. User notifications plus all cashier/admin/reporting APIs still need review.`
 
 ## 12. QA and Verification Checklist
 
@@ -249,22 +249,22 @@ Notes / blockers: `Frontend page work should move with API readiness, not drift 
 - [ ] Admin flow manually verified end to end
 - [ ] Print receipt verified
 - [ ] Backend tests run
-- [ ] Frontend build verified
+- [x] Frontend build verified
 
-Owner: `Unassigned`
+Owner: `Codex`
 Last updated: `2026-05-10`
-Notes / blockers: `Use this section as the release-readiness gate, not only as a final cleanup step.`
+Notes / blockers: `Frontend npm install, lint, and production build passed. Backend compile could not be verified in this environment because Maven is running against a JDK that does not support Java 21.`
 
 ## 13. Current Next Tasks
 
-- [ ] Create the `frontend/` scaffold
-- [ ] Add base app routing and auth bootstrap
-- [ ] Add shared CSS tokens and base layout styles
-- [ ] Build public landing and login pages as the first visible milestone
+- [ ] Review the legacy notification MVC/controller paths and define explicit user notification JSON contracts
+- [ ] Build the rebuilt user notifications inbox with unread-count and read-state actions
+- [ ] Continue formalizing shared table/list, loading, empty, and error primitives from the now-shipping public and user routes
+- [ ] Start cashier portal API review once the user notification slice is stable
 
 ## 14. Session Handoff Notes
 
 Use this section to record where work stopped so the next session can resume quickly.
 
-- Current handoff note: `Documentation alignment is complete. Frontend scaffold has not been created yet.`
-- Next recommended starting point: `Create frontend workspace and implement shared foundations before building role pages.`
+- Current handoff note: `The main user booking slice is now implemented. The frontend has rebuilt /user/book, /user/select-slot, and /user/bookings routes with booking context, slot selection, reservation confirmation, filters, and reserved-only cancellation. Supporting backend APIs were added for /api/user/booking-context, /api/user/bookings/slots, /api/user/bookings, and /api/user/bookings/{id}/cancel, and SecurityConfig now explicitly permits /api/auth/** while protecting user APIs. Frontend lint and production build passed. Backend compile verification is still blocked by the local JDK not supporting Java 21.`
+- Next recommended starting point: `Review the existing notification flows and rebuild the user notifications inbox plus read/unread actions on top of explicit JSON endpoints, then move into cashier portal API extraction.`
