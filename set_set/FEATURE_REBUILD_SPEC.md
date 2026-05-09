@@ -2,7 +2,7 @@
 
 ## 1. What This Web App Is
 
-Royal Service Parking is a server-rendered parking reservation and parking-operations web application for a single parking facility.
+Royal Service Parking is a parking reservation and parking-operations web application for a single parking facility.
 
 It supports three distinct roles:
 
@@ -14,6 +14,20 @@ It supports three distinct roles:
 At a high level, the system lets customers register, verify their email, reserve a parking slot in advance, view or cancel their bookings, and receive notifications. Cashiers manage active reservations and parking sessions on site. Admins oversee users, bookings, pricing, blocklisted accounts, and reports.
 
 The current implementation is a Spring Boot + Thymeleaf monolith with MySQL persistence, email notifications, scheduled background jobs, and role-based authentication.
+
+The rebuild direction is different:
+
+- Spring Boot remains the backend system of record
+- the new UI will be a plain JavaScript frontend
+- the legacy Thymeleaf templates remain useful as migration references, not as the target frontend architecture
+
+## 1.1 Rebuild Architecture Note
+
+Unless a requirement explicitly says otherwise, interpret this spec as:
+
+- backend requirements define business rules, persistence, security, scheduling, and data contracts
+- frontend requirements define user experience, route structure, role-based navigation, and state handling
+- parity with current behavior is required unless this document explicitly records a changed product decision
 
 ## 2. Core Product Purpose
 
@@ -100,10 +114,11 @@ Observed behavior:
 
 Rebuild module requirements:
 
-- Marketing/home page
-- Role-specific login entry points
-- Clear CTA for advance booking
-- Optional brand assets / carousel / hero presentation
+- Frontend marketing/home page
+- role-specific login entry points
+- clear CTA for advance booking
+- optional brand assets / carousel / hero presentation
+- public-facing API consumption only where needed
 
 ## 4.2 Authentication and Access Control
 
@@ -120,11 +135,12 @@ Observed behavior:
 
 Rebuild requirements:
 
-- Role-aware login UX
-- Session-based or token-based auth
-- Authorization middleware / guards per role
-- Redirect handling after successful login
-- Role mismatch handling
+- role-aware login UX
+- session-based authentication is the default recommendation
+- frontend route guards per role for UX
+- backend authorization enforcement per role
+- redirect handling after successful login
+- role mismatch handling
 
 Current implementation note:
 
@@ -160,11 +176,11 @@ Observed features:
 
 Rebuild requirements:
 
-- Registration flow
-- Email verification flow
-- Verified flag on users
-- Verification token generation and invalidation
-- Duplicate-email policy handling
+- frontend registration flow
+- frontend verification result handling
+- backend verified flag on users
+- verification token generation and invalidation
+- duplicate-email policy handling
 
 ## 4.4 Password Recovery
 
@@ -179,10 +195,10 @@ Observed features:
 
 Rebuild requirements:
 
-- Password reset request
-- Token generation/storage
-- Reset form with token validation
-- Password update and token invalidation
+- frontend password reset request flow
+- token generation/storage
+- reset form with token validation
+- password update and token invalidation
 
 ## 4.5 User Profile Management
 
@@ -202,9 +218,9 @@ Observed features:
 
 Rebuild requirements:
 
-- Profile read/update page
-- Editable vehicle and contact information
-- Restriction banner/status display
+- frontend profile read/update page
+- editable vehicle and contact information
+- restriction banner/status display
 
 ## 4.6 Parking Inventory / Slot Management
 
@@ -252,10 +268,10 @@ Observed features:
 
 Rebuild requirements:
 
-- Parking rate settings page
-- Current active rate record
-- Admin-only editing
-- Use current rate when computing booking/session cost
+- frontend parking rate settings page
+- current active rate record
+- admin-only editing
+- use current rate when computing booking/session cost
 
 Important rebuild decision:
 
@@ -320,13 +336,13 @@ System booking rules:
 
 Rebuild requirements:
 
-- Booking form
-- Slot-selection step
-- Reservation confirmation step
-- Pricing calculation
-- Active-booking validation
-- Slot locking / reservation logic
-- Reservation confirmation email and in-app notification
+- frontend booking form
+- slot-selection step
+- reservation confirmation step
+- pricing preview in the frontend backed by backend validation
+- active-booking validation
+- slot locking / reservation logic
+- reservation confirmation email and in-app notification
 
 ## 4.9 Slot Availability Experience
 
@@ -400,11 +416,11 @@ Observed displayed fields:
 
 Rebuild requirements:
 
-- Booking list view
-- Filters
-- Sorting
-- Status badges
-- Search
+- frontend booking list view
+- filters
+- sorting
+- status badges
+- search
 
 ## 4.11 Booking Cancellation
 
@@ -418,9 +434,9 @@ Observed features:
 
 Rebuild requirements:
 
-- User-owned booking cancellation
-- Status guardrails
-- Slot release on cancellation
+- frontend user-owned booking cancellation action
+- status guardrails
+- slot release on cancellation
 
 ## 4.12 Arrival Check-In
 
@@ -436,9 +452,9 @@ Observed cashier features:
 
 Rebuild requirements:
 
-- Cashier check-in action
-- Arrival timestamp tracking
-- Parking session start handling
+- frontend cashier check-in action
+- arrival timestamp tracking
+- parking session start handling
 
 Important rebuild decision:
 
@@ -476,12 +492,12 @@ Observed cashier features:
 
 Rebuild requirements:
 
-- Check-out / payment flow
-- Duration calculation
-- Rounded hourly billing
-- Slot release after exit
-- Receipt generation
-- Completed-booking notification/email
+- frontend check-out / payment flow
+- duration calculation
+- rounded hourly billing
+- slot release after exit
+- receipt generation
+- completed-booking notification/email
 
 ## 4.14 Cashier Operational Booking Management
 
@@ -500,10 +516,10 @@ Observed features:
 
 Rebuild requirements:
 
-- Back-office booking operations view
-- Search/filter tools
-- Status-based actions
-- Operational workflow for reserved -> arrived -> completed
+- frontend back-office booking operations view
+- search/filter tools
+- status-based actions
+- operational workflow for reserved -> arrived -> completed
 
 ## 4.15 Dashboards
 
@@ -540,9 +556,9 @@ Observed widgets:
 
 Rebuild requirements:
 
-- Role-specific dashboards
+- frontend role-specific dashboards
 - KPI cards
-- Quick links into main workflows
+- quick links into main workflows
 
 ## 4.16 Notifications
 
@@ -565,10 +581,10 @@ Observed features:
 
 Rebuild requirements:
 
-- Notification entity
-- Per-user inbox
-- Read/unread state
-- Unread counter endpoint
+- notification entity
+- frontend per-user inbox
+- read/unread state
+- unread counter endpoint
 
 ### B. Cashier Operational Notifications
 
@@ -592,9 +608,9 @@ Observed features:
 
 Rebuild requirements:
 
-- Staff operations notification feed
-- Time-based prioritization
-- Booking-state driven operational alerts
+- frontend staff operations notification feed
+- time-based prioritization
+- booking-state driven operational alerts
 
 ## 4.17 Email Notifications
 
@@ -727,11 +743,11 @@ Observed report logic:
 
 Rebuild requirements:
 
-- Analytics API
-- Date range filtering
-- Aggregation by day/week/month
-- Export pipeline
-- Admin reporting UI
+- analytics API
+- date range filtering
+- aggregation by day/week/month
+- export pipeline
+- frontend admin reporting UI
 
 ## 5. Primary Data Entities
 
@@ -923,7 +939,7 @@ These are important because they affect rebuild design.
 
 ## 8. Screens / Pages Inventory
 
-Public / shared:
+Public / shared frontend routes/screens:
 
 - Home page
 - Register page
@@ -938,7 +954,7 @@ Public / shared:
 - Reset-success page
 - Generic notifications page for users
 
-User area:
+User frontend routes/screens:
 
 - User dashboard
 - User profile
@@ -947,7 +963,7 @@ User area:
 - User bookings page
 - User parking-cost page
 
-Cashier area:
+Cashier frontend routes/screens:
 
 - Cashier dashboard
 - Cashier users page
@@ -958,7 +974,7 @@ Cashier area:
 - Cashier notifications page
 - Cashier parking-cost page
 
-Admin area:
+Admin frontend routes/screens:
 
 - Admin dashboard
 - Admin users page
@@ -979,7 +995,7 @@ Email templates:
 
 ## 9. Rebuild Scope Recommendation
 
-If rebuilding in another tech stack, I would separate the system into these bounded domains:
+For the plain JavaScript frontend plus Spring Boot backend rebuild, separate the system into these bounded domains:
 
 - Identity and access
 - Customer accounts and vehicle profiles
