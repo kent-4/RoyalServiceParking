@@ -41,35 +41,40 @@ public class SecurityConfig {
         // Configure database authentication for regular users
         authManagerBuilder.userDetailsService(userDetailsService)
                           .passwordEncoder(passwordEncoder());
-        
+
         // Add fixed admin user with credentials: admin/admin123
         authManagerBuilder.inMemoryAuthentication()
                           .withUser("admin")
                           .password(passwordEncoder().encode("admin123"))
                           .roles("ADMIN");
-        
+
         // Add fixed cashier user with credentials: cashier/cashier123
         authManagerBuilder.inMemoryAuthentication()
                           .withUser("cashier")
                           .password(passwordEncoder().encode("cashier123"))
                           .roles("CASHIER");
-        
+
         http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/register", "/verify", "/forgot-password", "/reset-password", 
-                               "/css/**", "/js/**", "/images/**", "/styles/**", "/scripts/**", "/static/**",
-                               "/login-error", "/reset-success", "/forgot-password-confirmation").permitAll()
-                .requestMatchers("/login-user").permitAll()
-                .requestMatchers("/login-cashier").permitAll()
-                .requestMatchers("/login-admin").permitAll()
+             .csrf(csrf -> csrf.disable())
+             .authorizeHttpRequests(authorize -> authorize
+                 .requestMatchers("/", "/login", "/register", "/verify", "/forgot-password", "/reset-password", 
+                                 "/css/**", "/js/**", "/images/**", "/styles/**", "/scripts/**", "/static/**",
+                                 "/login-error", "/reset-success", "/forgot-password-confirmation").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                 .requestMatchers("/login-user").permitAll()
+                 .requestMatchers("/login-cashier").permitAll()
+                 .requestMatchers("/login-admin").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/cashier/**").hasRole("CASHIER")
+                .requestMatchers("/api/profile/**", "/api/user/**").hasRole("USER")
+                .requestMatchers("/api/parking-rates/current").hasAnyRole("USER", "CASHIER", "ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/cashier/**").hasRole("CASHIER")
                 .requestMatchers("/user/**").hasRole("USER")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login-user")
+                .loginPage("/login")
                 .loginProcessingUrl("/login")
                 .usernameParameter("username")
                 .passwordParameter("password")
@@ -78,16 +83,6 @@ public class SecurityConfig {
                             .findFirst()
                             .map(authority -> authority.getAuthority())
                             .orElse("");
-                    
-                    String loginType = request.getParameter("loginType");
-                    
-                    // Validate role against login type
-                    if (("admin".equals(loginType) && !"ROLE_ADMIN".equals(role)) ||
-                        ("cashier".equals(loginType) && !"ROLE_CASHIER".equals(role)) ||
-                        ("user".equals(loginType) && !"ROLE_USER".equals(role))) {
-                        response.sendRedirect(request.getContextPath() + "/login-" + loginType + "?error=invalid_role");
-                        return;
-                    }
                     
                     // Redirect based on role
                     try {
@@ -105,8 +100,7 @@ public class SecurityConfig {
                     }
                 })
                 .failureHandler((request, response, exception) -> {
-                    String loginType = request.getParameter("loginType");
-                    response.sendRedirect(request.getContextPath() + "/login-" + loginType + "?error=true");
+                    response.sendRedirect(request.getContextPath() + "/login?error=true");
                 })
                 .permitAll()
             )
@@ -119,14 +113,7 @@ public class SecurityConfig {
             )
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint((request, response, authException) -> {
-                    String uri = request.getRequestURI();
-                    if (uri.startsWith("/admin")) {
-                        response.sendRedirect(request.getContextPath() + "/login-admin");
-                    } else if (uri.startsWith("/cashier")) {
-                        response.sendRedirect(request.getContextPath() + "/login-cashier");
-                    } else {
-                        response.sendRedirect(request.getContextPath() + "/login-user");
-                    }
+                    response.sendRedirect(request.getContextPath() + "/login");
                 })
             );
         

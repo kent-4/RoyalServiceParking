@@ -128,7 +128,7 @@ Observed behavior:
   - `/user/**`
   - `/cashier/**`
   - `/admin/**`
-- Separate login screens for each role
+- Legacy implementation shows separate login screens for each role
 - One shared login processing endpoint
 - Login flow validates that the selected login page matches the authenticated role
 - Redirects users into their own dashboards after login
@@ -136,6 +136,7 @@ Observed behavior:
 Rebuild requirements:
 
 - role-aware login UX
+- one shared frontend login page is allowed as long as the backend still resolves the authenticated role and redirects the session into the correct workspace
 - session-based authentication is the default recommendation
 - frontend route guards per role for UX
 - backend authorization enforcement per role

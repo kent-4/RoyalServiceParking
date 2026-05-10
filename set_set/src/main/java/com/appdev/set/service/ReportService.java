@@ -257,4 +257,38 @@ public class ReportService {
 
         return outputStream.toByteArray();
     }
+
+    public byte[] exportExcelReport(LocalDate startDate, LocalDate endDate, String period) throws Exception {
+        List<BookingSummary> summaries = getBookingSummary(startDate, endDate, period);
+        Map<LocalDate, List<String>> vehicleTypesByDate = getCompletedVehicleTypesByDate(startDate, endDate, summaries);
+        return generateExcelReport(summaries, vehicleTypesByDate);
+    }
+
+    public byte[] exportPdfReport(LocalDate startDate, LocalDate endDate, String period) throws Exception {
+        List<BookingSummary> summaries = getBookingSummary(startDate, endDate, period);
+        Map<LocalDate, List<String>> vehicleTypesByDate = getCompletedVehicleTypesByDate(startDate, endDate, summaries);
+        return generatePdfReport(summaries, vehicleTypesByDate);
+    }
+
+    public Map<LocalDate, List<String>> getCompletedVehicleTypesByDate(
+            LocalDate startDate,
+            LocalDate endDate,
+            List<BookingSummary> summaries
+    ) {
+        Map<LocalDate, List<String>> vehicleTypesByDate = new HashMap<>();
+        List<Booking> bookings = bookingRepository.findByDateBetween(startDate, endDate);
+        Map<LocalDate, List<Booking>> bookingsByDate = bookings.stream()
+                .collect(Collectors.groupingBy(Booking::getDate));
+
+        for (BookingSummary summary : summaries) {
+            List<String> types = bookingsByDate.getOrDefault(summary.getDate(), Collections.emptyList()).stream()
+                    .filter(booking -> booking.getStatus() == Booking.BookingStatus.COMPLETED)
+                    .map(booking -> booking.getVehicleType() != null ? booking.getVehicleType() : "Unknown")
+                    .distinct()
+                    .collect(Collectors.toList());
+            vehicleTypesByDate.put(summary.getDate(), types);
+        }
+
+        return vehicleTypesByDate;
+    }
 }
