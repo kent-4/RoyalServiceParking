@@ -3,7 +3,8 @@ import { renderKpiCard, renderPanelCard } from "../../components/card/panel-card
 import { renderErrorState } from "../../components/feedback/error-state.js";
 import { renderLoadingPanelCards } from "../../components/feedback/loading-state.js";
 import { renderFieldGroup, renderInputField, renderSelectField } from "../../components/form/form-field.js";
-import { fetchAdminReportsDashboard } from "../../services/report-service.js";
+import { downloadAdminReport, fetchAdminReportsDashboard } from "../../services/report-service.js";
+import { pushToast } from "../../state/ui-store.js";
 import { formatCurrency, formatDate } from "../../utils/formatters.js";
 import { bindAdminShell, renderAdminShell } from "./admin-shell.js";
 
@@ -21,6 +22,25 @@ function buildDefaultRange() {
     startDate: start.toISOString().split("T")[0],
     endDate: end.toISOString().split("T")[0]
   };
+}
+
+function buildExportFilename(format, filters) {
+  const start = filters.startDate || "start";
+  const end = filters.endDate || "end";
+  const period = filters.period || "day";
+  return `royal-service-parking-report_${start}_to_${end}_${period}.${format}`;
+}
+
+function triggerDownload({ blob, filename }) {
+  const objectUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = objectUrl;
+  anchor.download = filename;
+  anchor.style.display = "none";
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
 }
 
 function renderTrendCards(items, metricKey, formatValue, emptyMessage) {
@@ -100,13 +120,13 @@ export function createAdminReportsPage({ session, pathname, query }) {
       eyebrow: "Admin reports",
       title: "Review booking and earnings analytics",
       description:
-        "Analyze completed activity, trend lines, and distribution summaries with date filters and period grouping before export flows are rebuilt.",
+        "Analyze completed activity, trend lines, and distribution summaries with date filters, period grouping, and direct Excel/PDF exports.",
       content: `
         <section class="dashboard-grid booking-flow-grid">
           ${renderPanelCard({
             className: "booking-form-card",
             title: "Report filters",
-            description: "Choose a date range and aggregation period for the current reporting view.",
+            description: "Choose a date range and aggregation period, then refresh the dashboard or export the same filtered dataset.",
             content: `
               <form class="stack-sm" data-admin-reports-form>
                 <div class="field-row">
@@ -145,14 +165,27 @@ export function createAdminReportsPage({ session, pathname, query }) {
                         { value: "month", label: "Monthly" }
                       ]
                     }),
-                    hint: "Excel and PDF exports remain a separate Phase 6 step."
+                    hint: "Exports use the exact same filter state shown on this dashboard."
                   })}
                 </div>
                 <div class="auth-support-links">
                   ${renderButton({ label: "Apply filters", type: "submit", tone: "primary" })}
+                  ${renderButton({
+                    label: "Export Excel",
+                    type: "button",
+                    tone: "secondary",
+                    attributes: { "data-export-button": "excel" }
+                  })}
+                  ${renderButton({
+                    label: "Export PDF",
+                    type: "button",
+                    tone: "secondary",
+                    attributes: { "data-export-button": "pdf" }
+                  })}
                   ${renderButton({ label: "Reset", href: "/admin/reports", tone: "secondary" })}
                   ${renderButton({ label: "Back to dashboard", href: "/admin/dashboard", tone: "ghost" })}
                 </div>
+                <div class="form-feedback" role="status" aria-live="polite" data-admin-reports-feedback></div>
               </form>
             `
           })}
@@ -162,7 +195,7 @@ export function createAdminReportsPage({ session, pathname, query }) {
               <ul class="journey-list">
                 <li>Earnings count completed bookings only, matching the current backend report logic.</li>
                 <li>Vehicle type distribution also counts completed bookings only.</li>
-                <li>Excel and PDF export flows remain queued after this first dashboard slice.</li>
+                <li>Excel exports keep tabular summaries, while PDF exports keep a printable summary table.</li>
               </ul>
             `
           })}
@@ -183,6 +216,31 @@ export function createAdminReportsPage({ session, pathname, query }) {
       const kpiRoot = document.querySelector("[data-admin-reports-kpis]");
       const panelsRoot = document.querySelector("[data-admin-reports-panels]");
       const alertsRoot = document.querySelector("[data-admin-reports-alerts]");
+      const feedbackNode = document.querySelector("[data-admin-reports-feedback]");
+      const exportButtons = Array.from(document.querySelectorAll("[data-export-button]"));
+
+      function readFilters() {
+        const formData = new FormData(form);
+        return {
+          startDate: String(formData.get("startDate") ?? "").trim(),
+          endDate: String(formData.get("endDate") ?? "").trim(),
+          period: String(formData.get("period") ?? "day").trim() || "day"
+        };
+      }
+
+      function setExportState(isLoading, activeFormat = "") {
+        exportButtons.forEach((button) => {
+          const format = button.getAttribute("data-export-button");
+          const label = format === "excel" ? "Export Excel" : "Export PDF";
+
+          button.disabled = isLoading;
+          button.classList.toggle("is-loading", isLoading && format === activeFormat);
+          button.innerHTML = `
+            ${isLoading && format === activeFormat ? '<span class="button__spinner" aria-hidden="true"></span>' : ""}
+            <span>${isLoading && format === activeFormat ? `Exporting ${format.toUpperCase()}...` : label}</span>
+          `;
+        });
+      }
 
       async function loadDashboard(filters) {
         if (kpiRoot) {
@@ -264,13 +322,56 @@ export function createAdminReportsPage({ session, pathname, query }) {
         }
       }
 
+      async function handleExport(format) {
+        const filters = readFilters();
+
+        if (feedbackNode) {
+          feedbackNode.textContent = `Preparing ${format.toUpperCase()} export...`;
+          feedbackNode.className = "form-feedback";
+        }
+
+        setExportState(true, format);
+
+        try {
+          const file = await downloadAdminReport(format, filters);
+          triggerDownload({
+            blob: file.blob,
+            filename: file.filename || buildExportFilename(format, filters)
+          });
+
+          if (feedbackNode) {
+            feedbackNode.textContent = `${format.toUpperCase()} export downloaded successfully.`;
+            feedbackNode.className = "form-feedback form-feedback--success";
+          }
+
+          pushToast({
+            tone: "success",
+            title: `${format.toUpperCase()} export ready`,
+            message: "The filtered report file has been downloaded."
+          });
+        } catch (error) {
+          if (feedbackNode) {
+            feedbackNode.textContent = error.message || `Unable to export ${format.toUpperCase()} report.`;
+            feedbackNode.className = "form-feedback form-feedback--error";
+          }
+
+          pushToast({
+            tone: "danger",
+            title: "Export failed",
+            message: error.message || `Unable to export ${format.toUpperCase()} report.`
+          });
+        } finally {
+          setExportState(false);
+        }
+      }
+
       form?.addEventListener("submit", (event) => {
         event.preventDefault();
-        const formData = new FormData(form);
+        const filters = readFilters();
         const next = new URLSearchParams();
 
         ["startDate", "endDate", "period"].forEach((key) => {
-          const value = String(formData.get(key) ?? "").trim();
+          const value = filters[key];
           if (value) {
             next.set(key, value);
           }
@@ -278,6 +379,15 @@ export function createAdminReportsPage({ session, pathname, query }) {
 
         navigate(`/admin/reports${next.toString() ? `?${next.toString()}` : ""}`, {
           replace: true
+        });
+      });
+
+      exportButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const format = button.getAttribute("data-export-button");
+          if (format) {
+            handleExport(format);
+          }
         });
       });
 

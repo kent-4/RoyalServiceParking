@@ -8,75 +8,85 @@ import { pushToast } from "../../state/ui-store.js";
 import { validateRequiredFields } from "../../utils/validators.js";
 
 const roleCopy = {
+  default: {
+    eyebrow: "Unified access",
+    title: "Sign in once and open the correct workspace",
+    description: "Use one login page and let the backend resolve whether this account belongs in the user, cashier, or admin experience.",
+    accentClass: "auth-layout--user",
+    panelTitle: "One session flow, role-aware landing after authentication.",
+    panelCopy:
+      "Spring Security still owns the real authentication and authority checks. The frontend now asks the backend who you are, then opens the right workspace automatically.",
+    bullets: [
+      "Verified customer accounts still land in the user portal.",
+      "Cashier credentials still open the operational workspace.",
+      "Admin credentials still open management and reporting controls."
+    ],
+    helperText: "Use your email or username and password. The system will detect the correct role after authentication.",
+    footerLinks: `
+      <a href="/forgot-password" data-link>Forgot password?</a>
+      <a href="/register" data-link>Create an account</a>
+    `
+  },
   user: {
-    eyebrow: "Customer access",
-    title: "User login",
-    description: "Sign in to manage reservations, bookings, notifications, and your parking profile.",
+    eyebrow: "Customer access hint",
+    title: "Sign in to the customer portal",
+    description: "Use the same unified login form, then continue into reservations, bookings, notifications, and your parking profile.",
     accentClass: "auth-layout--user",
     panelTitle: "Advance booking remains account-based.",
     panelCopy:
-      "Verified customers use this route to review bookings, restriction status, notifications, and upcoming reservations.",
+      "Verified customers use this shared route to review bookings, restriction status, notifications, and upcoming reservations.",
     bullets: [
       "Booking access remains blocked until the backend confirms the account is verified.",
-      "Reservation history, profile updates, and notification flows will continue from this role area.",
+      "Reservation history, profile updates, and notification flows continue from the user role area.",
       "Forgot-password and registration routes stay available from the public experience."
     ],
-    helperText: "Use the same email and password tied to your verified customer account.",
+    helperText: "For customer access, use the verified email and password tied to your account.",
     footerLinks: `
       <a href="/forgot-password" data-link>Forgot password?</a>
       <a href="/register" data-link>Create an account</a>
     `
   },
   cashier: {
-    eyebrow: "Operational access",
-    title: "Cashier login",
-    description: "Access the operations workspace for arrivals, active sessions, and receipts.",
+    eyebrow: "Operational access hint",
+    title: "Sign in for cashier operations",
+    description: "Use the same unified login form, then continue into the arrivals, bookings, payment, and receipt workspace if your credentials are cashier-authorized.",
     accentClass: "auth-layout--cashier",
     panelTitle: "Built for time-sensitive on-site actions.",
     panelCopy:
-      "Cashier access stays separated from customer routes so arrival, payment, and receipt workflows remain fast and readable.",
+      "Cashier access still stays operationally separate after authentication so arrival, payment, and receipt workflows remain fast and readable.",
     bullets: [
-      "Use the cashier route only for operational tasks such as arrival check-in and booking completion.",
+      "Use cashier credentials only for on-site tasks such as arrival check-in and booking completion.",
       "The rebuild keeps tablet-friendly layout expectations in place for this role area.",
-      "Staff-account management is still a product decision, so this route remains backend-controlled."
+      "Staff-account management remains a backend/product decision, but the login route itself is now shared."
     ],
-    helperText: "Use your assigned cashier credentials.",
+    helperText: "Use your assigned cashier credentials. The backend will route you to the cashier portal automatically.",
     footerLinks: `
       <a href="/forgot-password" data-link>Forgot password?</a>
-      <a href="/login/admin" data-link>Admin login instead</a>
+      <a href="/login?role=admin" data-link>Admin hint instead</a>
     `
   },
   admin: {
-    eyebrow: "Management access",
-    title: "Admin login",
-    description: "Access pricing, user management, restrictions, and reporting controls.",
+    eyebrow: "Management access hint",
+    title: "Sign in for admin oversight",
+    description: "Use the same unified login form, then continue into pricing, user management, restrictions, reports, and export controls if your credentials are admin-authorized.",
     accentClass: "auth-layout--admin",
-    panelTitle: "Management routes stay separate from operations.",
+    panelTitle: "Management routes stay separate from operations after sign-in.",
     panelCopy:
-      "Admin access is reserved for oversight across pricing, users, restrictions, dashboards, and reporting controls.",
+      "Admin access remains reserved for oversight across pricing, users, restrictions, dashboards, and reporting controls.",
     bullets: [
-      "Role mismatch protection remains active so users cannot enter the wrong workspace after authentication.",
-      "Backend authorization still decides access even when the frontend route appears reachable.",
-      "Reporting and pricing pages will be layered into this workspace after the public/auth milestone."
+      "Backend authorization still decides access even when the shared login route is publicly reachable.",
+      "The redirect after authentication is based on the resolved authority, not a selected login page.",
+      "Reports and pricing controls stay isolated from cashier and customer workflows."
     ],
-    helperText: "Use your authorized administrator credentials.",
+    helperText: "Use your authorized administrator credentials. The backend will route you to the admin workspace automatically.",
     footerLinks: `
       <a href="/forgot-password" data-link>Forgot password?</a>
-      <a href="/login/cashier" data-link>Cashier login instead</a>
+      <a href="/login?role=cashier" data-link>Cashier hint instead</a>
     `
   }
 };
 
-function renderRouteMessage({ query, loginType }) {
-  if (query.get("error") === "invalid_role") {
-    return renderInlineAlert({
-      tone: "danger",
-      title: "Role mismatch",
-      message:
-        "The selected login page did not match the authenticated account type. Use the route that matches your role."
-    });
-  }
-
+function renderRouteMessage({ query }) {
   if (query.get("error") === "true") {
     return renderInlineAlert({
       tone: "danger",
@@ -93,19 +103,20 @@ function renderRouteMessage({ query, loginType }) {
     });
   }
 
-  if (query.get("reset") === "true" && loginType === "user") {
+  if (query.get("reset") === "true") {
     return renderInlineAlert({
       tone: "info",
       title: "Password updated",
-      message: "Use your new password to sign in to the user portal."
+      message: "Use your new password to sign in again."
     });
   }
 
   return "";
 }
 
-export function createLoginPage(context, { loginType }) {
-  const copy = roleCopy[loginType];
+export function createLoginPage(context) {
+  const selectedRole = String(context.query.get("role") ?? "default").toLowerCase();
+  const copy = roleCopy[selectedRole] ?? roleCopy.default;
 
   return {
     html: `
@@ -127,9 +138,9 @@ export function createLoginPage(context, { loginType }) {
               <div class="auth-support-links">
                 <a class="button button--ghost" href="/" data-link>Back to home</a>
                 ${
-                  loginType === "user"
+                  selectedRole === "user"
                     ? '<a class="button button--secondary" href="/register" data-link>Create account</a>'
-                    : '<a class="button button--secondary" href="/login/user" data-link>User login</a>'
+                    : '<a class="button button--secondary" href="/login?role=user" data-link>Customer access</a>'
                 }
               </div>
             </aside>
@@ -137,7 +148,7 @@ export function createLoginPage(context, { loginType }) {
               <span class="eyebrow">${copy.eyebrow}</span>
               <h2 class="auth-card__title">Sign in</h2>
               <p class="page-copy">${copy.helperText}</p>
-              ${renderRouteMessage({ query: context.query, loginType })}
+              ${renderRouteMessage({ query: context.query })}
               <form class="stack-sm" data-login-form novalidate>
                 <div class="field-group">
                   <label for="username">Email or username</label>
@@ -151,9 +162,11 @@ export function createLoginPage(context, { loginType }) {
                   />
                   <p class="field-hint" id="username-hint">
                     ${
-                      loginType === "user"
+                      selectedRole === "user"
                         ? "For users, this is typically the registered email address."
-                        : "Staff access remains controlled by the backend role configuration."
+                        : selectedRole === "cashier" || selectedRole === "admin"
+                          ? "Staff access remains controlled by the backend role configuration."
+                          : "The backend resolves the real role after authentication."
                     }
                   </p>
                   <p class="field-error" id="username-error" data-field-error="username"></p>
@@ -219,8 +232,7 @@ export function createLoginPage(context, { loginType }) {
         const formData = new FormData(form);
         const values = {
           username: String(formData.get("username") ?? "").trim(),
-          password: String(formData.get("password") ?? ""),
-          loginType
+          password: String(formData.get("password") ?? "")
         };
 
         const validationErrors = validateRequiredFields(values, ["username", "password"]);

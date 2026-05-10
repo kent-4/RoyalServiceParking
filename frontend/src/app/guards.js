@@ -5,9 +5,9 @@ const roleHomeByName = {
 };
 
 const loginRouteByRole = {
-  USER: "/login/user",
-  CASHIER: "/login/cashier",
-  ADMIN: "/login/admin"
+  USER: "/login",
+  CASHIER: "/login",
+  ADMIN: "/login"
 };
 
 export function getRoleHome(role) {

@@ -124,15 +124,17 @@ Recommended route groups:
 
 - `/`
 - `/register`
-- `/login/user`
-- `/login/cashier`
-- `/login/admin`
+- `/login`
 - `/forgot-password`
 - `/reset-password`
 - `/verify`
 - `/user/*`
 - `/cashier/*`
 - `/admin/*`
+
+Route note:
+
+- the rebuild may keep `/login/user`, `/login/cashier`, and `/login/admin` as compatibility aliases or role-hint routes, but `/login` should be treated as the primary shared login page
 
 Routing rules:
 

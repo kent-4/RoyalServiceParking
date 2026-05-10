@@ -40,7 +40,7 @@ export function createForgotPasswordPage(context) {
                 <div class="form-feedback" role="status" aria-live="polite" data-form-feedback></div>
                 <div class="auth-support-links">
                   <button class="button button--primary" type="submit" data-submit-button>Send reset link</button>
-                  <a class="button button--secondary" href="/login/user" data-link>Back to login</a>
+                  <a class="button button--secondary" href="/login" data-link>Back to login</a>
                 </div>
               </form>
             </div>

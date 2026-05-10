@@ -28,7 +28,7 @@ When a task changes state, update:
 ## 2. Current Snapshot
 
 - Current phase: `[/] In progress`
-- Current focus: `Phase 6 report export flows after the rebuilt reports dashboard`
+- Current focus: `Phase 6 runtime verification for shared login and report exports`
 - Last updated: `2026-05-10`
 - Current owner: `Codex + project owner`
 
@@ -42,7 +42,7 @@ When a task changes state, update:
 - [x] Confirm auth integration approach for the frontend
   Owner: `Codex + project owner`
   Last updated: `2026-05-10`
-  Notes / blockers: `Session-based auth bootstrap plus frontend-oriented login, registration, verification, forgot-password, reset-token validation, and reset-password APIs are now implemented. Staff-account modeling remains a separate product decision.`
+  Notes / blockers: `Session-based auth bootstrap plus frontend-oriented login, registration, verification, forgot-password, reset-token validation, and reset-password APIs are now implemented. The rebuild now treats /login as the primary shared sign-in page, with backend-resolved role redirects and legacy role-specific login URLs kept only as compatibility aliases. Staff-account modeling remains a separate product decision.`
 
 - [ ] Confirm slot conflict behavior for the rebuilt system
   Owner: `Project owner`
@@ -138,7 +138,7 @@ Notes / blockers: `The shared UI layer now includes generic app-navbar/app-sideb
 
 Owner: `Codex`
 Last updated: `2026-05-10`
-Notes / blockers: `Phase 2 public/auth routes are now implemented in the JavaScript frontend, including registration, verification result handling, forgot-password request, reset-token validation, and reset-password success states. End-to-end email delivery and token lifecycle still depend on backend runtime configuration and manual verification outside the frontend build checks.`
+Notes / blockers: `Phase 2 public/auth routes are now implemented in the JavaScript frontend, including a shared /login route with role-aware hints, compatibility redirects from the legacy role-specific login URLs, registration, verification result handling, forgot-password request, reset-token validation, and reset-password success states. End-to-end email delivery and token lifecycle still depend on backend runtime configuration and manual verification outside the frontend build checks.`
 
 ## 7. Phase 3: User Portal
 
@@ -208,12 +208,12 @@ Notes / blockers: `The rebuilt admin shell, dashboard, users page, user-details 
 - [x] Earnings trend chart
 - [x] Vehicle type distribution
 - [x] Booking status distribution
-- [ ] Excel export flow
-- [ ] PDF export flow
+- [x] Excel export flow
+- [x] PDF export flow
 
 Owner: `Codex`
 Last updated: `2026-05-10`
-Notes / blockers: `The rebuilt admin reports dashboard is now live in the JavaScript frontend with date filters, day/week/month grouping, KPI summaries, and lightweight trend/distribution visuals backed by /api/admin/reports/dashboard. Excel and PDF exports remain the next Phase 6 slice.`
+Notes / blockers: `The rebuilt admin reports dashboard is now live in the JavaScript frontend with date filters, day/week/month grouping, KPI summaries, lightweight trend/distribution visuals, and direct Excel/PDF export actions backed by /api/admin/reports/dashboard, /api/admin/reports/export/excel, and /api/admin/reports/export/pdf. Live file-download verification still depends on running the backend locally because this session only verified the frontend build.`
 
 ## 11. Backend/API Support Checklist
 
@@ -224,14 +224,14 @@ Notes / blockers: `The rebuilt admin reports dashboard is now live in the JavaSc
 - [x] Add missing JSON endpoints for user flows
 - [x] Add missing JSON endpoints for cashier flows
 - [/] Add missing JSON endpoints for admin flows
-- [/] Add missing JSON endpoints for reports/exports
-- [ ] Standardize API error payload shape
-- [ ] Standardize validation error payload shape
+- [x] Add missing JSON endpoints for reports/exports
+- [x] Standardize API error payload shape
+- [x] Standardize validation error payload shape
 - [/] Confirm CORS / cookie strategy for local development
 
 Owner: `Codex + project owner`
 Last updated: `2026-05-10`
-Notes / blockers: `Added /api/auth/me, /api/auth/login, /api/auth/logout, /api/auth/register, /api/auth/verify, /api/auth/forgot-password, /api/auth/reset-token, /api/auth/reset-password, /api/user/dashboard, /api/user/booking-context, /api/user/bookings/slots, /api/user/bookings, /api/user/bookings/{id}/cancel, /api/user/notifications, /api/user/notifications/unread-count, /api/user/notifications/{id}/read, /api/user/notifications/read-all, /api/cashier/dashboard, /api/cashier/users, /api/cashier/users/{id}, /api/cashier/bookings, /api/cashier/bookings/{id}/arrive, /api/cashier/bookings/{id}/payment, /api/cashier/bookings/{id}/complete, /api/cashier/bookings/{id}/receipt, /api/cashier/notifications, /api/admin/dashboard, /api/admin/users, /api/admin/users/{id}, /api/admin/bookings, /api/admin/parking-rates/current, /api/admin/blocklist, /api/admin/blocklist/{id}/remove, /api/admin/reports/dashboard, /api/profile/me, and /api/parking-rates/current plus local frontend CORS support. Export-oriented API review is still pending, and a manual blocklist-add API remains intentionally deferred until the product owner confirms that UI belongs in the first rebuild pass.`
+Notes / blockers: `Added /api/auth/me, /api/auth/login, /api/auth/logout, /api/auth/register, /api/auth/verify, /api/auth/forgot-password, /api/auth/reset-token, /api/auth/reset-password, /api/user/dashboard, /api/user/booking-context, /api/user/bookings/slots, /api/user/bookings, /api/user/bookings/{id}/cancel, /api/user/notifications, /api/user/notifications/unread-count, /api/user/notifications/{id}/read, /api/user/notifications/read-all, /api/cashier/dashboard, /api/cashier/users, /api/cashier/users/{id}, /api/cashier/bookings, /api/cashier/bookings/{id}/arrive, /api/cashier/bookings/{id}/payment, /api/cashier/bookings/{id}/complete, /api/cashier/bookings/{id}/receipt, /api/cashier/notifications, /api/admin/dashboard, /api/admin/users, /api/admin/users/{id}, /api/admin/bookings, /api/admin/parking-rates/current, /api/admin/blocklist, /api/admin/blocklist/{id}/remove, /api/admin/reports/dashboard, /api/admin/reports/export/excel, /api/admin/reports/export/pdf, /api/profile/me, and /api/parking-rates/current plus local frontend CORS support. Rebuilt API controllers now share common ApiErrorResponse and ValidationErrorResponse payloads instead of per-controller inline map/error-record variants. The login/session flow now uses one primary frontend login route while the backend resolves the actual authority for redirect and route protection. A manual blocklist-add API remains intentionally deferred until the product owner confirms that UI belongs in the first rebuild pass.`
 
 ## 12. QA and Verification Checklist
 
@@ -250,6 +250,7 @@ Notes / blockers: `Added /api/auth/me, /api/auth/login, /api/auth/logout, /api/a
 - [ ] Print receipt verified
 - [ ] Backend tests run
 - [x] Frontend build verified
+- [ ] Manually verify Excel and PDF downloads against a live backend runtime
 
 Owner: `Codex`
 Last updated: `2026-05-10`
@@ -265,11 +266,14 @@ Notes / blockers: `Frontend npm install, lint, and production build passed. Back
 - [x] Review blocklist MVC actions and rebuild the admin blocklist review/unblock flow
 - [ ] Decide whether the manual blocklist-add UI belongs in the first rebuild pass
 - [x] Start Phase 6 with the reports dashboard shell, filters, grouping controls, KPI cards, and trend/distribution views
-- [ ] Rebuild Excel and PDF export flows on top of stable frontend-oriented contracts
+- [x] Rebuild Excel and PDF export flows on top of stable frontend-oriented contracts
+- [x] Standardize rebuilt API error and validation payload contracts
+- [ ] Manually verify the shared /login flow against USER, CASHIER, and ADMIN accounts in a live backend runtime
+- [ ] Manually verify Excel and PDF downloads against the rebuilt reports page in a live backend runtime
 
 ## 14. Session Handoff Notes
 
 Use this section to record where work stopped so the next session can resume quickly.
 
-- Current handoff note: `Phase 6 has started. The frontend now has a real /admin/reports route on the shared admin shell, backed by /api/admin/reports/dashboard with date-range filters, day/week/month grouping, KPI summaries, and lightweight booking/earnings/distribution visuals. Frontend lint and production build passed. Backend compile verification is still blocked by the local JDK not supporting Java 21. The manual blocklist-add decision remains open but is no longer blocking report work.`
-- Next recommended starting point: `Keep Phase 6 moving by rebuilding the Excel and PDF export flows from the reports dashboard, then circle back to the manual blocklist-add decision if the project owner confirms it belongs in the first rebuild pass.`
+- Current handoff note: `The rebuilt API layer now uses shared ApiErrorResponse and ValidationErrorResponse contracts across the frontend-facing auth, user, cashier, and admin controllers that previously mixed inline message maps and per-controller validation records. Frontend lint and production build passed after this backend contract cleanup. Backend compile verification remains blocked by the local JDK not supporting Java 21, and live role-by-role login plus live file-download verification still need to be done against a running backend.`
+- Next recommended starting point: `Manually verify shared-login behavior plus Excel/PDF downloads against a live backend session, then either close the remaining QA checklist items or return to the still-open manual blocklist-add product decision for Phase 5.`

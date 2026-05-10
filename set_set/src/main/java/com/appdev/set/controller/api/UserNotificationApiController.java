@@ -1,5 +1,6 @@
 package com.appdev.set.controller.api;
 
+import com.appdev.set.controller.api.response.ApiErrorResponse;
 import com.appdev.set.model.Notification;
 import com.appdev.set.model.User;
 import com.appdev.set.service.NotificationService;
@@ -14,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/user/notifications")
 public class UserNotificationApiController {
@@ -63,7 +62,7 @@ public class UserNotificationApiController {
                         notificationService.getUnreadCount(user)
                 )))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                        Map.of("message", "Notification not found for this user.")
+                        ApiErrorResponse.of("Notification not found for this user.")
                 ));
     }
 

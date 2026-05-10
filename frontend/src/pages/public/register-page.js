@@ -177,7 +177,7 @@ export function createRegisterPage(context) {
 
                 <div class="auth-support-links">
                   <button class="button button--primary" type="submit" data-submit-button>Create account</button>
-                  <a class="button button--secondary" href="/login/user" data-link>Already have an account?</a>
+                  <a class="button button--secondary" href="/login" data-link>Already have an account?</a>
                 </div>
               </form>
             </div>

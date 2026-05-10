@@ -1,4 +1,4 @@
-import { apiRequest } from "./api-client.js";
+import { apiRequest, downloadRequest } from "./api-client.js";
 
 function buildQuery(params) {
   const query = new URLSearchParams();
@@ -15,4 +15,8 @@ function buildQuery(params) {
 
 export async function fetchAdminReportsDashboard(filters = {}) {
   return apiRequest(`/api/admin/reports/dashboard${buildQuery(filters)}`);
+}
+
+export async function downloadAdminReport(format, filters = {}) {
+  return downloadRequest(`/api/admin/reports/export/${format}${buildQuery(filters)}`);
 }

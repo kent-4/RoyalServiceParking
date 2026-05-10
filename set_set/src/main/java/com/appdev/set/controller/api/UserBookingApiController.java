@@ -1,5 +1,7 @@
 package com.appdev.set.controller.api;
 
+import com.appdev.set.controller.api.response.ApiErrorResponse;
+import com.appdev.set.controller.api.response.ValidationErrorResponse;
 import com.appdev.set.model.Booking;
 import com.appdev.set.model.ParkingCost;
 import com.appdev.set.model.ParkingSlot;
@@ -70,7 +72,7 @@ public class UserBookingApiController {
         try {
             selectedDate = resolveBookingDate(date);
         } catch (IllegalArgumentException exception) {
-            return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
+            return ResponseEntity.badRequest().body(ApiErrorResponse.of(exception.getMessage()));
         }
         ParkingCost currentRate = parkingCostService.getCurrentRate();
         BookingSummaryDto activeBooking = activeBookingSummary(user);
@@ -113,18 +115,18 @@ public class UserBookingApiController {
         try {
             selectedDate = resolveBookingDate(date);
         } catch (IllegalArgumentException exception) {
-            return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
+            return ResponseEntity.badRequest().body(ApiErrorResponse.of(exception.getMessage()));
         }
 
         if (!LEVELS.contains(level)) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Select a valid parking level."));
+            return ResponseEntity.badRequest().body(ApiErrorResponse.of("Select a valid parking level."));
         }
 
         LocalTime parsedStartTime;
         try {
             parsedStartTime = LocalTime.parse(startTime);
         } catch (DateTimeParseException exception) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Select a valid booking start time."));
+            return ResponseEntity.badRequest().body(ApiErrorResponse.of("Select a valid booking start time."));
         }
 
         LocalTime exitTime = parsedStartTime.plusHours(1);
@@ -269,7 +271,7 @@ public class UserBookingApiController {
         }
 
         if (!fieldErrors.isEmpty()) {
-            return ResponseEntity.badRequest().body(new ValidationErrorResponse(
+            return ResponseEntity.badRequest().body(ValidationErrorResponse.of(
                     "Review the booking details and try again.",
                     fieldErrors
             ));
@@ -280,7 +282,7 @@ public class UserBookingApiController {
         try {
             selectedDate = resolveBookingDate(request.date());
         } catch (IllegalArgumentException exception) {
-            return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
+            return ResponseEntity.badRequest().body(ApiErrorResponse.of(exception.getMessage()));
         }
 
         Booking booking = new Booking();
@@ -305,7 +307,7 @@ public class UserBookingApiController {
                     toUserBookingListItem(savedBooking)
             ));
         } catch (RuntimeException exception) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", exception.getMessage()));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiErrorResponse.of(exception.getMessage()));
         }
     }
 
@@ -315,18 +317,16 @@ public class UserBookingApiController {
         Optional<Booking> bookingOpt = bookingService.getBookingById(id);
 
         if (bookingOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Booking not found."));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiErrorResponse.of("Booking not found."));
         }
 
         Booking booking = bookingOpt.get();
         if (!booking.getUser().getId().equals(currentUser.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "You can only cancel your own bookings."));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiErrorResponse.of("You can only cancel your own bookings."));
         }
 
         if (booking.getStatus() != Booking.BookingStatus.RESERVED) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Only reserved bookings can be canceled."
-            ));
+            return ResponseEntity.badRequest().body(ApiErrorResponse.of("Only reserved bookings can be canceled."));
         }
 
         Booking updated = bookingService.updateBookingStatus(id, Booking.BookingStatus.CANCELED);
@@ -499,8 +499,5 @@ public class UserBookingApiController {
     }
 
     public record BookingMutationResponse(String message, UserBookingListItemDto booking) {
-    }
-
-    public record ValidationErrorResponse(String message, Map<String, String> fieldErrors) {
     }
 }

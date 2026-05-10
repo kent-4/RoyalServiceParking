@@ -1,5 +1,7 @@
 package com.appdev.set.controller.api;
 
+import com.appdev.set.controller.api.response.ApiErrorResponse;
+import com.appdev.set.controller.api.response.ValidationErrorResponse;
 import com.appdev.set.model.User;
 import com.appdev.set.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -54,12 +55,6 @@ public class AuthApiController {
                     new UsernamePasswordAuthenticationToken(request.username(), request.password())
             );
 
-            String resolvedRole = resolveRole(authenticated);
-            if (!matchesLoginType(request.loginType(), resolvedRole)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(Map.of("message", "The selected login page does not match this account role."));
-            }
-
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(authenticated);
             SecurityContextHolder.setContext(context);
@@ -70,7 +65,7 @@ public class AuthApiController {
             return ResponseEntity.ok(buildSessionResponse(authenticated));
         } catch (BadCredentialsException exception) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("message", "Invalid username or password."));
+                    .body(ApiErrorResponse.of("Invalid username or password."));
         }
     }
 
@@ -89,7 +84,7 @@ public class AuthApiController {
         Map<String, String> fieldErrors = validateRegistrationRequest(request);
         if (!fieldErrors.isEmpty()) {
             return ResponseEntity.badRequest()
-                    .body(new ValidationErrorResponse("Review the registration form and try again.", fieldErrors));
+                    .body(ValidationErrorResponse.of("Review the registration form and try again.", fieldErrors));
         }
 
         User user = new User();
@@ -114,7 +109,7 @@ public class AuthApiController {
                     )
             );
         } catch (RuntimeException exception) {
-            return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
+            return ResponseEntity.badRequest().body(ApiErrorResponse.of(exception.getMessage()));
         }
     }
 
@@ -139,7 +134,7 @@ public class AuthApiController {
         String email = request.email() == null ? "" : request.email().trim();
         if (email.isEmpty()) {
             return ResponseEntity.badRequest().body(
-                    new ValidationErrorResponse(
+                    ValidationErrorResponse.of(
                             "Email is required.",
                             Map.of("email", "Email is required.")
                     )
@@ -147,8 +142,8 @@ public class AuthApiController {
         }
 
         if (!userService.isEmailVerified(email)) {
-            return ResponseEntity.badRequest().body(Map.of(
-                    "message", "Email not found or not verified. Please check your email or register a new account."
+            return ResponseEntity.badRequest().body(ApiErrorResponse.of(
+                    "Email not found or not verified. Please check your email or register a new account."
             ));
         }
 
@@ -196,7 +191,7 @@ public class AuthApiController {
 
         if (!fieldErrors.isEmpty()) {
             return ResponseEntity.badRequest()
-                    .body(new ValidationErrorResponse("Review the password fields and try again.", fieldErrors));
+                    .body(ValidationErrorResponse.of("Review the password fields and try again.", fieldErrors));
         }
 
         boolean reset = userService.resetPassword(request.token(), request.password());
@@ -206,9 +201,7 @@ public class AuthApiController {
             ));
         }
 
-        return ResponseEntity.badRequest().body(Map.of(
-                "message", "Invalid or expired reset token."
-        ));
+        return ResponseEntity.badRequest().body(ApiErrorResponse.of("Invalid or expired reset token."));
     }
 
     private AuthSessionResponse buildSessionResponse(Authentication authentication) {
@@ -219,22 +212,20 @@ public class AuthApiController {
 
         String role = resolveRole(authentication);
         String username = authentication.getName();
+        Optional<User> userOpt = userService.findByEmail(username);
 
-        if ("USER".equals(role)) {
-            Optional<User> userOpt = userService.findByEmail(username);
-            if (userOpt.isPresent()) {
-                User user = userOpt.get();
-                return new AuthSessionResponse(
-                        true,
-                        role,
-                        username,
-                        user.getFullName(),
-                        user.getEmail(),
-                        user.isVerified(),
-                        user.isCurrentlyBlocklisted(),
-                        user.getBlocklistUntil() != null ? user.getBlocklistUntil().toString() : null
-                );
-            }
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            return new AuthSessionResponse(
+                    true,
+                    role,
+                    username,
+                    user.getFullName(),
+                    user.getEmail(),
+                    user.isVerified(),
+                    user.isCurrentlyBlocklisted(),
+                    user.getBlocklistUntil() != null ? user.getBlocklistUntil().toString() : null
+            );
         }
 
         String displayName = switch (role) {
@@ -324,19 +315,6 @@ public class AuthApiController {
                 .orElse("");
     }
 
-    private boolean matchesLoginType(String loginType, String resolvedRole) {
-        if (loginType == null || resolvedRole == null) {
-            return false;
-        }
-
-        return switch (loginType.toLowerCase(Locale.ROOT)) {
-            case "admin" -> "ADMIN".equals(resolvedRole);
-            case "cashier" -> "CASHIER".equals(resolvedRole);
-            case "user" -> "USER".equals(resolvedRole);
-            default -> false;
-        };
-    }
-
     public record LoginRequest(String username, String password, String loginType) {
     }
 
@@ -372,8 +350,5 @@ public class AuthApiController {
             boolean blocklisted,
             String blocklistUntil
     ) {
-    }
-
-    public record ValidationErrorResponse(String message, Map<String, String> fieldErrors) {
     }
 }

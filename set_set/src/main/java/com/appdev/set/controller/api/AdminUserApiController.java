@@ -1,5 +1,6 @@
 package com.appdev.set.controller.api;
 
+import com.appdev.set.controller.api.response.ApiErrorResponse;
 import com.appdev.set.model.Booking;
 import com.appdev.set.model.User;
 import com.appdev.set.service.BookingService;
@@ -14,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/admin/users")
 public class AdminUserApiController {
@@ -85,7 +84,7 @@ public class AdminUserApiController {
                     ));
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                        Map.of("message", "Verified user not found.")
+                        ApiErrorResponse.of("Verified user not found.")
                 ));
     }
 

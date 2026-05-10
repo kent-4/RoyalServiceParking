@@ -5,9 +5,7 @@ import { renderBrandMark } from "./brand-mark.js";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/register", label: "Register" },
-  { href: "/login/user", label: "User Login" },
-  { href: "/login/cashier", label: "Cashier" },
-  { href: "/login/admin", label: "Admin" }
+  { href: "/login", label: "Login" }
 ];
 
 export function renderPublicNavbar({ currentPath = "/", showPrimaryCta = true } = {}) {
@@ -23,7 +21,7 @@ export function renderPublicNavbar({ currentPath = "/", showPrimaryCta = true } 
       active: currentPath === link.href
     })),
     actions: `
-      ${renderButton({ label: "Staff access", href: "/login/cashier", tone: "ghost" })}
+      ${renderButton({ label: "Staff access", href: "/login?role=cashier", tone: "ghost" })}
       ${showPrimaryCta ? renderButton({ label: "Advance booking", href: "/register", tone: "primary" }) : ""}
     `
   });

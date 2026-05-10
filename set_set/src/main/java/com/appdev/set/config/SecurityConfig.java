@@ -57,7 +57,7 @@ public class SecurityConfig {
         http
              .csrf(csrf -> csrf.disable())
              .authorizeHttpRequests(authorize -> authorize
-                 .requestMatchers("/", "/register", "/verify", "/forgot-password", "/reset-password", 
+                 .requestMatchers("/", "/login", "/register", "/verify", "/forgot-password", "/reset-password", 
                                  "/css/**", "/js/**", "/images/**", "/styles/**", "/scripts/**", "/static/**",
                                  "/login-error", "/reset-success", "/forgot-password-confirmation").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
@@ -74,7 +74,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login-user")
+                .loginPage("/login")
                 .loginProcessingUrl("/login")
                 .usernameParameter("username")
                 .passwordParameter("password")
@@ -83,16 +83,6 @@ public class SecurityConfig {
                             .findFirst()
                             .map(authority -> authority.getAuthority())
                             .orElse("");
-                    
-                    String loginType = request.getParameter("loginType");
-                    
-                    // Validate role against login type
-                    if (("admin".equals(loginType) && !"ROLE_ADMIN".equals(role)) ||
-                        ("cashier".equals(loginType) && !"ROLE_CASHIER".equals(role)) ||
-                        ("user".equals(loginType) && !"ROLE_USER".equals(role))) {
-                        response.sendRedirect(request.getContextPath() + "/login-" + loginType + "?error=invalid_role");
-                        return;
-                    }
                     
                     // Redirect based on role
                     try {
@@ -110,8 +100,7 @@ public class SecurityConfig {
                     }
                 })
                 .failureHandler((request, response, exception) -> {
-                    String loginType = request.getParameter("loginType");
-                    response.sendRedirect(request.getContextPath() + "/login-" + loginType + "?error=true");
+                    response.sendRedirect(request.getContextPath() + "/login?error=true");
                 })
                 .permitAll()
             )
@@ -124,14 +113,7 @@ public class SecurityConfig {
             )
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint((request, response, authException) -> {
-                    String uri = request.getRequestURI();
-                    if (uri.startsWith("/admin")) {
-                        response.sendRedirect(request.getContextPath() + "/login-admin");
-                    } else if (uri.startsWith("/cashier")) {
-                        response.sendRedirect(request.getContextPath() + "/login-cashier");
-                    } else {
-                        response.sendRedirect(request.getContextPath() + "/login-user");
-                    }
+                    response.sendRedirect(request.getContextPath() + "/login");
                 })
             );
         

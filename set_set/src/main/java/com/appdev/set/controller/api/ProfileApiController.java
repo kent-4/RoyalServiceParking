@@ -1,5 +1,6 @@
 package com.appdev.set.controller.api;
 
+import com.appdev.set.controller.api.response.ValidationErrorResponse;
 import com.appdev.set.model.User;
 import com.appdev.set.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,7 @@ public class ProfileApiController {
         }
 
         if (!fieldErrors.isEmpty()) {
-          return ResponseEntity.badRequest().body(new ValidationErrorResponse(
+          return ResponseEntity.badRequest().body(ValidationErrorResponse.of(
                   "Review the profile form and try again.",
                   fieldErrors
           ));
@@ -134,8 +135,5 @@ public class ProfileApiController {
             String blocklistUntil,
             int missedBookingsCount
     ) {
-    }
-
-    public record ValidationErrorResponse(String message, Map<String, String> fieldErrors) {
     }
 }

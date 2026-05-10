@@ -1,5 +1,6 @@
 package com.appdev.set.controller.api;
 
+import com.appdev.set.controller.api.response.ApiErrorResponse;
 import com.appdev.set.model.Booking;
 import com.appdev.set.service.BookingService;
 import com.appdev.set.service.ParkingCostService;
@@ -19,8 +20,6 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/cashier/bookings")
 public class CashierBookingApiController {
@@ -78,7 +77,7 @@ public class CashierBookingApiController {
                 .<ResponseEntity<?>>map(booking -> {
                     if (booking.getStatus() != Booking.BookingStatus.RESERVED) {
                         return ResponseEntity.status(HttpStatus.CONFLICT)
-                                .body(Map.of("message", "Only reserved bookings can be marked as arrived."));
+                                .body(ApiErrorResponse.of("Only reserved bookings can be marked as arrived."));
                     }
 
                     Booking updated = bookingService.markUserArrived(id);
@@ -88,7 +87,7 @@ public class CashierBookingApiController {
                     ));
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", "Booking not found.")));
+                        .body(ApiErrorResponse.of("Booking not found.")));
     }
 
     @GetMapping("/{id}/payment")
@@ -96,7 +95,7 @@ public class CashierBookingApiController {
         return bookingService.getBookingById(id)
                 .<ResponseEntity<?>>map(booking -> ResponseEntity.ok(toPaymentPreview(booking)))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", "Booking not found.")));
+                        .body(ApiErrorResponse.of("Booking not found.")));
     }
 
     @PostMapping("/{id}/complete")
@@ -105,7 +104,7 @@ public class CashierBookingApiController {
                 .<ResponseEntity<?>>map(booking -> {
                     if (booking.getStatus() != Booking.BookingStatus.ARRIVED) {
                         return ResponseEntity.status(HttpStatus.CONFLICT)
-                                .body(Map.of("message", "Only arrived bookings can be completed."));
+                                .body(ApiErrorResponse.of("Only arrived bookings can be completed."));
                     }
 
                     Booking completed = bookingService.updateBookingStatus(id, Booking.BookingStatus.COMPLETED);
@@ -116,7 +115,7 @@ public class CashierBookingApiController {
                     ));
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", "Booking not found.")));
+                        .body(ApiErrorResponse.of("Booking not found.")));
     }
 
     @GetMapping("/{id}/receipt")
@@ -125,13 +124,13 @@ public class CashierBookingApiController {
                 .<ResponseEntity<?>>map(booking -> {
                     if (booking.getStatus() != Booking.BookingStatus.COMPLETED) {
                         return ResponseEntity.status(HttpStatus.CONFLICT)
-                                .body(Map.of("message", "A receipt is available only after payment is completed."));
+                                .body(ApiErrorResponse.of("A receipt is available only after payment is completed."));
                     }
 
                     return ResponseEntity.ok(toReceipt(booking));
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", "Booking not found.")));
+                        .body(ApiErrorResponse.of("Booking not found.")));
     }
 
     private Comparator<Booking> bookingComparator() {

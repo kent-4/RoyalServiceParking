@@ -57,7 +57,7 @@ export const routes = [
           ? `Verification instructions were requested for ${context.query.get("email")}.`
           : "Open the mailbox tied to the account and follow the verification link before trying to sign in.",
         actions: [
-          { href: "/login/user", label: "Go to user login", variant: "button--primary" },
+          { href: "/login", label: "Go to login", variant: "button--primary" },
           { href: "/", label: "Back to home" }
         ]
       })
@@ -84,7 +84,7 @@ export const routes = [
           ? `Check the inbox and spam folder for ${context.query.get("email")}.`
           : "Check the inbox and spam folder of the email you submitted.",
         actions: [
-          { href: "/login/user", label: "Back to user login", variant: "button--primary" },
+          { href: "/login", label: "Back to login", variant: "button--primary" },
           { href: "/", label: "Back to home" }
         ]
       })
@@ -109,7 +109,7 @@ export const routes = [
           "The backend accepted the new password. You can now use it to sign in to the user portal.",
         detail: "Return to the user login screen and continue with the updated credentials.",
         actions: [
-          { href: "/login/user?reset=true", label: "Proceed to user login", variant: "button--primary" },
+          { href: "/login?reset=true", label: "Proceed to login", variant: "button--primary" },
           { href: "/", label: "Back to home" }
         ]
       })
@@ -121,22 +121,25 @@ export const routes = [
     createPage: createVerifyPage
   },
   {
-    path: "/login/user",
-    title: "User Login",
+    path: "/login",
+    title: "Login",
     access: "guest",
-    createPage: (context) => createLoginPage(context, { loginType: "user" })
+    createPage: createLoginPage
+  },
+  {
+    path: "/login/user",
+    access: "guest",
+    redirectTo: "/login?role=user"
   },
   {
     path: "/login/cashier",
-    title: "Cashier Login",
     access: "guest",
-    createPage: (context) => createLoginPage(context, { loginType: "cashier" })
+    redirectTo: "/login?role=cashier"
   },
   {
     path: "/login/admin",
-    title: "Admin Login",
     access: "guest",
-    createPage: (context) => createLoginPage(context, { loginType: "admin" })
+    redirectTo: "/login?role=admin"
   },
   {
     path: "/user",

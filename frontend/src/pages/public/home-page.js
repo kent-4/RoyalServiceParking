@@ -12,7 +12,7 @@ const experienceCards = [
     meta: "For new customers"
   },
   {
-    href: "/login/user",
+    href: "/login?role=user",
     eyebrow: "Customer access",
     title: "Return to your user portal.",
     description:
@@ -20,7 +20,7 @@ const experienceCards = [
     meta: "For verified users"
   },
   {
-    href: "/login/cashier",
+    href: "/login?role=cashier",
     eyebrow: "Operations",
     title: "Open the cashier workspace.",
     description:
@@ -28,7 +28,7 @@ const experienceCards = [
     meta: "For staff on site"
   },
   {
-    href: "/login/admin",
+    href: "/login?role=admin",
     eyebrow: "Management",
     title: "Enter the admin workspace.",
     description:
@@ -95,8 +95,8 @@ export function createPublicHomePage({ session, pathname }) {
             </p>
             <div class="hero-actions">
               <a class="button button--primary" href="${primaryAction.href}" data-link>${primaryAction.label}</a>
-              <a class="button button--secondary" href="/login/user" data-link>User login</a>
-              <a class="button button--ghost" href="/login/cashier" data-link>Cashier access</a>
+              <a class="button button--secondary" href="/login" data-link>Login</a>
+              <a class="button button--ghost" href="/login?role=cashier" data-link>Cashier access</a>
             </div>
             <div class="hero-highlights">
               <div class="hero-highlight">

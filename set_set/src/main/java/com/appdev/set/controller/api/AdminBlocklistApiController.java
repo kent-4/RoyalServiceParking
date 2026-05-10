@@ -1,5 +1,6 @@
 package com.appdev.set.controller.api;
 
+import com.appdev.set.controller.api.response.ApiErrorResponse;
 import com.appdev.set.model.User;
 import com.appdev.set.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -13,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/admin/blocklist")
 public class AdminBlocklistApiController {
@@ -66,7 +65,7 @@ public class AdminBlocklistApiController {
                     ));
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("message", "Active blocklisted user not found.")));
+                        .body(ApiErrorResponse.of("Active blocklisted user not found.")));
     }
 
     private AdminBlocklistUserDto toDto(User user) {

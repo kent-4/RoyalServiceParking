@@ -23,13 +23,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Skip database lookup for the fixed admin user
-        if ("admin".equals(username)) {
-            // This will be handled by inMemoryAuthentication
-            throw new UsernameNotFoundException("Admin user is handled separately");
+        // Skip database lookup for the fixed in-memory staff users.
+        if ("admin".equalsIgnoreCase(username) || "cashier".equalsIgnoreCase(username)) {
+            throw new UsernameNotFoundException("Fixed staff users are handled separately");
         }
 
-        // For regular users, look up in the database by email
         Optional<User> userOpt = userRepository.findByEmail(username);
 
         if (userOpt.isEmpty()) {
@@ -43,7 +41,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),

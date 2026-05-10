@@ -96,7 +96,7 @@ export function createVerifyPage(context) {
           description: response.message,
           detail: "You can now sign in to the customer portal using the verified account credentials.",
           actions: [
-            { href: "/login/user", label: "Proceed to user login", variant: "button--primary" },
+            { href: "/login", label: "Proceed to login", variant: "button--primary" },
             { href: "/", label: "Back to home" }
           ]
         });
