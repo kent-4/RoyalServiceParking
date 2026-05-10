@@ -9,12 +9,17 @@ const navItems = {
   CASHIER: [
     { href: "/cashier/dashboard", label: "Dashboard", match: ["/cashier/dashboard"] },
     { href: "/cashier/users", label: "Users", match: ["/cashier/users", "/cashier/users/detail"] },
-    { href: "/cashier/bookings", label: "Bookings", match: ["/cashier/bookings"] },
-    { label: "Notifications", disabled: true },
-    { label: "Parking Rate", disabled: true }
+    { href: "/cashier/bookings", label: "Bookings", match: ["/cashier/bookings", "/cashier/bookings/payment", "/cashier/bookings/receipt"] },
+    { href: "/cashier/notifications", label: "Notifications", match: ["/cashier/notifications"] },
+    { href: "/cashier/parking-cost", label: "Parking Rate", match: ["/cashier/parking-cost"] }
   ],
   ADMIN: [
-    { href: "/admin/dashboard", label: "Dashboard", match: ["/admin/dashboard"] }
+    { href: "/admin/dashboard", label: "Dashboard", match: ["/admin/dashboard"] },
+    { href: "/admin/users", label: "Users", match: ["/admin/users", "/admin/users/detail"] },
+    { href: "/admin/bookings", label: "Bookings", match: ["/admin/bookings"] },
+    { href: "/admin/parking-cost", label: "Parking Rate", match: ["/admin/parking-cost"] },
+    { href: "/admin/blocklist", label: "Blocklist", match: ["/admin/blocklist"] },
+    { href: "/admin/reports", label: "Reports", match: ["/admin/reports"] }
   ]
 };
 

@@ -1,6 +1,16 @@
 import { createAdminDashboardPage } from "../pages/admin/dashboard-page.js";
+import { createAdminBlocklistPage } from "../pages/admin/blocklist-page.js";
+import { createAdminBookingsPage } from "../pages/admin/bookings-page.js";
+import { createAdminParkingRatePage } from "../pages/admin/parking-rate-page.js";
+import { createAdminReportsPage } from "../pages/admin/reports-page.js";
+import { createAdminUserDetailsPage } from "../pages/admin/user-details-page.js";
+import { createAdminUsersPage } from "../pages/admin/users-page.js";
 import { createCashierDashboardPage } from "../pages/cashier/dashboard-page.js";
 import { createCashierBookingsPage } from "../pages/cashier/bookings-page.js";
+import { createCashierNotificationsPage } from "../pages/cashier/notifications-page.js";
+import { createCashierPaymentPage } from "../pages/cashier/payment-page.js";
+import { createCashierParkingRatePage } from "../pages/cashier/parking-rate-page.js";
+import { createCashierReceiptPage } from "../pages/cashier/receipt-page.js";
 import { createCashierUserDetailsPage } from "../pages/cashier/user-details-page.js";
 import { createCashierUsersPage } from "../pages/cashier/users-page.js";
 import { createForgotPasswordPage } from "../pages/public/forgot-password-page.js";
@@ -210,9 +220,69 @@ export const routes = [
     createPage: createCashierBookingsPage
   },
   {
+    path: "/cashier/bookings/payment",
+    title: "Cashier Payment",
+    access: { role: "CASHIER" },
+    createPage: createCashierPaymentPage
+  },
+  {
+    path: "/cashier/bookings/receipt",
+    title: "Cashier Receipt",
+    access: { role: "CASHIER" },
+    createPage: createCashierReceiptPage
+  },
+  {
+    path: "/cashier/notifications",
+    title: "Cashier Notifications",
+    access: { role: "CASHIER" },
+    createPage: createCashierNotificationsPage
+  },
+  {
+    path: "/cashier/parking-cost",
+    title: "Cashier Parking Rate",
+    access: { role: "CASHIER" },
+    createPage: createCashierParkingRatePage
+  },
+  {
     path: "/admin/dashboard",
     title: "Admin Dashboard",
     access: { role: "ADMIN" },
     createPage: createAdminDashboardPage
+  },
+  {
+    path: "/admin/users",
+    title: "Admin Users",
+    access: { role: "ADMIN" },
+    createPage: createAdminUsersPage
+  },
+  {
+    path: "/admin/users/detail",
+    title: "Admin User Details",
+    access: { role: "ADMIN" },
+    createPage: createAdminUserDetailsPage
+  },
+  {
+    path: "/admin/bookings",
+    title: "Admin Bookings",
+    access: { role: "ADMIN" },
+    createPage: createAdminBookingsPage
+  },
+  {
+    path: "/admin/parking-cost",
+    title: "Admin Parking Rate",
+    access: { role: "ADMIN" },
+    createPage: createAdminParkingRatePage
+  },
+  {
+    path: "/admin/blocklist",
+    title: "Admin Blocklist",
+    access: { role: "ADMIN" },
+    createPage: createAdminBlocklistPage
+  },
+  {
+    path: "/admin/reports",
+    title: "Admin Reports",
+    access: { role: "ADMIN" },
+    createPage: createAdminReportsPage
   }
 ];

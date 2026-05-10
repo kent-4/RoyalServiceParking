@@ -34,3 +34,21 @@ export async function markCashierBookingArrived(bookingId) {
     method: "POST"
   });
 }
+
+export async function fetchCashierBookingPayment(bookingId) {
+  return apiRequest(`/api/cashier/bookings/${encodeURIComponent(bookingId)}/payment`);
+}
+
+export async function completeCashierBooking(bookingId) {
+  return apiRequest(`/api/cashier/bookings/${encodeURIComponent(bookingId)}/complete`, {
+    method: "POST"
+  });
+}
+
+export async function fetchCashierBookingReceipt(bookingId) {
+  return apiRequest(`/api/cashier/bookings/${encodeURIComponent(bookingId)}/receipt`);
+}
+
+export async function fetchCashierNotifications() {
+  return apiRequest("/api/cashier/notifications");
+}

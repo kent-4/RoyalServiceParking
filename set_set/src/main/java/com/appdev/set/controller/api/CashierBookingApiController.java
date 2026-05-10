@@ -2,6 +2,7 @@ package com.appdev.set.controller.api;
 
 import com.appdev.set.model.Booking;
 import com.appdev.set.service.BookingService;
+import com.appdev.set.service.ParkingCostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -22,9 +26,11 @@ import java.util.Map;
 public class CashierBookingApiController {
 
     private final BookingService bookingService;
+    private final ParkingCostService parkingCostService;
 
-    public CashierBookingApiController(BookingService bookingService) {
+    public CashierBookingApiController(BookingService bookingService, ParkingCostService parkingCostService) {
         this.bookingService = bookingService;
+        this.parkingCostService = parkingCostService;
     }
 
     @GetMapping
@@ -80,6 +86,49 @@ public class CashierBookingApiController {
                             "User marked as arrived.",
                             toListItem(updated)
                     ));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "Booking not found.")));
+    }
+
+    @GetMapping("/{id}/payment")
+    public ResponseEntity<?> paymentPreview(@PathVariable Long id) {
+        return bookingService.getBookingById(id)
+                .<ResponseEntity<?>>map(booking -> ResponseEntity.ok(toPaymentPreview(booking)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "Booking not found.")));
+    }
+
+    @PostMapping("/{id}/complete")
+    public ResponseEntity<?> complete(@PathVariable Long id) {
+        return bookingService.getBookingById(id)
+                .<ResponseEntity<?>>map(booking -> {
+                    if (booking.getStatus() != Booking.BookingStatus.ARRIVED) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body(Map.of("message", "Only arrived bookings can be completed."));
+                    }
+
+                    Booking completed = bookingService.updateBookingStatus(id, Booking.BookingStatus.COMPLETED);
+                    return ResponseEntity.ok(new BookingCompletionResponse(
+                            "Payment completed successfully.",
+                            completed.getId(),
+                            toListItem(completed)
+                    ));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "Booking not found.")));
+    }
+
+    @GetMapping("/{id}/receipt")
+    public ResponseEntity<?> receipt(@PathVariable Long id) {
+        return bookingService.getBookingById(id)
+                .<ResponseEntity<?>>map(booking -> {
+                    if (booking.getStatus() != Booking.BookingStatus.COMPLETED) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body(Map.of("message", "A receipt is available only after payment is completed."));
+                    }
+
+                    return ResponseEntity.ok(toReceipt(booking));
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("message", "Booking not found.")));
@@ -144,6 +193,73 @@ public class CashierBookingApiController {
         return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
     }
 
+    private CashierBookingPaymentResponse toPaymentPreview(Booking booking) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startDateTime = LocalDateTime.of(booking.getDate(), booking.getStartTime());
+        LocalDateTime exitDateTime = LocalDateTime.of(now.toLocalDate(), now.toLocalTime());
+
+        if (exitDateTime.isBefore(startDateTime)) {
+            exitDateTime = exitDateTime.plusDays(1);
+        }
+
+        long minutesBetween = Duration.between(startDateTime, exitDateTime).toMinutes();
+        if (minutesBetween < 0) {
+            minutesBetween = 0;
+        }
+
+        long totalHours = Math.max(1, (minutesBetween + 59) / 60);
+        long parkingDays = totalHours / 24;
+        long parkingHours = totalHours % 24;
+        double hourlyRate = parkingCostService.getCurrentRate().getHourlyRate();
+        double previewCost = totalHours * hourlyRate;
+
+        return new CashierBookingPaymentResponse(
+                booking.getId(),
+                booking.getUser() != null ? booking.getUser().getId() : null,
+                booking.getUser() != null ? safe(booking.getUser().getFullName()) : "Unknown user",
+                booking.getUser() != null ? safe(booking.getUser().getEmail()) : "Not provided",
+                safe(booking.getPlateNumber()),
+                safe(booking.getVehicleType()),
+                booking.getDate() != null ? booking.getDate().toString() : null,
+                booking.getStartTime() != null ? booking.getStartTime().toString() : null,
+                now.toLocalTime().toString(),
+                safe(booking.getLevel()),
+                safe(booking.getSlotName()),
+                booking.getStatus().name(),
+                totalHours,
+                parkingDays,
+                parkingHours,
+                hourlyRate,
+                previewCost,
+                booking.getStatus() == Booking.BookingStatus.ARRIVED
+        );
+    }
+
+    private CashierBookingReceiptResponse toReceipt(Booking booking) {
+        long totalHours = Math.max(1, booking.getParkingHours());
+        long parkingDays = totalHours / 24;
+        long parkingHours = totalHours % 24;
+        double hourlyRate = parkingCostService.getCurrentRate().getHourlyRate();
+
+        return new CashierBookingReceiptResponse(
+                booking.getId(),
+                booking.getUser() != null ? safe(booking.getUser().getFullName()) : "Unknown user",
+                safe(booking.getPlateNumber()),
+                safe(booking.getVehicleType()),
+                booking.getDate() != null ? booking.getDate().toString() : null,
+                booking.getStartTime() != null ? booking.getStartTime().toString() : null,
+                booking.getExitTime() != null ? booking.getExitTime().toString() : null,
+                safe(booking.getLevel()),
+                safe(booking.getSlotName()),
+                totalHours,
+                parkingDays,
+                parkingHours,
+                hourlyRate,
+                booking.getParkingCost(),
+                booking.getStatus().name()
+        );
+    }
+
     private CashierBookingListItemDto toListItem(Booking booking) {
         Booking.BookingStatus status = booking.getStatus();
 
@@ -202,5 +318,49 @@ public class CashierBookingApiController {
     }
 
     public record BookingMutationResponse(String message, CashierBookingListItemDto booking) {
+    }
+
+    public record CashierBookingPaymentResponse(
+            Long bookingId,
+            Long userId,
+            String fullName,
+            String email,
+            String plateNumber,
+            String vehicleType,
+            String date,
+            String startTime,
+            String previewExitTime,
+            String level,
+            String slotName,
+            String status,
+            long totalHours,
+            long parkingDays,
+            long parkingHours,
+            double hourlyRate,
+            double previewCost,
+            boolean canComplete
+    ) {
+    }
+
+    public record BookingCompletionResponse(String message, Long bookingId, CashierBookingListItemDto booking) {
+    }
+
+    public record CashierBookingReceiptResponse(
+            Long bookingId,
+            String fullName,
+            String plateNumber,
+            String vehicleType,
+            String date,
+            String startTime,
+            String exitTime,
+            String level,
+            String slotName,
+            long totalHours,
+            long parkingDays,
+            long parkingHours,
+            double hourlyRate,
+            double totalCost,
+            String status
+    ) {
     }
 }

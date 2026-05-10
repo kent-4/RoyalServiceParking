@@ -64,6 +64,7 @@ public class SecurityConfig {
                  .requestMatchers("/login-user").permitAll()
                  .requestMatchers("/login-cashier").permitAll()
                  .requestMatchers("/login-admin").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/cashier/**").hasRole("CASHIER")
                 .requestMatchers("/api/profile/**", "/api/user/**").hasRole("USER")
                 .requestMatchers("/api/parking-rates/current").hasAnyRole("USER", "CASHIER", "ADMIN")

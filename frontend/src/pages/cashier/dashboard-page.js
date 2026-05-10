@@ -39,12 +39,12 @@ export function createCashierDashboardPage({ session, pathname }) {
               </a>
               <a class="action-card" href="/cashier/bookings" data-link>
                 <strong>Booking desk</strong>
-                <p>Review operational bookings, apply filters, and confirm on-site arrivals before payment work begins.</p>
+                <p>Review operational bookings, confirm arrivals, and move active sessions into payment and receipt handling.</p>
               </a>
-              <article class="action-card action-card--disabled">
+              <a class="action-card" href="/cashier/notifications" data-link>
                 <strong>Operations feed</strong>
-                <p>Cashier notifications still need a final contract decision because the legacy feed is booking-derived.</p>
-              </article>
+                <p>Track current-booking alerts, arrived vehicles, and blocklisted-user warnings from the cashier feed.</p>
+              </a>
             </div>
           </article>
         </section>
@@ -85,6 +85,9 @@ export function createCashierDashboardPage({ session, pathname }) {
               <div><span>Reserved queue</span><strong>${data.totalReserved}</strong></div>
               <div><span>Parked vehicles</span><strong>${data.totalParked}</strong></div>
               <div><span>Open capacity</span><strong>${data.totalAvailable}</strong></div>
+            </div>
+            <div class="auth-support-links">
+              <a class="button button--secondary" href="/cashier/parking-cost" data-link>Open rate view</a>
             </div>
           `;
         }

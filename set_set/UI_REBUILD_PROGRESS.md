@@ -28,7 +28,7 @@ When a task changes state, update:
 ## 2. Current Snapshot
 
 - Current phase: `[/] In progress`
-- Current focus: `Cashier payment, completion, and receipt flows after the bookings and arrival slice`
+- Current focus: `Phase 6 report export flows after the rebuilt reports dashboard`
 - Last updated: `2026-05-10`
 - Current owner: `Codex + project owner`
 
@@ -169,51 +169,51 @@ Notes / blockers: `Phase 3 user routes are now fully rebuilt in the JavaScript f
 - [x] Cashier bookings page
 - [x] Booking filters and search
 - [x] Mark-arrived action
-- [ ] Edit/payment page
-- [ ] Booking completion flow
-- [ ] Receipt page
-- [ ] Print receipt styling
-- [ ] Cashier notifications page
-- [ ] Parking rate view
+- [x] Edit/payment page
+- [x] Booking completion flow
+- [x] Receipt page
+- [x] Print receipt styling
+- [x] Cashier notifications page
+- [x] Parking rate view
 
 Owner: `Codex`
 Last updated: `2026-05-10`
-Notes / blockers: `The rebuilt frontend now includes the cashier shell, dashboard, verified-customer search/list, cashier user detail view, and operational bookings table with filter/search plus arrival actions backed by explicit JSON APIs. Payment, completion, receipt, notifications, and parking-rate screens remain to be rebuilt. Tablet usability should stay part of the completion criteria for the remaining cashier flows.`
+Notes / blockers: `Phase 4 cashier routes are now functionally rebuilt in the JavaScript frontend, including dashboard, users, bookings, payment, receipt, notifications, and parking-rate views backed by explicit JSON APIs. The current notifications implementation keeps the legacy booking-derived feed behavior behind a frontend-oriented API for this pass. Tablet usability should stay part of the completion criteria for the remaining staff/admin flows.`
 
 ## 9. Phase 5: Admin Portal
 
-- [ ] Admin shell and navigation
-- [ ] Admin dashboard
-- [ ] Admin users page
-- [ ] Admin user details page
-- [ ] Admin bookings page
-- [ ] Admin booking filters and search
-- [ ] Admin parking rate page
-- [ ] Parking rate update flow
-- [ ] Admin blocklist page
-- [ ] Manual unblock flow
+- [x] Admin shell and navigation
+- [x] Admin dashboard
+- [x] Admin users page
+- [x] Admin user details page
+- [x] Admin bookings page
+- [x] Admin booking filters and search
+- [x] Admin parking rate page
+- [x] Parking rate update flow
+- [x] Admin blocklist page
+- [x] Manual unblock flow
 - [ ] Manual blocklist flow if approved
 
-Owner: `Unassigned`
+Owner: `Codex`
 Last updated: `2026-05-10`
-Notes / blockers: `Blocklist scope depends on the product decision recorded above.`
+Notes / blockers: `The rebuilt admin shell, dashboard, users page, user-details page, bookings oversight table, parking-rate management screen, and blocklist review/unblock flow are now live in the JavaScript frontend with dedicated /api/admin/dashboard, /api/admin/users*, /api/admin/bookings, /api/admin/parking-rates/current, and /api/admin/blocklist* endpoints. The only remaining Phase 5 item is the still-decision-gated manual blocklist-add flow.`
 
 ## 10. Phase 6: Reports and Exports
 
-- [ ] Reports dashboard shell
-- [ ] Date range filters
-- [ ] Day/week/month grouping controls
-- [ ] KPI summaries
-- [ ] Booking trend chart
-- [ ] Earnings trend chart
-- [ ] Vehicle type distribution
-- [ ] Booking status distribution
+- [x] Reports dashboard shell
+- [x] Date range filters
+- [x] Day/week/month grouping controls
+- [x] KPI summaries
+- [x] Booking trend chart
+- [x] Earnings trend chart
+- [x] Vehicle type distribution
+- [x] Booking status distribution
 - [ ] Excel export flow
 - [ ] PDF export flow
 
-Owner: `Unassigned`
+Owner: `Codex`
 Last updated: `2026-05-10`
-Notes / blockers: `This phase depends on stable reporting APIs and final charting/export approach.`
+Notes / blockers: `The rebuilt admin reports dashboard is now live in the JavaScript frontend with date filters, day/week/month grouping, KPI summaries, and lightweight trend/distribution visuals backed by /api/admin/reports/dashboard. Excel and PDF exports remain the next Phase 6 slice.`
 
 ## 11. Backend/API Support Checklist
 
@@ -222,16 +222,16 @@ Notes / blockers: `This phase depends on stable reporting APIs and final chartin
 - [/] Review current controllers for JSON API readiness
 - [x] Add missing JSON endpoints for public/auth flows
 - [x] Add missing JSON endpoints for user flows
-- [/] Add missing JSON endpoints for cashier flows
-- [ ] Add missing JSON endpoints for admin flows
-- [ ] Add missing JSON endpoints for reports/exports
+- [x] Add missing JSON endpoints for cashier flows
+- [/] Add missing JSON endpoints for admin flows
+- [/] Add missing JSON endpoints for reports/exports
 - [ ] Standardize API error payload shape
 - [ ] Standardize validation error payload shape
 - [/] Confirm CORS / cookie strategy for local development
 
 Owner: `Codex + project owner`
 Last updated: `2026-05-10`
-Notes / blockers: `Added /api/auth/me, /api/auth/login, /api/auth/logout, /api/auth/register, /api/auth/verify, /api/auth/forgot-password, /api/auth/reset-token, /api/auth/reset-password, /api/user/dashboard, /api/user/booking-context, /api/user/bookings/slots, /api/user/bookings, /api/user/bookings/{id}/cancel, /api/user/notifications, /api/user/notifications/unread-count, /api/user/notifications/{id}/read, /api/user/notifications/read-all, /api/cashier/dashboard, /api/cashier/users, /api/cashier/users/{id}, /api/cashier/bookings, /api/cashier/bookings/{id}/arrive, /api/profile/me, and /api/parking-rates/current plus local frontend CORS support. Cashier payment/receipt/notifications plus admin/reporting APIs still need review.`
+Notes / blockers: `Added /api/auth/me, /api/auth/login, /api/auth/logout, /api/auth/register, /api/auth/verify, /api/auth/forgot-password, /api/auth/reset-token, /api/auth/reset-password, /api/user/dashboard, /api/user/booking-context, /api/user/bookings/slots, /api/user/bookings, /api/user/bookings/{id}/cancel, /api/user/notifications, /api/user/notifications/unread-count, /api/user/notifications/{id}/read, /api/user/notifications/read-all, /api/cashier/dashboard, /api/cashier/users, /api/cashier/users/{id}, /api/cashier/bookings, /api/cashier/bookings/{id}/arrive, /api/cashier/bookings/{id}/payment, /api/cashier/bookings/{id}/complete, /api/cashier/bookings/{id}/receipt, /api/cashier/notifications, /api/admin/dashboard, /api/admin/users, /api/admin/users/{id}, /api/admin/bookings, /api/admin/parking-rates/current, /api/admin/blocklist, /api/admin/blocklist/{id}/remove, /api/admin/reports/dashboard, /api/profile/me, and /api/parking-rates/current plus local frontend CORS support. Export-oriented API review is still pending, and a manual blocklist-add API remains intentionally deferred until the product owner confirms that UI belongs in the first rebuild pass.`
 
 ## 12. QA and Verification Checklist
 
@@ -257,15 +257,19 @@ Notes / blockers: `Frontend npm install, lint, and production build passed. Back
 
 ## 13. Current Next Tasks
 
-- [ ] Review remaining cashier MVC actions for payment, receipt, notifications, and parking-rate JSON contracts
-- [x] Build the cashier users page and user-details flow against explicit backend APIs
-- [/] Build the cashier bookings page with filters plus status-aware action slots for arrival and completion
-- [x] Continue formalizing shared table/list, loading, empty, and error primitives from the now-shipping public and user routes
-- [ ] Decide whether the cashier notification feed should stay booking-derived or move to a unified API model before full Phase 4 implementation
+- [x] Review admin dashboard behavior and expose a frontend-friendly dashboard API
+- [x] Build the admin shell and dashboard on top of the shared role-shell foundation
+- [x] Build the admin users page and user-details flow against explicit backend APIs
+- [x] Build the admin bookings page with filters/search and management-ready table states
+- [x] Review parking-rate update MVC actions and rebuild the admin parking-rate management flow
+- [x] Review blocklist MVC actions and rebuild the admin blocklist review/unblock flow
+- [ ] Decide whether the manual blocklist-add UI belongs in the first rebuild pass
+- [x] Start Phase 6 with the reports dashboard shell, filters, grouping controls, KPI cards, and trend/distribution views
+- [ ] Rebuild Excel and PDF export flows on top of stable frontend-oriented contracts
 
 ## 14. Session Handoff Notes
 
 Use this section to record where work stopped so the next session can resume quickly.
 
-- Current handoff note: `The cashier bookings slice is now in place. The frontend has rebuilt /cashier/bookings with shared table/form/card primitives, status-aware KPI summaries, filters by status/date/slot plus free-text search, and a working mark-arrived action backed by /api/cashier/bookings and /api/cashier/bookings/{id}/arrive. The cashier sidebar and dashboard quick actions now expose the bookings route. ARRIVED and COMPLETED rows intentionally surface payment/receipt as the next rebuild step instead of linking to legacy Thymeleaf pages. Frontend lint and production build passed. Backend compile verification is still blocked by the local JDK not supporting Java 21.`
-- Next recommended starting point: `Build the cashier edit/payment page and booking completion flow on top of explicit JSON endpoints, then add the rebuilt receipt page and print styling.`
+- Current handoff note: `Phase 6 has started. The frontend now has a real /admin/reports route on the shared admin shell, backed by /api/admin/reports/dashboard with date-range filters, day/week/month grouping, KPI summaries, and lightweight booking/earnings/distribution visuals. Frontend lint and production build passed. Backend compile verification is still blocked by the local JDK not supporting Java 21. The manual blocklist-add decision remains open but is no longer blocking report work.`
+- Next recommended starting point: `Keep Phase 6 moving by rebuilding the Excel and PDF export flows from the reports dashboard, then circle back to the manual blocklist-add decision if the project owner confirms it belongs in the first rebuild pass.`

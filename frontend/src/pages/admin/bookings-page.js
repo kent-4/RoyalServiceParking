@@ -6,22 +6,20 @@ import { renderErrorState } from "../../components/feedback/error-state.js";
 import { renderLoadingPanelCards, renderLoadingTable } from "../../components/feedback/loading-state.js";
 import { renderFieldGroup, renderInputField, renderSelectField } from "../../components/form/form-field.js";
 import { renderStatusBadge } from "../../components/badge/status-badge.js";
-import { openConfirmDialog } from "../../components/dialog/confirm-dialog.js";
 import { renderDataTable } from "../../components/table/data-table.js";
-import { fetchCashierBookings, markCashierBookingArrived } from "../../services/cashier-service.js";
-import { pushToast } from "../../state/ui-store.js";
+import { fetchAdminBookings } from "../../services/admin-service.js";
 import { formatCurrency, formatDate, formatTime } from "../../utils/formatters.js";
-import { bindCashierShell, renderCashierShell } from "./cashier-shell.js";
+import { bindAdminShell, renderAdminShell } from "./admin-shell.js";
 
 function renderStatusCell(booking) {
   const meta =
     booking.status === "ARRIVED" && booking.arrivalTime
       ? `Arrived ${formatTime(booking.arrivalTime.split("T")[1] ?? "")}`
       : booking.status === "RESERVED"
-        ? "Awaiting on-site check-in"
+        ? "Queued for arrival monitoring"
         : booking.status === "COMPLETED"
-          ? "Payment already completed"
-          : "Closed or released booking";
+          ? "Payment already closed"
+          : "Released or canceled booking";
 
   return `
     <div class="table-cell-stack">
@@ -32,47 +30,19 @@ function renderStatusCell(booking) {
 }
 
 function renderActionCell(booking) {
-  const actions = [];
-
-  if (booking.canMarkArrived) {
-    actions.push(
-      renderButton({
-        label: "Mark arrived",
-        tone: "primary",
-        attributes: { "data-mark-arrived": booking.id }
-      })
-    );
+  if (!booking.userId) {
+    return '<div class="table-actions"><span class="status-badge status-badge--neutral">No linked user</span></div>';
   }
 
-  if (booking.canOpenPayment) {
-    actions.push(
-      renderButton({
-        label: "Open payment",
-        href: `/cashier/bookings/payment?id=${encodeURIComponent(booking.id)}`,
-        tone: "primary"
-      })
-    );
-  }
-
-  if (booking.canViewReceipt) {
-    actions.push(
-      renderButton({
-        label: "Open receipt",
-        href: `/cashier/bookings/receipt?id=${encodeURIComponent(booking.id)}`,
-        tone: "ghost"
-      })
-    );
-  }
-
-  actions.push(
-    renderButton({
-      label: "User details",
-      href: `/cashier/users/detail?id=${encodeURIComponent(booking.userId)}`,
-      tone: "secondary"
-    })
-  );
-
-  return `<div class="table-actions">${actions.join("")}</div>`;
+  return `
+    <div class="table-actions">
+      ${renderButton({
+        label: "User details",
+        href: `/admin/users/detail?id=${encodeURIComponent(booking.userId)}`,
+        tone: "secondary"
+      })}
+    </div>
+  `;
 }
 
 const bookingColumns = [
@@ -87,12 +57,22 @@ const bookingColumns = [
     `
   },
   {
+    key: "contact",
+    label: "Contact",
+    render: (booking) => `
+      <div class="table-cell-stack">
+        <strong>${booking.email}</strong>
+        <span>${booking.plateNumber}</span>
+      </div>
+    `
+  },
+  {
     key: "vehicle",
     label: "Vehicle",
     render: (booking) => `
       <div class="table-cell-stack">
-        <strong>${booking.plateNumber}</strong>
-        <span>${booking.vehicleType}</span>
+        <strong>${booking.vehicleType}</strong>
+        <span>${booking.plateNumber}</span>
       </div>
     `
   },
@@ -139,39 +119,39 @@ const bookingColumns = [
   }
 ];
 
-export function createCashierBookingsPage({ session, pathname, query }) {
+export function createAdminBookingsPage({ session, pathname, query }) {
   const initialFilters = {
     status: query?.get("status") ?? "",
     date: query?.get("date") ?? "",
-    slot: query?.get("slot") ?? "",
-    search: query?.get("search") ?? ""
+    user: query?.get("user") ?? "",
+    slot: query?.get("slot") ?? ""
   };
 
   return {
-    html: renderCashierShell({
+    html: renderAdminShell({
       session,
       currentPath: pathname,
-      eyebrow: "Cashier bookings",
-      title: "Manage operational bookings",
+      eyebrow: "Admin bookings",
+      title: "Audit reservations and completed parking activity",
       description:
-        "Track active reservations, surface time-sensitive arrivals, and prepare the next payment and receipt steps for on-site parking operations.",
+        "Filter bookings by status, date, user, and slot to monitor the reservation pipeline and review account-linked parking activity.",
       content: `
-        <section class="dashboard-grid dashboard-grid--kpi" data-cashier-bookings-summary>
+        <section class="dashboard-grid dashboard-grid--kpi" data-admin-bookings-summary>
           ${renderLoadingPanelCards({ count: 4 })}
         </section>
         <section class="dashboard-grid booking-flow-grid">
           ${renderPanelCard({
             className: "booking-form-card",
-            title: "Filter operational bookings",
-            description: "Search by booking ID, customer, plate number, level, or slot name.",
+            title: "Filter booking records",
+            description: "Search by user name or email and narrow results by date, status, or slot context.",
             content: `
-              <form class="stack-sm" data-cashier-bookings-form>
+              <form class="stack-sm" data-admin-bookings-form>
                 <div class="field-row">
                   ${renderFieldGroup({
                     label: "Status",
-                    inputId: "cashier-booking-filter-status",
+                    inputId: "admin-booking-filter-status",
                     input: renderSelectField({
-                      id: "cashier-booking-filter-status",
+                      id: "admin-booking-filter-status",
                       name: "status",
                       value: initialFilters.status,
                       options: [
@@ -185,9 +165,9 @@ export function createCashierBookingsPage({ session, pathname, query }) {
                   })}
                   ${renderFieldGroup({
                     label: "Date",
-                    inputId: "cashier-booking-filter-date",
+                    inputId: "admin-booking-filter-date",
                     input: renderInputField({
-                      id: "cashier-booking-filter-date",
+                      id: "admin-booking-filter-date",
                       name: "date",
                       type: "date",
                       value: initialFilters.date
@@ -196,65 +176,64 @@ export function createCashierBookingsPage({ session, pathname, query }) {
                 </div>
                 <div class="field-row">
                   ${renderFieldGroup({
-                    label: "Level or slot",
-                    inputId: "cashier-booking-filter-slot",
+                    label: "User search",
+                    inputId: "admin-booking-filter-user",
                     input: renderInputField({
-                      id: "cashier-booking-filter-slot",
+                      id: "admin-booking-filter-user",
+                      name: "user",
+                      type: "search",
+                      value: initialFilters.user,
+                      placeholder: "Customer name or email"
+                    })
+                  })}
+                  ${renderFieldGroup({
+                    label: "Slot or level",
+                    inputId: "admin-booking-filter-slot",
+                    input: renderInputField({
+                      id: "admin-booking-filter-slot",
                       name: "slot",
                       type: "search",
                       value: initialFilters.slot,
                       placeholder: "Level 1 or Slot A"
                     })
                   })}
-                  ${renderFieldGroup({
-                    label: "Search",
-                    inputId: "cashier-booking-filter-search",
-                    input: renderInputField({
-                      id: "cashier-booking-filter-search",
-                      name: "search",
-                      type: "search",
-                      value: initialFilters.search,
-                      placeholder: "Booking ID, customer, or plate"
-                    })
-                  })}
                 </div>
                 <div class="auth-support-links">
                   ${renderButton({ label: "Apply filters", type: "submit", tone: "primary" })}
-                  ${renderButton({ label: "Clear", href: "/cashier/bookings", tone: "secondary" })}
-                  ${renderButton({ label: "Back to dashboard", href: "/cashier/dashboard", tone: "ghost" })}
+                  ${renderButton({ label: "Clear", href: "/admin/bookings", tone: "secondary" })}
+                  ${renderButton({ label: "Back to dashboard", href: "/admin/dashboard", tone: "ghost" })}
                 </div>
               </form>
             `
           })}
           ${renderPanelCard({
-            title: "Operational workflow",
+            title: "Management view",
             content: `
               <ul class="journey-list">
-                <li>Prioritize reserved bookings that are due for on-site arrival.</li>
-                <li>Only reserved bookings can be marked as arrived from this screen.</li>
-                <li>Arrived bookings now open the payment page, while completed bookings expose the receipt route.</li>
+                <li>Use this screen to audit booking flow health rather than perform cashier arrival or payment actions.</li>
+                <li>User details stay one click away so restrictions and booking history can be reviewed together.</li>
+                <li>Canceled bookings remain visible here to support support-case review and blocklist follow-up.</li>
               </ul>
             `
           })}
         </section>
         <section class="stack-sm">
-          <div data-cashier-bookings-alerts></div>
-          <div data-cashier-bookings-results>
+          <div data-admin-bookings-alerts></div>
+          <div data-admin-bookings-results>
             ${renderLoadingTable({ columns: bookingColumns.length, rows: 5 })}
           </div>
         </section>
       `
     }),
     onMount: async ({ navigate }) => {
-      bindCashierShell({ navigate });
+      bindAdminShell({ navigate });
 
-      const form = document.querySelector("[data-cashier-bookings-form]");
-      const alertsRoot = document.querySelector("[data-cashier-bookings-alerts]");
-      const summaryRoot = document.querySelector("[data-cashier-bookings-summary]");
-      const resultsRoot = document.querySelector("[data-cashier-bookings-results]");
+      const form = document.querySelector("[data-admin-bookings-form]");
+      const alertsRoot = document.querySelector("[data-admin-bookings-alerts]");
+      const summaryRoot = document.querySelector("[data-admin-bookings-summary]");
+      const resultsRoot = document.querySelector("[data-admin-bookings-results]");
 
       let currentResponse = null;
-      let pendingArrivalId = null;
 
       function renderSummary() {
         if (!summaryRoot || !currentResponse) {
@@ -277,7 +256,7 @@ export function createCashierBookingsPage({ session, pathname, query }) {
         if (!currentResponse.bookings.length) {
           resultsRoot.innerHTML = renderEmptyState({
             title: "No bookings match the current filter",
-            message: "Adjust the status, date, level, slot, or search query to continue cashier operations."
+            message: "Adjust the status, date, user, or slot query to continue admin review."
           });
           return;
         }
@@ -286,7 +265,7 @@ export function createCashierBookingsPage({ session, pathname, query }) {
           columns: bookingColumns,
           rows: currentResponse.bookings,
           emptyTitle: "No bookings match the current filter",
-          emptyMessage: "Adjust the status, date, level, slot, or search query to continue cashier operations."
+          emptyMessage: "Adjust the status, date, user, or slot query to continue admin review."
         });
       }
 
@@ -299,13 +278,13 @@ export function createCashierBookingsPage({ session, pathname, query }) {
         }
 
         try {
-          currentResponse = await fetchCashierBookings(filters);
+          currentResponse = await fetchAdminBookings(filters);
           if (alertsRoot) {
-            alertsRoot.innerHTML = currentResponse.arrivedCount > 0
+            alertsRoot.innerHTML = currentResponse.canceledCount > 0
               ? renderInlineAlert({
-                  tone: "info",
-                  title: "Payment queue ready",
-                  message: `${currentResponse.arrivedCount} arrived booking${currentResponse.arrivedCount === 1 ? "" : "s"} are ready for payment completion.`
+                  tone: "warning",
+                  title: "Canceled bookings in scope",
+                  message: `${currentResponse.canceledCount} canceled booking${currentResponse.canceledCount === 1 ? "" : "s"} are included in the current admin result set.`
                 })
               : "";
           }
@@ -315,7 +294,7 @@ export function createCashierBookingsPage({ session, pathname, query }) {
           if (alertsRoot) {
             alertsRoot.innerHTML = renderErrorState({
               title: "Bookings unavailable",
-              message: error.message || "The cashier bookings list could not be loaded."
+              message: error.message || "The admin bookings list could not be loaded."
             });
           }
           if (summaryRoot) {
@@ -332,64 +311,16 @@ export function createCashierBookingsPage({ session, pathname, query }) {
         const formData = new FormData(form);
         const next = new URLSearchParams();
 
-        ["status", "date", "slot", "search"].forEach((key) => {
+        ["status", "date", "user", "slot"].forEach((key) => {
           const value = String(formData.get(key) ?? "").trim();
           if (value) {
             next.set(key, value);
           }
         });
 
-        navigate(`/cashier/bookings${next.toString() ? `?${next.toString()}` : ""}`, {
+        navigate(`/admin/bookings${next.toString() ? `?${next.toString()}` : ""}`, {
           replace: true
         });
-      });
-
-      resultsRoot?.addEventListener("click", async (event) => {
-        const button = event.target.closest("[data-mark-arrived]");
-        if (!button || pendingArrivalId) {
-          return;
-        }
-
-        const bookingId = button.getAttribute("data-mark-arrived");
-        const booking = currentResponse?.bookings.find((item) => String(item.id) === bookingId);
-        if (!booking) {
-          return;
-        }
-
-        const approved = await openConfirmDialog({
-          title: "Mark this booking as arrived",
-          message: `Mark booking #${booking.id} for ${booking.fullName} at ${booking.level} ${booking.slotName} as arrived now?`,
-          confirmLabel: "Mark arrived"
-        });
-
-        if (!approved) {
-          return;
-        }
-
-        pendingArrivalId = bookingId;
-        button.disabled = true;
-        button.textContent = "Updating...";
-
-        try {
-          await markCashierBookingArrived(booking.id);
-          pushToast({
-            tone: "success",
-            title: "Arrival confirmed",
-            message: `Booking #${booking.id} is now marked as arrived.`
-          });
-          await loadBookings(initialFilters);
-        } catch (error) {
-          button.disabled = false;
-          button.textContent = "Mark arrived";
-          if (alertsRoot) {
-            alertsRoot.innerHTML = renderErrorState({
-              title: "Unable to mark arrival",
-              message: error.message || "The booking could not be updated."
-            });
-          }
-        } finally {
-          pendingArrivalId = null;
-        }
       });
 
       await loadBookings(initialFilters);
