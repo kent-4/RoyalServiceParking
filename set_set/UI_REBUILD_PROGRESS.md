@@ -29,7 +29,7 @@ When a task changes state, update:
 
 - Current phase: `[/] In progress`
 - Current focus: `Phase 6 runtime verification for shared login and report exports`
-- Last updated: `2026-05-10`
+- Last updated: `2026-05-11`
 - Current owner: `Codex + project owner`
 
 ## 3. Open Product / Architecture Decisions
@@ -275,5 +275,5 @@ Notes / blockers: `Frontend npm install, lint, and production build passed. Back
 
 Use this section to record where work stopped so the next session can resume quickly.
 
-- Current handoff note: `The rebuilt API layer now uses shared ApiErrorResponse and ValidationErrorResponse contracts across the frontend-facing auth, user, cashier, and admin controllers that previously mixed inline message maps and per-controller validation records. Frontend lint and production build passed after this backend contract cleanup. Backend compile verification remains blocked by the local JDK not supporting Java 21, and live role-by-role login plus live file-download verification still need to be done against a running backend.`
-- Next recommended starting point: `Manually verify shared-login behavior plus Excel/PDF downloads against a live backend session, then either close the remaining QA checklist items or return to the still-open manual blocklist-add product decision for Phase 5.`
+- Current handoff note: `The rebuild docs now include set_set/STITCH_DESIGN_PROMPT.md plus four split Google Stitch briefs: set_set/STITCH_PROMPT_PUBLIC.md, set_set/STITCH_PROMPT_USER.md, set_set/STITCH_PROMPT_CASHIER.md, and set_set/STITCH_PROMPT_ADMIN.md. Together they cover the master system summary, role shells, route inventory, page structure, component expectations, and role-specific ready-to-paste prompts for design generation. The rebuilt API layer still uses shared ApiErrorResponse and ValidationErrorResponse contracts across the frontend-facing auth, user, cashier, and admin controllers. Backend compile verification remains blocked by the local JDK not supporting Java 21, and live role-by-role login plus live file-download verification still need to be done against a running backend.`
+- Next recommended starting point: `Use the split Stitch prompts for role-specific design generation, then manually verify shared-login behavior plus Excel/PDF downloads against a live backend session before closing the remaining QA items or revisiting the manual blocklist-add product decision.`
