@@ -9,11 +9,17 @@ export function createStatusPage(context, options) {
         <section class="shell shell--centered">
           <div class="status-panel status-panel--wide">
             <span class="eyebrow">${options.eyebrow}</span>
-            <div class="status-hero">
-              <div class="status-icon status-icon--${options.tone}">${options.iconText}</div>
-              <div>
-                <h1 class="page-title" tabindex="-1" data-page-heading>${options.title}</h1>
-                <p class="page-copy page-copy--lead">${options.description}</p>
+            <div class="status-panel__header">
+              <div class="status-hero">
+                <div class="status-icon status-icon--${options.tone}">${options.iconText}</div>
+                <div>
+                  <h1 class="page-title" tabindex="-1" data-page-heading>${options.title}</h1>
+                  <p class="page-copy page-copy--lead">${options.description}</p>
+                </div>
+              </div>
+              <div class="status-panel__meta">
+                <span class="status-chip">Shared auth flow</span>
+                <span class="status-chip">Public route</span>
               </div>
             </div>
             ${

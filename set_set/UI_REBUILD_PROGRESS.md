@@ -28,7 +28,7 @@ When a task changes state, update:
 ## 2. Current Snapshot
 
 - Current phase: `[/] In progress`
-- Current focus: `Phase 6 runtime verification for shared login and report exports`
+- Current focus: `Responsive and runtime verification for the Stitch-aligned public/shared-auth and user passes before moving to cashier pages`
 - Last updated: `2026-05-11`
 - Current owner: `Codex + project owner`
 
@@ -258,22 +258,32 @@ Notes / blockers: `Frontend npm install, lint, and production build passed. Back
 
 ## 13. Current Next Tasks
 
-- [x] Review admin dashboard behavior and expose a frontend-friendly dashboard API
-- [x] Build the admin shell and dashboard on top of the shared role-shell foundation
-- [x] Build the admin users page and user-details flow against explicit backend APIs
-- [x] Build the admin bookings page with filters/search and management-ready table states
-- [x] Review parking-rate update MVC actions and rebuild the admin parking-rate management flow
-- [x] Review blocklist MVC actions and rebuild the admin blocklist review/unblock flow
-- [ ] Decide whether the manual blocklist-add UI belongs in the first rebuild pass
-- [x] Start Phase 6 with the reports dashboard shell, filters, grouping controls, KPI cards, and trend/distribution views
-- [x] Rebuild Excel and PDF export flows on top of stable frontend-oriented contracts
-- [x] Standardize rebuilt API error and validation payload contracts
+- [ ] Run responsive browser verification on the Stitch-aligned public/shared-auth routes
+- [ ] Manually verify the register, verify, forgot-password, and reset-password flows against a live backend runtime
 - [ ] Manually verify the shared /login flow against USER, CASHIER, and ADMIN accounts in a live backend runtime
+- [ ] Run responsive browser verification on the Stitch-aligned user routes
+- [ ] Manually verify the user booking, profile, bookings, notifications, and parking-cost flows against a live backend runtime
+- [ ] Start the cashier-role Stitch migration pass after the public/shared-auth and user verification gate clears
+- [ ] Queue the cashier and admin Stitch migration passes after the public/shared-auth and user passes stabilize
+- [ ] Decide whether the manual blocklist-add UI belongs in the first rebuild pass
 - [ ] Manually verify Excel and PDF downloads against the rebuilt reports page in a live backend runtime
 
-## 14. Session Handoff Notes
+## 14. Stitch Migration Workstream
+
+- [x] Map shared frontend primitives to the Stitch `Design Library | Component Specifications` screen before final shared-component signoff
+- [x] Migrate public/shared-auth pages from Stitch using `set_set/STITCH_PROMPT_PUBLIC.md`
+- [x] Migrate user pages from Stitch using `set_set/STITCH_PROMPT_USER.md`
+- [ ] Migrate cashier pages from Stitch using `set_set/STITCH_PROMPT_CASHIER.md`
+- [ ] Migrate admin pages from Stitch using `set_set/STITCH_PROMPT_ADMIN.md`
+- [ ] Run responsive and live-runtime verification after each role-group Stitch pass
+
+Owner: `Codex + project owner`
+Last updated: `2026-05-11`
+Notes / blockers: `The migration target remains the existing plain JavaScript frontend. Stitch is the visual and content source, not the runtime implementation. The public/shared-auth execution pass is implemented in code across Home, Login, Register, Verify, Forgot Password, Reset Password, and the shared status surfaces. The user execution pass is now also implemented in code across Dashboard, Profile, Parking Cost, Book Parking, Select Slot, My Bookings, and Notifications using the user Stitch prompt plus the shared design-library component language. The Stitch project design-library screen has been folded into the shared component layer for buttons, forms, badges, KPI cards, and table shells. The remaining gate before moving on is responsive browser verification plus live backend/runtime checks for auth, verification, password recovery, and the user booking/profile flows.`
+
+## 15. Session Handoff Notes
 
 Use this section to record where work stopped so the next session can resume quickly.
 
-- Current handoff note: `The rebuild docs now include set_set/STITCH_DESIGN_PROMPT.md plus four split Google Stitch briefs: set_set/STITCH_PROMPT_PUBLIC.md, set_set/STITCH_PROMPT_USER.md, set_set/STITCH_PROMPT_CASHIER.md, and set_set/STITCH_PROMPT_ADMIN.md. Together they cover the master system summary, role shells, route inventory, page structure, component expectations, and role-specific ready-to-paste prompts for design generation. The rebuilt API layer still uses shared ApiErrorResponse and ValidationErrorResponse contracts across the frontend-facing auth, user, cashier, and admin controllers. Backend compile verification remains blocked by the local JDK not supporting Java 21, and live role-by-role login plus live file-download verification still need to be done against a running backend.`
-- Next recommended starting point: `Use the split Stitch prompts for role-specific design generation, then manually verify shared-login behavior plus Excel/PDF downloads against a live backend session before closing the remaining QA items or revisiting the manual blocklist-add product decision.`
+- Current handoff note: `The Stitch-aligned user pass is now implemented in code on top of the existing rebuilt portal. User shell/header patterns now support action groups and notice panels, the dashboard remains the anchor surface, and the Profile, Parking Cost, Book Parking, and Select Slot screens have been restructured to match the user Stitch prompt and the design-library component language. Public/shared-auth remains implemented from the earlier pass, and shared components still follow the design-library direction for gold primary buttons, outlined secondary buttons, text-only ghost buttons, tighter form fields, icon-based status badges, KPI card icon support, and softer bordered table/card surfaces.`
+- Next recommended starting point: `Run responsive browser verification on the public/shared-auth and user routes, then manually verify register, verify, forgot-password, reset-password, shared-login, and the user booking/profile/notifications flows against a live backend runtime before starting the cashier Stitch migration pass.`

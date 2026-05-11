@@ -17,9 +17,10 @@ export function renderUserNavbar({ session, currentPath }) {
     brand: `
       <div class="user-nav__brand">
         <span class="brand-mark__crest">RSP</span>
-        <div>
+        <div class="user-nav__brand-copy">
           <strong>Royal Service Parking</strong>
           <p>${session.displayName ?? session.username ?? "User"}</p>
+          <small>Verified customer portal</small>
         </div>
       </div>
     `,
@@ -31,10 +32,15 @@ export function renderUserNavbar({ session, currentPath }) {
       badge: item.badge ? '<span class="nav-badge" data-notification-badge hidden>0</span>' : ""
     })),
     actions: `
-      <span class="status-chip">${session.role ?? "USER"}</span>
+      <span class="status-chip">Verified customer</span>
+      ${renderButton({
+        label: "New booking",
+        href: "/user/book",
+        tone: "primary"
+      })}
       ${renderButton({
         label: "Sign out",
-        tone: "secondary",
+        tone: "ghost",
         attributes: { "data-logout": true }
       })}
     `

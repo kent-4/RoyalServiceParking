@@ -12,13 +12,19 @@ export function createVerifyPage(context) {
         <section class="shell shell--centered">
           <div class="status-panel status-panel--wide">
             <span class="eyebrow">Email verification</span>
-            <div class="status-hero">
-              <div class="status-icon status-icon--info" data-status-icon>...</div>
-              <div>
-                <h1 class="page-title" tabindex="-1" data-page-heading data-status-title>Checking your verification link</h1>
-                <p class="page-copy page-copy--lead" data-status-description>
-                  The backend is validating the verification token attached to this email link.
-                </p>
+            <div class="status-panel__header">
+              <div class="status-hero">
+                <div class="status-icon status-icon--info" data-status-icon>...</div>
+                <div>
+                  <h1 class="page-title" tabindex="-1" data-page-heading data-status-title>Checking your verification link</h1>
+                  <p class="page-copy page-copy--lead" data-status-description>
+                    The backend is validating the verification token attached to this email link.
+                  </p>
+                </div>
+              </div>
+              <div class="status-panel__meta">
+                <span class="status-chip">Verification route</span>
+                <span class="status-chip">Public access</span>
               </div>
             </div>
             <div class="status-detail">

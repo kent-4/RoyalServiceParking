@@ -56,6 +56,12 @@ export function createRegisterPage(context) {
                   If an unverified account already exists for the same email, the backend replaces it during registration.
                 </p>
               </div>
+              <div class="auth-policy-card">
+                <span class="metric-card__label">Before you submit</span>
+                <p>
+                  Registration creates the customer account shell first. Booking access only opens after the verification link is completed successfully.
+                </p>
+              </div>
             </aside>
             <div class="auth-card auth-card--elevated">
               <span class="eyebrow">Registration form</span>
@@ -63,6 +69,10 @@ export function createRegisterPage(context) {
               <p class="page-copy">
                 Complete the required fields carefully. The backend remains the final validator for uniqueness and account creation.
               </p>
+              <div class="auth-policy-card auth-policy-card--compact">
+                <span class="metric-card__label">Structured onboarding</span>
+                <p>Account information, personal details, and vehicle details stay grouped so later booking flows can reuse the same customer profile.</p>
+              </div>
               <form class="stack-sm" data-register-form novalidate>
                 <section class="form-section">
                   <h3>Account information</h3>
