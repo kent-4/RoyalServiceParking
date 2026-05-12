@@ -64,12 +64,17 @@ export function createAdminUsersPage({ session, pathname, query }) {
       title: "Manage verified customer accounts",
       description:
         "Search verified users, review standing, and open detailed records before moving into blocklist or booking oversight work.",
+      actions: `
+        ${renderButton({ label: "Open blocklist", href: "/admin/blocklist", tone: "secondary" })}
+        ${renderButton({ label: "Review bookings", href: "/admin/bookings", tone: "ghost" })}
+      `,
       content: `
         <section class="dashboard-grid dashboard-grid--kpi" data-admin-users-summary>
           ${renderLoadingPanelCards({ count: 3 })}
         </section>
-        <section class="stack-sm">
+        <section class="dashboard-grid admin-overview-grid">
           ${renderPanelCard({
+            className: "booking-form-card",
             title: "Search verified users",
             description: "Filter the verified-user directory by name, email, or plate number.",
             content: `
@@ -88,6 +93,10 @@ export function createAdminUsersPage({ session, pathname, query }) {
                     hint: "This view remains restricted to verified customer accounts. Staff accounts are still managed separately."
                   })}
                 </div>
+                <div class="admin-note-surface">
+                  <strong>Directory scope</strong>
+                  <p>This list is limited to verified customer accounts. Staff-account administration remains a separate product decision.</p>
+                </div>
                 <div class="auth-support-links">
                   ${renderButton({ label: "Apply search", type: "submit", tone: "primary" })}
                   ${renderButton({ label: "Clear", href: "/admin/users", tone: "secondary" })}
@@ -96,6 +105,19 @@ export function createAdminUsersPage({ session, pathname, query }) {
               </form>
             `
           })}
+          ${renderPanelCard({
+            className: "operations-card-accent",
+            title: "Management notes",
+            content: `
+              <ul class="admin-policy-list">
+                <li><strong>Account standing:</strong> Restricted users remain visible here so support and policy review start from one directory.</li>
+                <li><strong>Account detail flow:</strong> Open a customer record before lifting restrictions or reviewing booking history.</li>
+                <li><strong>Current gap:</strong> Manual staff-account management is still outside the first rebuild pass.</li>
+              </ul>
+            `
+          })}
+        </section>
+        <section class="stack-sm">
           <div data-admin-users-alerts></div>
           <div data-admin-users-list>
             ${renderLoadingTable({ columns: userColumns.length, rows: 4 })}
@@ -124,9 +146,9 @@ export function createAdminUsersPage({ session, pathname, query }) {
 
           if (summaryRoot) {
             summaryRoot.innerHTML = [
-              renderKpiCard({ label: "Matching users", value: data.totalResults }),
-              renderKpiCard({ label: "Verified customers", value: data.totalVerifiedUsers }),
-              renderKpiCard({ label: "Restricted users", value: data.restrictedUsers })
+              renderKpiCard({ label: "Matching users", value: data.totalResults, helper: "Current filtered directory result", icon: "MU" }),
+              renderKpiCard({ label: "Verified customers", value: data.totalVerifiedUsers, helper: "Eligible customer accounts", icon: "VC" }),
+              renderKpiCard({ label: "Restricted users", value: data.restrictedUsers, helper: "Accounts with active restrictions", icon: "BL" })
             ].join("");
           }
 

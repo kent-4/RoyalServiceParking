@@ -1746,6 +1746,14 @@
   text-align: center;
 }
 
+.receipt-card__header--split {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-5);
+  text-align: left;
+}
+
 .receipt-card__header h2,
 .receipt-total strong {
   margin: 0;
@@ -1762,6 +1770,37 @@
   display: grid;
   gap: var(--space-2);
   margin-top: var(--space-5);
+}
+
+.receipt-qr {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  min-width: 148px;
+  padding: var(--space-3);
+  border: 1px solid rgba(31, 41, 55, 0.18);
+  border-radius: 16px;
+  background: rgba(249, 250, 251, 0.96);
+  text-align: center;
+}
+
+.receipt-qr img {
+  display: block;
+  width: 116px;
+  height: 116px;
+}
+
+.receipt-qr__label {
+  font-size: var(--font-size-helper);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.receipt-qr span,
+.receipt-card__footnote {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  line-height: 1.45;
 }
 
 .receipt-row,
@@ -2430,6 +2469,7 @@
   .admin-account-hero,
   .record-card__header,
   .record-card__footer,
+  .receipt-card__header--split,
   .receipt-page__actions,
   .receipt-row,
   .receipt-total {

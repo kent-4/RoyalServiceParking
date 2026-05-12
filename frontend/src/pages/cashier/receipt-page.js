@@ -3,10 +3,26 @@ import { renderErrorState } from "../../components/feedback/error-state.js";
 import { renderLoadingPanelCards } from "../../components/feedback/loading-state.js";
 import { fetchCashierBookingReceipt } from "../../services/cashier-service.js";
 import { formatCurrency, formatDate, formatTime } from "../../utils/formatters.js";
+import { buildQrSvgDataUrl } from "../../utils/qr-code.js";
 import { bindCashierShell, renderCashierShell } from "./cashier-shell.js";
 
 function durationText(receipt) {
   return `${receipt.parkingDays > 0 ? `${receipt.parkingDays} day${receipt.parkingDays === 1 ? "" : "s"} ` : ""}${receipt.parkingHours} hour${receipt.parkingHours === 1 ? "" : "s"}`;
+}
+
+function compactDigits(value) {
+  return String(value ?? "").replace(/\D/g, "");
+}
+
+function buildReceiptQrPayload(receipt) {
+  const bookingId = String(receipt.bookingId ?? "").replace(/[^0-9A-Z]/gi, "").toUpperCase();
+  const date = compactDigits(receipt.date).slice(0, 8);
+  const timeIn = compactDigits(receipt.startTime).slice(0, 4);
+  const timeOut = compactDigits(receipt.exitTime).slice(0, 4);
+  const totalCents = String(Math.round(Number(receipt.totalCost ?? 0) * 100));
+  const plate = String(receipt.plateNumber ?? "").replace(/[^0-9A-Z]/gi, "").toUpperCase();
+
+  return `RSP*B${bookingId}*D${date}*I${timeIn}*O${timeOut}*T${totalCents}*P${plate}`.slice(0, 77);
 }
 
 export function createCashierReceiptPage({ session, pathname, query }) {
@@ -58,6 +74,8 @@ export function createCashierReceiptPage({ session, pathname, query }) {
 
       try {
         const receipt = await fetchCashierBookingReceipt(bookingId);
+        const qrPayload = buildReceiptQrPayload(receipt);
+        const qrCodeDataUrl = buildQrSvgDataUrl(qrPayload, { scale: 4, border: 3 });
 
         if (receiptRoot) {
           receiptRoot.innerHTML = `
@@ -74,10 +92,17 @@ export function createCashierReceiptPage({ session, pathname, query }) {
               })}
             </div>
             <article class="receipt-card">
-              <header class="receipt-card__header">
-                <h2>Royal Service Parking</h2>
-                <p>Official Parking Receipt</p>
-                <span>Receipt #${receipt.bookingId}</span>
+              <header class="receipt-card__header receipt-card__header--split">
+                <div>
+                  <h2>Royal Service Parking</h2>
+                  <p>Official Parking Receipt</p>
+                  <span>Receipt #${receipt.bookingId}</span>
+                </div>
+                <div class="receipt-qr">
+                  <img src="${qrCodeDataUrl}" alt="Receipt verification QR code for booking ${receipt.bookingId}" />
+                  <strong class="receipt-qr__label">Verification QR</strong>
+                  <span>${qrPayload}</span>
+                </div>
               </header>
               <div class="receipt-card__rows">
                 <div class="receipt-row"><span>Customer</span><strong>${receipt.fullName}</strong></div>
@@ -96,6 +121,7 @@ export function createCashierReceiptPage({ session, pathname, query }) {
                 <strong>${formatCurrency(receipt.totalCost)}</strong>
               </div>
               <footer class="receipt-card__footer">
+                <p class="receipt-card__footnote">Scan the QR code to verify the finalized receipt reference and session totals.</p>
                 <p>Thank you for choosing Royal Service Parking.</p>
                 <p>Status: ${receipt.status}</p>
               </footer>
