@@ -3,11 +3,14 @@ export function renderAppSidebar({
   eyebrow,
   title,
   subtitle,
+  className = "",
   items = [],
   footer = ""
 }) {
+  const sidebarClassName = ["role-sidebar", className].filter(Boolean).join(" ");
+
   return `
-    <aside class="role-sidebar" aria-label="${ariaLabel}">
+    <aside class="${sidebarClassName}" aria-label="${ariaLabel}">
       <div class="role-sidebar__header">
         <span class="eyebrow">${eyebrow}</span>
         <h2>${title}</h2>

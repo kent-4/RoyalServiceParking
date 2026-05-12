@@ -135,11 +135,15 @@ export function createAdminBookingsPage({ session, pathname, query }) {
       title: "Audit reservations and completed parking activity",
       description:
         "Filter bookings by status, date, user, and slot to monitor the reservation pipeline and review account-linked parking activity.",
+      actions: `
+        ${renderButton({ label: "Open users", href: "/admin/users", tone: "secondary" })}
+        ${renderButton({ label: "Open reports", href: "/admin/reports", tone: "ghost" })}
+      `,
       content: `
         <section class="dashboard-grid dashboard-grid--kpi" data-admin-bookings-summary>
           ${renderLoadingPanelCards({ count: 4 })}
         </section>
-        <section class="dashboard-grid booking-flow-grid">
+        <section class="dashboard-grid admin-overview-grid">
           ${renderPanelCard({
             className: "booking-form-card",
             title: "Filter booking records",
@@ -198,6 +202,10 @@ export function createAdminBookingsPage({ session, pathname, query }) {
                     })
                   })}
                 </div>
+                <div class="admin-note-surface">
+                  <strong>Oversight intent</strong>
+                  <p>This screen is for audit and policy review. Arrival, payment, and receipt actions stay inside the cashier portal.</p>
+                </div>
                 <div class="auth-support-links">
                   ${renderButton({ label: "Apply filters", type: "submit", tone: "primary" })}
                   ${renderButton({ label: "Clear", href: "/admin/bookings", tone: "secondary" })}
@@ -207,12 +215,13 @@ export function createAdminBookingsPage({ session, pathname, query }) {
             `
           })}
           ${renderPanelCard({
+            className: "operations-card-accent",
             title: "Management view",
             content: `
-              <ul class="journey-list">
-                <li>Use this screen to audit booking flow health rather than perform cashier arrival or payment actions.</li>
-                <li>User details stay one click away so restrictions and booking history can be reviewed together.</li>
-                <li>Canceled bookings remain visible here to support support-case review and blocklist follow-up.</li>
+              <ul class="admin-policy-list">
+                <li><strong>Flow health:</strong> Review reservation pressure here instead of performing cashier arrival or payment work.</li>
+                <li><strong>Customer traceability:</strong> User details stay one click away so restrictions and booking history can be reviewed together.</li>
+                <li><strong>Support review:</strong> Canceled bookings remain visible to support blocklist follow-up and dispute handling.</li>
               </ul>
             `
           })}
@@ -241,10 +250,10 @@ export function createAdminBookingsPage({ session, pathname, query }) {
         }
 
         summaryRoot.innerHTML = [
-          renderKpiCard({ label: "Matching bookings", value: currentResponse.totalResults }),
-          renderKpiCard({ label: "Reserved", value: currentResponse.reservedCount }),
-          renderKpiCard({ label: "Arrived", value: currentResponse.arrivedCount }),
-          renderKpiCard({ label: "Completed", value: currentResponse.completedCount })
+          renderKpiCard({ label: "Matching bookings", value: currentResponse.totalResults, helper: "Current filtered result set", icon: "MB" }),
+          renderKpiCard({ label: "Reserved", value: currentResponse.reservedCount, helper: "Waiting for arrival", icon: "RS" }),
+          renderKpiCard({ label: "Arrived", value: currentResponse.arrivedCount, helper: "On-site sessions", icon: "AR" }),
+          renderKpiCard({ label: "Completed", value: currentResponse.completedCount, helper: "Closed sessions", icon: "CP" })
         ].join("");
       }
 

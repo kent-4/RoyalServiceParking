@@ -25,12 +25,34 @@ const navItems = {
 
 export function renderRoleSidebar(session, currentPath) {
   const items = navItems[session.role] ?? [];
+  const roleConfig = {
+    USER: {
+      eyebrow: "Customer Workspace",
+      title: session.displayName ?? "Royal Service Parking",
+      subtitle: "Advance bookings and profile controls"
+    },
+    CASHIER: {
+      eyebrow: "Cashier Portal",
+      title: session.displayName ?? "Operations Desk",
+      subtitle: "Arrival, payment, and receipt workflow"
+    },
+    ADMIN: {
+      eyebrow: "Admin Control",
+      title: session.displayName ?? "Management Console",
+      subtitle: "Oversight, pricing, restrictions, and reports"
+    }
+  }[session.role] ?? {
+    eyebrow: formatRoleLabel(session.role),
+    title: session.displayName ?? "Royal Service Parking",
+    subtitle: session.email ?? session.username ?? "Session active"
+  };
 
   return renderAppSidebar({
     ariaLabel: `${formatRoleLabel(session.role)} navigation`,
-    eyebrow: formatRoleLabel(session.role),
-    title: session.displayName ?? "Royal Service Parking",
-    subtitle: session.email ?? session.username ?? "Session active",
+    eyebrow: roleConfig.eyebrow,
+    title: roleConfig.title,
+    subtitle: roleConfig.subtitle,
+    className: session.role ? `role-sidebar--${session.role.toLowerCase()}` : "",
     items: items.map((item) => ({
       ...item,
       active: (item.match ?? [item.href]).includes(currentPath)

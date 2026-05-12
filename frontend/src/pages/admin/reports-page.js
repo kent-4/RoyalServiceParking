@@ -121,8 +121,12 @@ export function createAdminReportsPage({ session, pathname, query }) {
       title: "Review booking and earnings analytics",
       description:
         "Analyze completed activity, trend lines, and distribution summaries with date filters, period grouping, and direct Excel/PDF exports.",
+      actions: `
+        ${renderButton({ label: "Open bookings", href: "/admin/bookings", tone: "secondary" })}
+        ${renderButton({ label: "Back to dashboard", href: "/admin/dashboard", tone: "ghost" })}
+      `,
       content: `
-        <section class="dashboard-grid booking-flow-grid">
+        <section class="dashboard-grid admin-overview-grid">
           ${renderPanelCard({
             className: "booking-form-card",
             title: "Report filters",
@@ -168,6 +172,10 @@ export function createAdminReportsPage({ session, pathname, query }) {
                     hint: "Exports use the exact same filter state shown on this dashboard."
                   })}
                 </div>
+                <div class="admin-note-surface">
+                  <strong>Export parity</strong>
+                  <p>Excel and PDF downloads use the exact same date range and grouping visible in this analytics view.</p>
+                </div>
                 <div class="auth-support-links">
                   ${renderButton({ label: "Apply filters", type: "submit", tone: "primary" })}
                   ${renderButton({
@@ -190,12 +198,13 @@ export function createAdminReportsPage({ session, pathname, query }) {
             `
           })}
           ${renderPanelCard({
+            className: "operations-card-accent",
             title: "Reporting note",
             content: `
-              <ul class="journey-list">
-                <li>Earnings count completed bookings only, matching the current backend report logic.</li>
-                <li>Vehicle type distribution also counts completed bookings only.</li>
-                <li>Excel exports keep tabular summaries, while PDF exports keep a printable summary table.</li>
+              <ul class="admin-policy-list">
+                <li><strong>Earnings rule:</strong> Earnings count completed bookings only, matching the current backend report logic.</li>
+                <li><strong>Distribution rule:</strong> Vehicle type charts also count completed bookings only.</li>
+                <li><strong>Export format:</strong> Excel keeps tabular summaries while PDF keeps a printable summary table.</li>
               </ul>
             `
           })}
@@ -259,10 +268,10 @@ export function createAdminReportsPage({ session, pathname, query }) {
 
           if (kpiRoot) {
             kpiRoot.innerHTML = [
-              renderKpiCard({ label: "Completed bookings", value: data.statistics.completedBookings }),
-              renderKpiCard({ label: "Total earnings", value: formatCurrency(data.statistics.totalEarnings) }),
-              renderKpiCard({ label: "Completion rate", value: formatPercent(data.statistics.completionRate) }),
-              renderKpiCard({ label: "No-show bookings", value: data.statistics.noShowBookings })
+              renderKpiCard({ label: "Completed bookings", value: data.statistics.completedBookings, helper: "Closed sessions in range", icon: "CB" }),
+              renderKpiCard({ label: "Total earnings", value: formatCurrency(data.statistics.totalEarnings), helper: "Completed-booking revenue", icon: "TE" }),
+              renderKpiCard({ label: "Completion rate", value: formatPercent(data.statistics.completionRate), helper: "Reserved-to-completed ratio", icon: "CR" }),
+              renderKpiCard({ label: "No-show bookings", value: data.statistics.noShowBookings, helper: "Missed arrivals in range", icon: "NS" })
             ].join("");
           }
 

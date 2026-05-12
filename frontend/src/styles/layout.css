@@ -129,6 +129,12 @@
   padding: var(--space-6);
 }
 
+.role-shell__content--admin {
+  display: grid;
+  align-content: start;
+  gap: var(--space-5);
+}
+
 .page-header {
   margin-bottom: var(--space-5);
 }

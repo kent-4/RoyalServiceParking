@@ -12,25 +12,32 @@ import { bindAdminShell, renderAdminShell } from "./admin-shell.js";
 function renderRatePanels(hourlyRate) {
   return `
     ${renderPanelCard({
+      className: "operations-card-accent",
       title: "Current hourly rate",
       content: `
-        <span class="metric-card__label">Active backend rate</span>
-        <strong class="panel-card__value">${formatCurrency(hourlyRate)}</strong>
-        <p class="page-copy">This rate is used by booking completion, receipts, and user-facing parking-cost guidance.</p>
-        <div class="detail-list">
-          <div><span>Example for 1 hour</span><strong>${formatCurrency(hourlyRate)}</strong></div>
-          <div><span>Example for 4 hours</span><strong>${formatCurrency(hourlyRate * 4)}</strong></div>
-          <div><span>Example for 12 hours</span><strong>${formatCurrency(hourlyRate * 12)}</strong></div>
+        <div class="admin-account-hero admin-account-hero--compact">
+          <div class="admin-avatar-badge admin-avatar-badge--rate">PHP</div>
+          <div class="admin-account-hero__copy">
+            <span class="eyebrow">Active configuration</span>
+            <h2>${formatCurrency(hourlyRate)}</h2>
+            <p class="page-copy">This rate is used by new booking guidance, cashier completion, and printed receipt totals.</p>
+          </div>
+          <span class="status-badge status-badge--success">Active rate</span>
+        </div>
+        <div class="admin-preview-grid">
+          <article><span>Example for 1 hour</span><strong>${formatCurrency(hourlyRate)}</strong></article>
+          <article><span>Example for 4 hours</span><strong>${formatCurrency(hourlyRate * 4)}</strong></article>
+          <article><span>Example for 12 hours</span><strong>${formatCurrency(hourlyRate * 12)}</strong></article>
         </div>
       `
     })}
     ${renderPanelCard({
-      title: "Admin rate policy",
+      title: "Rate policy",
       content: `
-        <ul class="journey-list">
-          <li>Cashiers can review the rate but cannot change it from their portal.</li>
-          <li>Partial hours are still rounded up by the backend during completion.</li>
-          <li>Historical rate versioning is still an open product decision, so this update changes the single active rate only.</li>
+        <ul class="admin-policy-list">
+          <li><strong>Cashier scope:</strong> Cashiers can review the current rate but cannot change it from their portal.</li>
+          <li><strong>Billing rule:</strong> Partial hours are still rounded up by the backend during completion.</li>
+          <li><strong>Versioning note:</strong> Historical rate tracking remains an open product decision, so this updates the single active rate only.</li>
         </ul>
       `,
       footer: `
@@ -52,9 +59,13 @@ export function createAdminParkingRatePage({ session, pathname }) {
       title: "Review and update the active hourly rate",
       description:
         "Manage the current parking rate used across reservation pricing, cashier completion, and printed receipt totals.",
+      actions: `
+        ${renderButton({ label: "Open bookings", href: "/admin/bookings", tone: "secondary" })}
+        ${renderButton({ label: "Open reports", href: "/admin/reports", tone: "ghost" })}
+      `,
       content: `
         <div data-admin-rate-alerts></div>
-        <section class="dashboard-grid cashier-rate-grid" data-admin-rate-panels>
+        <section class="dashboard-grid admin-overview-grid" data-admin-rate-panels>
           ${renderLoadingPanelCards({ count: 2 })}
         </section>
         <section class="stack-sm" data-admin-rate-form-shell>
@@ -80,7 +91,7 @@ export function createAdminParkingRatePage({ session, pathname }) {
         formShell.innerHTML = renderPanelCard({
           className: "booking-form-card",
           title: "Update hourly rate",
-          description: "Submit a new amount to change the single active backend parking rate.",
+          description: "Submit a new amount to change the single active backend parking rate used for new reservations and cashier completion.",
           content: `
             <form class="stack-sm" data-admin-rate-form novalidate>
               <div class="field-row field-row--single">
@@ -101,6 +112,10 @@ export function createAdminParkingRatePage({ session, pathname }) {
                   }),
                   hint: "Enter the active rate in Philippine peso for one parking hour."
                 })}
+              </div>
+              <div class="admin-note-surface">
+                <strong>Change effect</strong>
+                <p>Updates apply immediately to new bookings. Existing backend billing rules still control final cashier collection and receipt totals.</p>
               </div>
               <div class="auth-support-links">
                 ${renderButton({ label: "Save rate", type: "submit", tone: "primary" })}
