@@ -18,7 +18,7 @@ export function renderPublicNavbar({ currentPath = "/", showPrimaryCta = true } 
     shellClassName: "public-nav-shell",
     navClassName: "public-nav",
     brand: renderBrandMark({
-      subtitle: "Reserve before you arrive"
+      subtitle: "Single-facility reservations"
     }),
     navLabel: "Primary",
     navItems: navLinks.map((link) => ({
@@ -34,7 +34,7 @@ export function renderPublicNavbar({ currentPath = "/", showPrimaryCta = true } 
             .join("")}
         </div>
       </div>
-      ${showPrimaryCta ? renderButton({ label: "Advance booking", href: "/register", tone: "primary" }) : ""}
+      ${showPrimaryCta ? renderButton({ label: "Book my spot", href: "/register", tone: "primary" }) : ""}
     `
   });
 }

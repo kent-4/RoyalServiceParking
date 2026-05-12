@@ -92,7 +92,7 @@ export function createUserProfilePage({ session, pathname }) {
       session,
       currentPath: pathname,
       eyebrow: "Profile management",
-      title: "Keep your customer and vehicle details current",
+      title: "Manage your customer profile",
       description:
         "Edit the contact and vehicle information used across booking, notifications, and reservation review screens.",
       headerActions: `

@@ -30,7 +30,7 @@ export function createUserSelectSlotPage({ session, pathname, query }) {
       session,
       currentPath: pathname,
       eyebrow: "Slot selection",
-      title: "Choose the exact parking slot before confirming",
+      title: "Select the exact parking slot",
       description:
         "Review the available slots for the chosen level, then confirm the reservation to create a reserved booking.",
       headerActions: `
