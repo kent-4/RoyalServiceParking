@@ -1,8 +1,8 @@
 import { renderButton } from "../../components/button/action-button.js";
 import { renderPanelCard } from "../../components/card/panel-card.js";
+import { openConfirmDialog } from "../../components/dialog/confirm-dialog.js";
 import { renderErrorState } from "../../components/feedback/error-state.js";
 import { renderLoadingPanelCards } from "../../components/feedback/loading-state.js";
-import { openConfirmDialog } from "../../components/dialog/confirm-dialog.js";
 import { completeCashierBooking, fetchCashierBookingPayment } from "../../services/cashier-service.js";
 import { pushToast } from "../../state/ui-store.js";
 import { formatCurrency, formatDate, formatTime } from "../../utils/formatters.js";
@@ -20,13 +20,25 @@ export function createCashierPaymentPage({ session, pathname, query }) {
       session,
       currentPath: pathname,
       eyebrow: "Cashier payment",
-      title: "Review parking session payment",
+      title: "Complete the parking session with the backend billing preview",
       description:
-        "Use the backend preview to confirm exit time, billable duration, and total amount before completing the parking session.",
+        "Confirm booking details, review the rounded duration and cost, then close the session into a printable receipt.",
+      headerActions: `
+        ${renderButton({ label: "Back to bookings", href: "/cashier/bookings", tone: "secondary" })}
+      `,
+      notice: `
+        <div class="operations-notice-panel__content">
+          <span class="metric-card__label">Payment rule</span>
+          <h2>The backend remains the source of truth for rounded billing and final completion state.</h2>
+          <p class="page-copy">
+            Use this preview to confirm the customer, vehicle, time in, exit preview, and cost before finalizing the parking session.
+          </p>
+        </div>
+      `,
       content: `
         <div data-cashier-payment-alerts></div>
         <section class="dashboard-grid cashier-dashboard-grid" data-cashier-payment-panels>
-          ${renderLoadingPanelCards({ count: 2 })}
+          ${renderLoadingPanelCards({ count: 3 })}
         </section>
       `
     }),
@@ -51,8 +63,10 @@ export function createCashierPaymentPage({ session, pathname, query }) {
 
         panelsRoot.innerHTML = `
           ${renderPanelCard({
+            eyebrow: "Booking summary",
             title: `Booking #${payment.bookingId}`,
-            description: "Current session summary from the backend billing preview.",
+            description: "Customer, vehicle, and scheduled session context.",
+            className: "operations-card-accent",
             content: `
               <div class="detail-list">
                 <div><span>Customer</span><strong>${payment.fullName}</strong></div>
@@ -61,21 +75,37 @@ export function createCashierPaymentPage({ session, pathname, query }) {
                 <div><span>Vehicle type</span><strong>${payment.vehicleType}</strong></div>
                 <div><span>Date</span><strong>${formatDate(payment.date)}</strong></div>
                 <div><span>Location</span><strong>${payment.level} - ${payment.slotName}</strong></div>
+              </div>
+            `
+          })}
+          ${renderPanelCard({
+            eyebrow: "Arrival and exit",
+            title: "Session timing",
+            description: "Use the current preview to explain how the duration is being billed.",
+            content: `
+              <div class="detail-list">
                 <div><span>Start time</span><strong>${formatTime(payment.startTime)}</strong></div>
                 <div><span>Exit preview</span><strong>${formatTime(payment.previewExitTime)}</strong></div>
+                <div><span>Duration</span><strong>${durationText(payment)}</strong></div>
+                <div><span>Total billable hours</span><strong>${payment.totalHours}</strong></div>
                 <div><span>Status</span><strong>${payment.status}</strong></div>
               </div>
             `
           })}
           ${renderPanelCard({
-            title: "Billing preview",
-            description: "The backend remains the source of truth for duration rounding, minimum charge, and slot release on completion.",
+            eyebrow: "Billing preview",
+            title: "Final cost before completion",
+            description: "Rounded-up duration and minimum one-hour billing are already reflected below.",
             content: `
+              <strong class="panel-card__value">${formatCurrency(payment.previewCost)}</strong>
               <div class="detail-list">
-                <div><span>Duration</span><strong>${durationText(payment)}</strong></div>
-                <div><span>Total hours</span><strong>${payment.totalHours}</strong></div>
                 <div><span>Hourly rate</span><strong>${formatCurrency(payment.hourlyRate)}</strong></div>
-                <div><span>Total cost</span><strong>${formatCurrency(payment.previewCost)}</strong></div>
+                <div><span>Total hours</span><strong>${payment.totalHours}</strong></div>
+                <div><span>Final preview</span><strong>${formatCurrency(payment.previewCost)}</strong></div>
+              </div>
+              <div class="receipt-side-note">
+                <h3>Billing note</h3>
+                <p>Partial hours are rounded up and the preview never bills less than one hour.</p>
               </div>
             `,
             footer: `
@@ -102,7 +132,7 @@ export function createCashierPaymentPage({ session, pathname, query }) {
 
       async function loadPayment() {
         if (panelsRoot) {
-          panelsRoot.innerHTML = renderLoadingPanelCards({ count: 2 });
+          panelsRoot.innerHTML = renderLoadingPanelCards({ count: 3 });
         }
 
         try {

@@ -1,12 +1,12 @@
 import { renderInlineAlert } from "../../components/alert/inline-alert.js";
+import { renderStatusBadge } from "../../components/badge/status-badge.js";
 import { renderButton } from "../../components/button/action-button.js";
 import { renderKpiCard, renderPanelCard } from "../../components/card/panel-card.js";
+import { openConfirmDialog } from "../../components/dialog/confirm-dialog.js";
 import { renderEmptyState } from "../../components/feedback/empty-state.js";
 import { renderErrorState } from "../../components/feedback/error-state.js";
 import { renderLoadingPanelCards, renderLoadingTable } from "../../components/feedback/loading-state.js";
 import { renderFieldGroup, renderInputField, renderSelectField } from "../../components/form/form-field.js";
-import { renderStatusBadge } from "../../components/badge/status-badge.js";
-import { openConfirmDialog } from "../../components/dialog/confirm-dialog.js";
 import { renderDataTable } from "../../components/table/data-table.js";
 import { fetchCashierBookings, markCashierBookingArrived } from "../../services/cashier-service.js";
 import { pushToast } from "../../state/ui-store.js";
@@ -152,17 +152,31 @@ export function createCashierBookingsPage({ session, pathname, query }) {
       session,
       currentPath: pathname,
       eyebrow: "Cashier bookings",
-      title: "Manage operational bookings",
+      title: "Run the main arrival and payment workflow from one table",
       description:
-        "Track active reservations, surface time-sensitive arrivals, and prepare the next payment and receipt steps for on-site parking operations.",
+        "Filter operational bookings, surface reserved and arrived work clearly, and move each session into payment or receipt handling.",
+      headerActions: `
+        ${renderButton({ label: "Notifications", href: "/cashier/notifications", tone: "secondary" })}
+        ${renderButton({ label: "Dashboard", href: "/cashier/dashboard", tone: "ghost" })}
+      `,
+      notice: `
+        <div class="operations-notice-panel__content">
+          <span class="metric-card__label">Queue priority</span>
+          <h2>Reserved and arrived bookings are the action-first states on this screen.</h2>
+          <p class="page-copy">
+            Mark on-site arrivals first, then move arrived sessions into payment and receipt completion without leaving the cashier workflow.
+          </p>
+        </div>
+      `,
       content: `
         <section class="dashboard-grid dashboard-grid--kpi" data-cashier-bookings-summary>
           ${renderLoadingPanelCards({ count: 4 })}
         </section>
-        <section class="dashboard-grid booking-flow-grid">
+        <section class="operations-split-grid">
           ${renderPanelCard({
-            className: "booking-form-card",
-            title: "Filter operational bookings",
+            className: "operations-card-accent",
+            eyebrow: "Filter bookings",
+            title: "Search the live operations queue",
             description: "Search by booking ID, customer, plate number, level, or slot name.",
             content: `
               <form class="stack-sm" data-cashier-bookings-form>
@@ -221,19 +235,28 @@ export function createCashierBookingsPage({ session, pathname, query }) {
                 <div class="auth-support-links">
                   ${renderButton({ label: "Apply filters", type: "submit", tone: "primary" })}
                   ${renderButton({ label: "Clear", href: "/cashier/bookings", tone: "secondary" })}
-                  ${renderButton({ label: "Back to dashboard", href: "/cashier/dashboard", tone: "ghost" })}
                 </div>
               </form>
             `
           })}
           ${renderPanelCard({
-            title: "Operational workflow",
+            eyebrow: "Workflow guide",
+            title: "Action sequence",
             content: `
-              <ul class="journey-list">
-                <li>Prioritize reserved bookings that are due for on-site arrival.</li>
-                <li>Only reserved bookings can be marked as arrived from this screen.</li>
-                <li>Arrived bookings now open the payment page, while completed bookings expose the receipt route.</li>
-              </ul>
+              <div class="operations-panel-list">
+                <article>
+                  <strong>Reserved -> Arrived</strong>
+                  <p>Only reserved bookings can be checked in from this screen.</p>
+                </article>
+                <article>
+                  <strong>Arrived -> Payment</strong>
+                  <p>Arrived sessions are ready for the payment preview and completion route.</p>
+                </article>
+                <article>
+                  <strong>Completed -> Receipt</strong>
+                  <p>Closed sessions stay available through the print-ready receipt page.</p>
+                </article>
+              </div>
             `
           })}
         </section>
@@ -262,10 +285,10 @@ export function createCashierBookingsPage({ session, pathname, query }) {
         }
 
         summaryRoot.innerHTML = [
-          renderKpiCard({ label: "Matching bookings", value: currentResponse.totalResults }),
-          renderKpiCard({ label: "Reserved", value: currentResponse.reservedCount }),
-          renderKpiCard({ label: "Arrived", value: currentResponse.arrivedCount }),
-          renderKpiCard({ label: "Completed", value: currentResponse.completedCount })
+          renderKpiCard({ label: "Matching bookings", value: currentResponse.totalResults, helper: "Current filtered result count", icon: "RS" }),
+          renderKpiCard({ label: "Reserved", value: currentResponse.reservedCount, helper: "Arrival queue", icon: "RV" }),
+          renderKpiCard({ label: "Arrived", value: currentResponse.arrivedCount, helper: "Payment queue", icon: "AR" }),
+          renderKpiCard({ label: "Completed", value: currentResponse.completedCount, helper: "Receipt-ready sessions", icon: "OK" })
         ].join("");
       }
 
@@ -307,7 +330,13 @@ export function createCashierBookingsPage({ session, pathname, query }) {
                   title: "Payment queue ready",
                   message: `${currentResponse.arrivedCount} arrived booking${currentResponse.arrivedCount === 1 ? "" : "s"} are ready for payment completion.`
                 })
-              : "";
+              : currentResponse.reservedCount > 0
+                ? renderInlineAlert({
+                    tone: "warning",
+                    title: "Arrival queue active",
+                    message: `${currentResponse.reservedCount} reserved booking${currentResponse.reservedCount === 1 ? "" : "s"} still need arrival handling.`
+                  })
+                : "";
           }
           renderSummary();
           renderResults();

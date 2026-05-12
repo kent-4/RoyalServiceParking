@@ -2,25 +2,17 @@ package com.appdev.set.service;
 
 import com.appdev.set.model.User;
 import com.appdev.set.model.Booking;
+import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import org.springframework.beans.factory.annotation.Value;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
-import org.springframework.core.env.Environment;
 import java.util.logging.Logger;
-import java.util.logging.Level;
-import org.springframework.boot.web.context.WebServerApplicationContext;
-import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 
 @Service
 public class EmailService {
@@ -35,117 +27,46 @@ public class EmailService {
     
     @Autowired
     private ParkingCostService parkingCostService;
+    
+    @Value("${frontend.public-url:}")
+    private String frontendPublicUrl;
 
-    @Autowired
-    private Environment environment;
-    
-    @Value("${app.url}")
-    private String configuredAppUrl;
-    
-    @Value("${server.port:8080}")
-    private String serverPort;
-    
-    @Value("${server.servlet.context-path:}")
-    private String configuredContextPath;
-    
-    private String dynamicAppUrl;
-    private String warContextPath = "/royal-service-parking";  // Default WAR context path
+    @Value("${app.url:}")
+    private String backendAppUrl;
     
     @PostConstruct
     public void init() {
-        // Try to determine the dynamic IP address on startup
-        updateDynamicAppUrl();
-        logger.info("Dynamic application URL initialized to: " + dynamicAppUrl);
-        logger.info("Using WAR context path: " + warContextPath);
+        logger.info("Email auth links will use public URL: " + resolvePublicBaseUrl());
     }
     
     /**
-     * Updates the dynamic application URL based on the server's IP address
-     */
-    private void updateDynamicAppUrl() {
-        try {
-            String ip = getServerIpAddress();
-            if (ip != null) {
-                dynamicAppUrl = "http://" + ip + ":" + serverPort;
-                logger.info("Dynamic URL updated to: " + dynamicAppUrl);
-            } else {
-                // Fall back to configured URL if IP detection fails
-                dynamicAppUrl = configuredAppUrl;
-                logger.warning("Could not detect server IP. Using configured URL: " + dynamicAppUrl);
-            }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Error detecting server IP. Using configured URL: " + configuredAppUrl, e);
-            dynamicAppUrl = configuredAppUrl;
-        }
-    }
-    
-    /**
-     * Detect the server's IP address
-     * @return The server's IP address or null if it cannot be determined
-     */
-    private String getServerIpAddress() {
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            while (interfaces.hasMoreElements()) {
-                NetworkInterface iface = interfaces.nextElement();
-                // Skip loopback, inactive, and virtual interfaces
-                if (iface.isLoopback() || !iface.isUp() || iface.isVirtual()) {
-                    continue;
-                }
-                
-                Enumeration<InetAddress> addresses = iface.getInetAddresses();
-                while (addresses.hasMoreElements()) {
-                    InetAddress addr = addresses.nextElement();
-                    String hostAddress = addr.getHostAddress();
-                    // Skip IPv6 addresses and loopback
-                    if (!hostAddress.contains(":") && !addr.isLoopbackAddress()) {
-                        logger.info("Detected server IP: " + hostAddress);
-                        return hostAddress;
-                    }
-                }
-            }
-        } catch (SocketException e) {
-            logger.log(Level.WARNING, "Error getting network interfaces", e);
-        }
-        return null;
-    }
-    
-    /**
-     * Get the full application URL including context path
+     * Get the full public application URL for email links.
      * @param path the path to append to the base URL
      * @return the complete URL
      */
     private String getFullUrl(String path) {
-        // Check if we need to refresh the dynamic URL (in case IP has changed)
-        updateDynamicAppUrl();
-        
-        // Ensure path starts with a slash if not empty
+        String publicBaseUrl = resolvePublicBaseUrl();
+        if (publicBaseUrl == null || publicBaseUrl.isBlank()) {
+            throw new IllegalStateException("frontend.public-url or app.url must be configured for email links.");
+        }
+
         if (!path.isEmpty() && !path.startsWith("/")) {
             path = "/" + path;
         }
-        
-        // Always include WAR context path when deployed as WAR
-        String contextPathToUse = warContextPath;
-        
-        // Normalize the context path
-        if (contextPathToUse != null && !contextPathToUse.isEmpty()) {
-            // Make sure contextPath doesn't start with slash as appUrl might already end with one
-            if (contextPathToUse.startsWith("/")) {
-                contextPathToUse = contextPathToUse.substring(1);
-            }
-            
-            // Make sure appUrl ends with slash before appending
-            String normalizedAppUrl = dynamicAppUrl.endsWith("/") ? dynamicAppUrl : dynamicAppUrl + "/";
-            String fullUrl = normalizedAppUrl + contextPathToUse + path;
-            
-            logger.info("Generated URL: " + fullUrl);
-            return fullUrl;
-        } else {
-            // If no context path, just combine appUrl and path
-            String fullUrl = dynamicAppUrl + path;
-            logger.info("Generated URL (no context path): " + fullUrl);
-            return fullUrl;
+
+        String normalizedAppUrl = publicBaseUrl.endsWith("/")
+                ? publicBaseUrl.substring(0, publicBaseUrl.length() - 1)
+                : publicBaseUrl;
+        String fullUrl = normalizedAppUrl + path;
+        logger.info("Generated URL: " + fullUrl);
+        return fullUrl;
+    }
+
+    private String resolvePublicBaseUrl() {
+        if (frontendPublicUrl != null && !frontendPublicUrl.isBlank()) {
+            return frontendPublicUrl;
         }
+        return backendAppUrl;
     }
     
     public void sendVerificationEmail(User user) {
