@@ -31,16 +31,16 @@ export function createUserBookPage({ session, pathname, query }) {
       session,
       currentPath: pathname,
       eyebrow: "Booking setup",
-      title: "Start the booking with date, time, and level",
+      title: "Book parking",
       description:
-        "This first step defines the booking date, scheduled time, and parking level before slot selection and final confirmation.",
+        "Start the reservation with date, scheduled time, and parking level before the exact slot is chosen.",
       headerActions: `
         ${renderButton({ label: "My bookings", href: "/user/bookings", tone: "secondary" })}
         ${renderButton({ label: "Parking cost", href: "/user/parking-cost", tone: "ghost" })}
       `,
       notice: `
         <div class="user-notice-panel__content">
-          <span class="metric-card__label">Booking reminders</span>
+          <span class="metric-card__label">Booking window and rules</span>
           <h2>Customers can hold only one active reserved or arrived booking at a time.</h2>
           <p class="page-copy">
             This step also respects restriction status, the booking window, and the no-show policy before slot selection becomes available.

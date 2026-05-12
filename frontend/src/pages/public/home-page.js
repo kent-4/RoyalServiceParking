@@ -88,17 +88,21 @@ export function createPublicHomePage({ session, pathname }) {
           <div class="hero-shell__content">
             <span class="eyebrow">Royal Service Parking</span>
             <h1 class="hero-title" tabindex="-1" data-page-heading>
-              Reserve before you arrive, then move through check-in and completion with clear role-based access.
+              Secure your spot before you arrive.
             </h1>
             <p class="page-copy page-copy--lead">
-              Royal Service Parking is the public front door to a role-based parking platform. Customers start with a verified account, while cashier and admin entry points remain visible but secondary to the booking journey.
+              Royal Service Parking is the public front door to a single-facility booking and operations platform. Customers begin with a verified account, while cashier and admin access remain visible but secondary to the reservation journey.
             </p>
             <div class="hero-actions">
-              <a class="button button--primary" href="${primaryAction.href}" data-link>${primaryAction.label}</a>
-              <a class="button button--secondary" href="/login" data-link>Login</a>
-              <a class="button button--ghost" href="/login?role=cashier" data-link>Cashier access</a>
+              <a class="button button--primary" href="${primaryAction.href}" data-link>${session.authenticated ? primaryAction.label : "Book my spot"}</a>
+              <a class="button button--secondary" href="/login" data-link>Member login</a>
+              <a class="button button--ghost" href="/login?role=cashier" data-link>Staff access</a>
             </div>
             <div class="hero-stat-grid">
+              <div class="hero-stat">
+                <strong>Single facility</strong>
+                <span>Everything in this flow is designed for one operational parking location.</span>
+              </div>
               <div class="hero-stat">
                 <strong>Verified account required</strong>
                 <span>Customer booking opens only after registration and email verification.</span>
@@ -128,7 +132,7 @@ export function createPublicHomePage({ session, pathname }) {
               <span class="metric-card__label">Policy reminder</span>
               <strong>Booking is for advance reservation, not walk-in slot discovery.</strong>
               <p>
-                Customers must arrive within the allowed window. Missed reservations can trigger temporary booking restrictions.
+                Customers must arrive within the allowed window. Missed reservations can trigger temporary booking restrictions and block future reservations for a period.
               </p>
             </div>
             <div class="policy-card">

@@ -5,12 +5,12 @@ export function renderPublicFooter() {
         <div class="public-footer__brand">
           <strong>Royal Service Parking</strong>
           <p>
-            Advance reservation and parking-operations access for a single
+            Advance reservation and parking-operations access for one parking
             facility, rebuilt in plain JavaScript and backed by Spring Boot.
           </p>
           <p class="public-footer__meta">
-            Verified account required for customer booking. Shared login routes
-            customers, cashiers, and administrators into the correct workspace.
+            Verified customer access, a visible 1-hour arrival rule, and a
+            shared login that still routes each role into the correct workspace.
           </p>
         </div>
         <div class="public-footer__column">

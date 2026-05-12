@@ -24,10 +24,10 @@
 .hero-shell {
   width: min(100% - 2rem, var(--max-shell-width));
   margin: 0 auto;
-  padding: var(--space-8) 0;
+  padding: var(--space-7) 0 var(--space-8);
   display: grid;
-  gap: var(--space-6);
-  grid-template-columns: 1.2fr 0.8fr;
+  gap: var(--space-5);
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
 }
 
 .hero-shell--public {
@@ -40,17 +40,17 @@
 .status-panel,
 .panel-card,
 .role-sidebar,
-.auth-layout__panel,
-.public-footer__inner {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(209, 213, 219, 0.85);
-  border-radius: 24px;
+.auth-layout__panel {
+  background: var(--color-surface);
+  border: 1px solid rgba(209, 213, 219, 0.88);
+  border-radius: 28px;
   box-shadow: var(--shadow-panel);
 }
 
 .hero-shell__content {
   padding: var(--space-8);
+  position: relative;
+  overflow: hidden;
 }
 
 .hero-shell__panel {
@@ -90,12 +90,12 @@
 .auth-layout {
   display: grid;
   gap: var(--space-5);
-  grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
-  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 460px);
+  align-items: start;
 }
 
 .auth-layout__panel {
-  padding: var(--space-6);
+  padding: var(--space-7);
 }
 
 .public-form-layout {
@@ -110,7 +110,7 @@
 }
 
 .user-shell {
-  padding: var(--space-6) 0 var(--space-8);
+  padding: var(--space-5) 0 var(--space-8);
 }
 
 .user-shell__inner {

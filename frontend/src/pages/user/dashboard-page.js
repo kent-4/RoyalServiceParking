@@ -5,21 +5,23 @@ import { formatCurrency, formatDate, formatTime } from "../../utils/formatters.j
 import { bindUserShell, renderUserShell } from "./user-shell.js";
 
 export function createUserDashboardPage({ session, pathname }) {
+  const welcomeName = session.displayName ?? session.username ?? "Customer";
+
   return {
     html: renderUserShell({
       session,
       currentPath: pathname,
-      eyebrow: "User dashboard",
-      title: "Plan your next parking session with confidence",
+      eyebrow: "Customer dashboard",
+      title: `Welcome back, ${welcomeName}`,
       description:
-        "Keep your next booking, account standing, and current parking rate visible from one cleaner customer dashboard.",
+        "Keep your next booking, account standing, and current parking rate visible from one guided customer workspace.",
       headerActions: `
         ${renderButton({ label: "Book parking", href: "/user/book", tone: "primary" })}
         ${renderButton({ label: "My bookings", href: "/user/bookings", tone: "secondary" })}
       `,
       notice: `
         <div class="user-notice-panel__content">
-          <span class="metric-card__label">Arrival policy</span>
+          <span class="metric-card__label">Arrival protocol notice</span>
           <h2>Advance reservations still require on-time arrival.</h2>
           <p class="page-copy">
             Customers must arrive within one hour of the scheduled booking time to avoid automatic cancellation and temporary restriction.
@@ -39,19 +41,40 @@ export function createUserDashboardPage({ session, pathname }) {
             )
             .join("")}
         </section>
-        <section class="dashboard-grid">
+        <section class="dashboard-grid split-panel-grid">
           <article class="panel-card" data-dashboard-next-booking>
             <div class="loading-block loading-block--title"></div>
             <div class="loading-block loading-block--line"></div>
             <div class="loading-block loading-block--line"></div>
           </article>
+          <article class="panel-card dashboard-action-panel">
+            <div class="panel-card__header">
+              <span class="eyebrow">Quick routes</span>
+              <h2>What you can do next</h2>
+              <p class="page-copy">Move directly into the booking, booking-history, and pricing routes from the same customer workspace.</p>
+            </div>
+            <div class="action-stack">
+              <a class="action-card" href="/user/book" data-link>
+                <strong>Book parking</strong>
+                <p>Choose the next reservation date, time, and level before selecting a slot.</p>
+              </a>
+              <a class="action-card" href="/user/bookings" data-link>
+                <strong>Review my bookings</strong>
+                <p>Track current reservations, completed bookings, and cancellation eligibility.</p>
+              </a>
+              <a class="action-card" href="/user/profile" data-link>
+                <strong>Update profile</strong>
+                <p>Keep vehicle and contact details aligned with the customer who will arrive on site.</p>
+              </a>
+            </div>
+          </article>
+        </section>
+        <section class="dashboard-grid">
           <article class="panel-card" data-dashboard-account>
             <div class="loading-block loading-block--title"></div>
             <div class="loading-block loading-block--line"></div>
             <div class="loading-block loading-block--line"></div>
           </article>
-        </section>
-        <section class="dashboard-grid">
           <article class="panel-card" data-dashboard-profile>
             <div class="loading-block loading-block--title"></div>
             <div class="loading-block loading-block--line"></div>
