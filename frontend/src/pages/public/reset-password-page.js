@@ -17,23 +17,33 @@ export function createResetPasswordPage(context) {
               <span class="eyebrow">Token-based recovery</span>
               <h1 class="page-title" tabindex="-1" data-page-heading>Set a new password</h1>
               <p class="page-copy page-copy--lead">
-                Reset tokens are validated by the backend before the password update is accepted.
+                Reset tokens are validated by the backend before any password update is accepted.
               </p>
               <div class="auth-story-card">
                 <h2>Password reset rules</h2>
                 <ul class="auth-story-list">
                   <li>Reset links must still be valid when you open this page.</li>
                   <li>Passwords must match before submission.</li>
-                  <li>Successful resets return the customer to the user login route.</li>
+                  <li>Successful resets return the customer to the shared login route.</li>
                 </ul>
+              </div>
+              <div class="auth-policy-card">
+                <span class="metric-card__label">Security note</span>
+                <p>
+                  If the token is invalid or expired, the password cannot be updated and a new recovery email must be requested.
+                </p>
               </div>
             </aside>
             <div class="auth-card auth-card--elevated">
               <span class="eyebrow">Reset form</span>
               <h2 class="auth-card__title">Choose your new password</h2>
               <p class="page-copy" data-reset-status>
-                Validating reset token before allowing password changes.
+                Validating the reset token before allowing password changes.
               </p>
+              <div class="auth-policy-card auth-policy-card--compact">
+                <span class="metric-card__label">Password quality</span>
+                <p>Use at least 6 characters and confirm the same value in both password fields before submission.</p>
+              </div>
               <form class="stack-sm" data-reset-password-form novalidate>
                 <div class="field-group">
                   <label for="reset-password">New password</label>

@@ -44,12 +44,23 @@ export function renderPanelCard({
   `;
 }
 
-export function renderKpiCard({ label, value, helper = "", className = "" }) {
+export function renderKpiCard({ label, value, helper = "", icon = "", className = "" }) {
   return `
     <article class="panel-card kpi-card ${className}">
-      <span class="metric-card__label">${label}</span>
-      <strong>${value}</strong>
-      ${helper ? `<p class="panel-card__meta">${helper}</p>` : ""}
+      <div class="kpi-card__content">
+        <span class="metric-card__label">${label}</span>
+        <strong>${value}</strong>
+        ${helper ? `<p class="panel-card__meta">${helper}</p>` : ""}
+      </div>
+      ${
+        icon
+          ? `
+            <div class="kpi-card__icon" aria-hidden="true">
+              <span>${icon}</span>
+            </div>
+          `
+          : ""
+      }
     </article>
   `;
 }

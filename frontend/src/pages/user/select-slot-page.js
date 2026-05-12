@@ -1,4 +1,5 @@
 import { renderInlineAlert } from "../../components/alert/inline-alert.js";
+import { renderButton } from "../../components/button/action-button.js";
 import { openConfirmDialog } from "../../components/dialog/confirm-dialog.js";
 import { fetchSlotSelection, createUserBooking } from "../../services/booking-service.js";
 import { pushToast } from "../../state/ui-store.js";
@@ -29,9 +30,25 @@ export function createUserSelectSlotPage({ session, pathname, query }) {
       session,
       currentPath: pathname,
       eyebrow: "Slot selection",
-      title: "Choose the exact parking slot",
+      title: "Choose the exact parking slot before confirming",
       description:
-        "Review the filtered slots for the chosen level, then confirm the reservation with the backend.",
+        "Review the available slots for the chosen level, then confirm the reservation to create a reserved booking.",
+      headerActions: `
+        ${renderButton({
+          label: "Back to booking details",
+          href: `/user/book?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}&level=${encodeURIComponent(level)}`,
+          tone: "secondary"
+        })}
+      `,
+      notice: `
+        <div class="user-notice-panel__content">
+          <span class="metric-card__label">Confirmation step</span>
+          <h2>Only available slots can be selected, and confirmation creates the reserved booking immediately.</h2>
+          <p class="page-copy">
+            Review the booking context carefully before choosing the final slot and submitting the reservation.
+          </p>
+        </div>
+      `,
       content: `
         <section class="dashboard-grid booking-flow-grid">
           <article class="panel-card booking-form-card">
@@ -134,8 +151,11 @@ export function createUserSelectSlotPage({ session, pathname, query }) {
         const disabled = currentData.blocklisted || Boolean(currentData.activeBooking) || !selectedSlot || submitInFlight;
 
         selectionCard.innerHTML = `
-          <h2>Reservation summary</h2>
-          <p class="page-copy">Confirming this step creates a reserved booking immediately.</p>
+          <div class="panel-card__header">
+            <span class="eyebrow">Reservation summary</span>
+            <h2>Confirm the selected slot</h2>
+            <p class="page-copy">Confirming this step creates a reserved booking immediately.</p>
+          </div>
           <div class="detail-list">
             <div><span>Level</span><strong>${currentData.level}</strong></div>
             <div><span>Date</span><strong>${formatDate(currentData.date)}</strong></div>
@@ -259,8 +279,11 @@ export function createUserSelectSlotPage({ session, pathname, query }) {
         }
         if (selectionCard) {
           selectionCard.innerHTML = `
-            <h2>Return to booking setup</h2>
-            <p class="page-copy">Refresh the booking details and try loading the level again.</p>
+            <div class="panel-card__header">
+              <span class="eyebrow">Retry flow</span>
+              <h2>Return to booking setup</h2>
+              <p class="page-copy">Refresh the booking details and try loading the level again.</p>
+            </div>
             <div class="auth-support-links">
               <a class="button button--secondary" href="/user/book?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}" data-link>
                 Back to booking setup

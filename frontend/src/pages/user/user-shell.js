@@ -4,15 +4,31 @@ import { logout } from "../../services/auth-service.js";
 import { fetchUserUnreadNotificationCount } from "../../services/notification-service.js";
 import { setAuthState } from "../../state/auth-store.js";
 
-export function renderUserShell({ session, currentPath, eyebrow, title, description, content }) {
+export function renderUserShell({
+  session,
+  currentPath,
+  eyebrow,
+  title,
+  description,
+  content,
+  headerActions = "",
+  notice = ""
+}) {
   return `
     ${renderUserNavbar({ session, currentPath })}
     <main class="app-main user-shell">
       <section class="user-shell__inner">
-        <header class="page-header">
-          <span class="eyebrow">${eyebrow}</span>
-          <h1 class="page-title" tabindex="-1" data-page-heading>${title}</h1>
-          <p class="page-copy page-copy--lead">${description}</p>
+        <header class="page-header page-header--user">
+          <div class="page-header__copy">
+            <span class="eyebrow">${eyebrow}</span>
+            <h1 class="page-title" tabindex="-1" data-page-heading>${title}</h1>
+            <p class="page-copy page-copy--lead">${description}</p>
+          </div>
+          ${
+            headerActions
+              ? `<div class="page-header__actions">${headerActions}</div>`
+              : ""
+          }
         </header>
         ${
           session.blocklisted
@@ -24,6 +40,15 @@ export function renderUserShell({ session, currentPath, eyebrow, title, descript
                     ? `Booking restrictions are active until ${session.blocklistUntil}.`
                     : "Booking restrictions are active on this account."
               })
+            : ""
+        }
+        ${
+          notice
+            ? `
+              <section class="user-notice-panel">
+                ${notice}
+              </section>
+            `
             : ""
         }
         ${content}

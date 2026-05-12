@@ -1,14 +1,14 @@
+import { renderStatusBadge } from "../../components/badge/status-badge.js";
 import { renderButton } from "../../components/button/action-button.js";
 import { renderKpiCard, renderPanelCard } from "../../components/card/panel-card.js";
 import { renderEmptyState } from "../../components/feedback/empty-state.js";
 import { renderErrorState } from "../../components/feedback/error-state.js";
 import { renderLoadingPanelCards, renderLoadingTable } from "../../components/feedback/loading-state.js";
 import { renderFieldGroup, renderInputField } from "../../components/form/form-field.js";
-import { fetchCashierUsers } from "../../services/cashier-service.js";
-import { renderStatusBadge } from "../../components/badge/status-badge.js";
 import { renderDataTable } from "../../components/table/data-table.js";
-import { bindCashierShell, renderCashierShell } from "./cashier-shell.js";
+import { fetchCashierUsers } from "../../services/cashier-service.js";
 import { formatDate } from "../../utils/formatters.js";
+import { bindCashierShell, renderCashierShell } from "./cashier-shell.js";
 
 function renderAccountBadge(user) {
   return user.blocklisted
@@ -27,9 +27,17 @@ const userColumns = [
       </div>
     `
   },
-  { key: "phoneNumber", label: "Phone" },
+  {
+    key: "contact",
+    label: "Contact",
+    render: (user) => `
+      <div class="table-cell-stack">
+        <strong>${user.phoneNumber || "Not provided"}</strong>
+        <span>${user.address || "Address not provided"}</span>
+      </div>
+    `
+  },
   { key: "plateNumber", label: "Plate" },
-  { key: "address", label: "Address" },
   {
     key: "restriction",
     label: "Standing",
@@ -61,17 +69,32 @@ export function createCashierUsersPage({ session, pathname, query }) {
       session,
       currentPath: pathname,
       eyebrow: "Cashier users",
-      title: "Review verified customer accounts",
+      title: "Search customer records used during on-site operations",
       description:
-        "Search verified customer records, check restriction status, and open vehicle details before arrival or payment operations.",
+        "Review verified customer accounts, check restriction state, and open vehicle details before moving into arrival or payment work.",
+      headerActions: `
+        ${renderButton({ label: "Open bookings", href: "/cashier/bookings", tone: "primary" })}
+        ${renderButton({ label: "Dashboard", href: "/cashier/dashboard", tone: "ghost" })}
+      `,
+      notice: `
+        <div class="operations-notice-panel__content">
+          <span class="metric-card__label">User desk</span>
+          <h2>Use this list to confirm identity, standing, and plate details before counter actions.</h2>
+          <p class="page-copy">
+            Verified customer records stay separate from staff accounts, and restricted users should be escalated before further booking handling.
+          </p>
+        </div>
+      `,
       content: `
         <section class="dashboard-grid dashboard-grid--kpi" data-cashier-users-summary>
           ${renderLoadingPanelCards({ count: 3 })}
         </section>
-        <section class="stack-sm">
+        <section class="operations-split-grid">
           ${renderPanelCard({
-            title: "Search verified users",
-            description: "Filter the verified customer directory by name, email, or plate number.",
+            className: "operations-card-accent",
+            eyebrow: "Search and filter",
+            title: "Find verified users quickly",
+            description: "Search by customer name, email, or plate number.",
             content: `
               <form class="stack-sm" data-cashier-users-form>
                 <div class="field-row field-row--single">
@@ -85,17 +108,38 @@ export function createCashierUsersPage({ session, pathname, query }) {
                       value: initialSearch,
                       placeholder: "Name, email, or plate number"
                     }),
-                    hint: "Verified accounts only. Staff and unverified registrations are excluded."
+                    hint: "Only verified customer accounts are shown here."
                   })}
                 </div>
                 <div class="auth-support-links">
                   ${renderButton({ label: "Apply search", type: "submit", tone: "primary" })}
                   ${renderButton({ label: "Clear", href: "/cashier/users", tone: "secondary" })}
-                  ${renderButton({ label: "Back to dashboard", href: "/cashier/dashboard", tone: "ghost" })}
                 </div>
               </form>
             `
           })}
+          ${renderPanelCard({
+            eyebrow: "Desk guidance",
+            title: "What the cashier should confirm",
+            content: `
+              <div class="operations-panel-list">
+                <article>
+                  <strong>Restriction state</strong>
+                  <p>Blocklisted users should be treated as exceptions before booking or completion work continues.</p>
+                </article>
+                <article>
+                  <strong>Plate accuracy</strong>
+                  <p>Use the stored plate number as the first vehicle-matching checkpoint at the desk.</p>
+                </article>
+                <article>
+                  <strong>Recent account context</strong>
+                  <p>The detail view carries the richer contact, vehicle, and booking summary needed during live operations.</p>
+                </article>
+              </div>
+            `
+          })}
+        </section>
+        <section class="stack-sm">
           <div data-cashier-users-alerts></div>
           <div data-cashier-users-list>
             ${renderLoadingTable({ columns: userColumns.length, rows: 4 })}
@@ -124,9 +168,9 @@ export function createCashierUsersPage({ session, pathname, query }) {
 
           if (summaryRoot) {
             summaryRoot.innerHTML = [
-              renderKpiCard({ label: "Matching users", value: data.totalResults }),
-              renderKpiCard({ label: "Verified customers", value: data.totalVerifiedUsers }),
-              renderKpiCard({ label: "Restricted users", value: data.restrictedUsers })
+              renderKpiCard({ label: "Matching users", value: data.totalResults, helper: "Current search result count", icon: "RS" }),
+              renderKpiCard({ label: "Verified customers", value: data.totalVerifiedUsers, helper: "Available to cashier workflows", icon: "VR" }),
+              renderKpiCard({ label: "Restricted users", value: data.restrictedUsers, helper: "Needs escalation before action", icon: "BL" })
             ].join("");
           }
 
@@ -145,7 +189,12 @@ export function createCashierUsersPage({ session, pathname, query }) {
           }
 
           if (alertsRoot) {
-            alertsRoot.innerHTML = "";
+            alertsRoot.innerHTML = data.restrictedUsers > 0
+              ? renderErrorState({
+                  title: "Restricted users are present in the directory",
+                  message: `${data.restrictedUsers} verified user${data.restrictedUsers === 1 ? "" : "s"} currently show a booking restriction.`
+                })
+              : "";
           }
         } catch (error) {
           if (summaryRoot) {

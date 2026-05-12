@@ -1,4 +1,5 @@
 import { renderInlineAlert } from "../../components/alert/inline-alert.js";
+import { renderButton } from "../../components/button/action-button.js";
 import { fetchBookingContext } from "../../services/booking-service.js";
 import { formatCurrency, formatDate, formatTime } from "../../utils/formatters.js";
 import { bindUserShell, renderUserShell } from "./user-shell.js";
@@ -30,9 +31,22 @@ export function createUserBookPage({ session, pathname, query }) {
       session,
       currentPath: pathname,
       eyebrow: "Booking setup",
-      title: "Reserve a parking slot",
+      title: "Start the booking with date, time, and level",
       description:
-        "Start with the booking date, scheduled time, and preferred level. Slot selection and final confirmation happen in the next step.",
+        "This first step defines the booking date, scheduled time, and parking level before slot selection and final confirmation.",
+      headerActions: `
+        ${renderButton({ label: "My bookings", href: "/user/bookings", tone: "secondary" })}
+        ${renderButton({ label: "Parking cost", href: "/user/parking-cost", tone: "ghost" })}
+      `,
+      notice: `
+        <div class="user-notice-panel__content">
+          <span class="metric-card__label">Booking reminders</span>
+          <h2>Customers can hold only one active reserved or arrived booking at a time.</h2>
+          <p class="page-copy">
+            This step also respects restriction status, the booking window, and the no-show policy before slot selection becomes available.
+          </p>
+        </div>
+      `,
       content: `
         <section class="dashboard-grid dashboard-grid--kpi" data-booking-context-grid>
           ${renderContextSkeleton()}
@@ -40,6 +54,7 @@ export function createUserBookPage({ session, pathname, query }) {
         <section class="dashboard-grid booking-flow-grid">
           <article class="panel-card booking-form-card">
             <div class="booking-form-card__header">
+              <span class="eyebrow">Booking form</span>
               <h2>Booking details</h2>
               <p class="page-copy">Advance bookings are limited to today through the next three calendar days.</p>
             </div>
@@ -93,10 +108,7 @@ export function createUserBookPage({ session, pathname, query }) {
       let currentContext = null;
 
       function setFieldError(field, message = "") {
-        const input =
-          field === "level"
-            ? levelRoot
-            : form?.querySelector(`[name="${field}"]`);
+        const input = field === "level" ? levelRoot : form?.querySelector(`[name="${field}"]`);
         const errorNode = form?.querySelector(`[data-field-error="${field}"]`);
 
         if (input instanceof HTMLElement && field !== "level") {
@@ -150,21 +162,34 @@ export function createUserBookPage({ session, pathname, query }) {
 
         contextGrid.innerHTML = `
           <article class="panel-card kpi-card">
-            <span class="metric-card__label">Current hourly rate</span>
-            <strong>${formatCurrency(currentContext.hourlyRate)}</strong>
+            <div class="kpi-card__content">
+              <span class="metric-card__label">Current hourly rate</span>
+              <strong>${formatCurrency(currentContext.hourlyRate)}</strong>
+            </div>
+            <div class="kpi-card__icon" aria-hidden="true"><span>$</span></div>
           </article>
           <article class="panel-card kpi-card">
-            <span class="metric-card__label">Available slots on ${formatDate(currentContext.selectedDate)}</span>
-            <strong>${currentContext.totalAvailableSlots}</strong>
+            <div class="kpi-card__content">
+              <span class="metric-card__label">Available slots on ${formatDate(currentContext.selectedDate)}</span>
+              <strong>${currentContext.totalAvailableSlots}</strong>
+            </div>
+            <div class="kpi-card__icon" aria-hidden="true"><span>SL</span></div>
           </article>
           <article class="panel-card kpi-card">
-            <span class="metric-card__label">Booking window</span>
-            <strong>${formatDate(currentContext.minBookingDate)} to ${formatDate(currentContext.maxBookingDate)}</strong>
+            <div class="kpi-card__content">
+              <span class="metric-card__label">Booking window</span>
+              <strong>${formatDate(currentContext.minBookingDate)} to ${formatDate(currentContext.maxBookingDate)}</strong>
+            </div>
+            <div class="kpi-card__icon" aria-hidden="true"><span>DT</span></div>
           </article>
         `;
 
         policyCard.innerHTML = `
-          <h2>Availability by level</h2>
+          <div class="panel-card__header">
+            <span class="eyebrow">Level availability</span>
+            <h2>Availability by level</h2>
+            <p class="page-copy">Use the live counts below to choose the level before selecting the exact slot in the next step.</p>
+          </div>
           <div class="booking-availability-grid">
             ${currentContext.availableSlotsPerLevel
               .map(
@@ -186,7 +211,7 @@ export function createUserBookPage({ session, pathname, query }) {
                     <div class="detail-list">
                       <div><span>Date</span><strong>${formatDate(currentContext.activeBooking.date)}</strong></div>
                       <div><span>Start time</span><strong>${formatTime(currentContext.activeBooking.startTime)}</strong></div>
-                      <div><span>Slot</span><strong>${currentContext.activeBooking.level} - ${currentContext.activeBooking.slotName}</strong></div>
+                      <div><span>Slot</span><strong>${currentContext.activeBooking.level} | ${currentContext.activeBooking.slotName}</strong></div>
                     </div>
                   </div>
                 `

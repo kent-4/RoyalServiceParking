@@ -1,3 +1,5 @@
+import { renderButton } from "../../components/button/action-button.js";
+import { renderKpiCard, renderPanelCard } from "../../components/card/panel-card.js";
 import { fetchUserDashboard } from "../../services/user-service.js";
 import { formatCurrency, formatDate, formatTime } from "../../utils/formatters.js";
 import { bindUserShell, renderUserShell } from "./user-shell.js";
@@ -7,10 +9,23 @@ export function createUserDashboardPage({ session, pathname }) {
     html: renderUserShell({
       session,
       currentPath: pathname,
-      eyebrow: "User workspace",
-      title: "Your booking overview",
+      eyebrow: "User dashboard",
+      title: "Plan your next parking session with confidence",
       description:
-        "Track account standing, next parking activity, and key account metrics from the rebuilt user portal.",
+        "Keep your next booking, account standing, and current parking rate visible from one cleaner customer dashboard.",
+      headerActions: `
+        ${renderButton({ label: "Book parking", href: "/user/book", tone: "primary" })}
+        ${renderButton({ label: "My bookings", href: "/user/bookings", tone: "secondary" })}
+      `,
+      notice: `
+        <div class="user-notice-panel__content">
+          <span class="metric-card__label">Arrival policy</span>
+          <h2>Advance reservations still require on-time arrival.</h2>
+          <p class="page-copy">
+            Customers must arrive within one hour of the scheduled booking time to avoid automatic cancellation and temporary restriction.
+          </p>
+        </div>
+      `,
       content: `
         <section class="dashboard-grid dashboard-grid--kpi" data-dashboard-kpis>
           ${Array.from({ length: 4 })
@@ -30,9 +45,10 @@ export function createUserDashboardPage({ session, pathname }) {
             <div class="loading-block loading-block--line"></div>
             <div class="loading-block loading-block--line"></div>
           </article>
-          <article class="panel-card" data-dashboard-policy>
-            <h2>Parking reminder</h2>
-            <p>Customers must arrive within one hour of the scheduled booking time to avoid automatic cancellation and temporary restriction.</p>
+          <article class="panel-card" data-dashboard-account>
+            <div class="loading-block loading-block--title"></div>
+            <div class="loading-block loading-block--line"></div>
+            <div class="loading-block loading-block--line"></div>
           </article>
         </section>
         <section class="dashboard-grid">
@@ -54,6 +70,7 @@ export function createUserDashboardPage({ session, pathname }) {
 
       const kpiRoot = document.querySelector("[data-dashboard-kpis]");
       const nextBookingRoot = document.querySelector("[data-dashboard-next-booking]");
+      const accountRoot = document.querySelector("[data-dashboard-account]");
       const profileRoot = document.querySelector("[data-dashboard-profile]");
       const rateRoot = document.querySelector("[data-dashboard-rate]");
 
@@ -62,64 +79,101 @@ export function createUserDashboardPage({ session, pathname }) {
 
         if (kpiRoot) {
           kpiRoot.innerHTML = [
-            { label: "Total bookings", value: data.totalBookings },
-            { label: "Active bookings", value: data.activeBookings },
-            { label: "Completed bookings", value: data.completedBookings },
-            { label: "Current hourly rate", value: formatCurrency(data.currentHourlyRate) }
+            { label: "Total bookings", value: data.totalBookings, icon: "BK" },
+            { label: "Active bookings", value: data.activeBookings, icon: "ON" },
+            { label: "Completed bookings", value: data.completedBookings, icon: "OK" },
+            { label: "Current hourly rate", value: formatCurrency(data.currentHourlyRate), icon: "$" }
           ]
-            .map(
-              (item) => `
-                <article class="panel-card kpi-card">
-                  <span class="metric-card__label">${item.label}</span>
-                  <strong>${item.value}</strong>
-                </article>
-              `
-            )
+            .map((item) => renderKpiCard(item))
             .join("");
         }
 
         if (nextBookingRoot) {
           nextBookingRoot.innerHTML = data.nextUpcomingBooking
             ? `
-                <h2>Next upcoming booking</h2>
+                <div class="panel-card__header">
+                  <span class="eyebrow">Next action</span>
+                  <h2>Upcoming reserved booking</h2>
+                  <p class="page-copy">Keep the date, time, and slot visible before you arrive on site.</p>
+                </div>
                 <div class="detail-list">
                   <div><span>Date</span><strong>${formatDate(data.nextUpcomingBooking.date)}</strong></div>
                   <div><span>Start time</span><strong>${formatTime(data.nextUpcomingBooking.startTime)}</strong></div>
                   <div><span>Slot</span><strong>${data.nextUpcomingBooking.level} - ${data.nextUpcomingBooking.slotName}</strong></div>
                   <div><span>Status</span><strong>${data.nextUpcomingBooking.status}</strong></div>
                 </div>
+                <div class="auth-support-links">
+                  <a class="button button--primary" href="/user/bookings" data-link>Review booking</a>
+                </div>
               `
             : `
-                <h2>Next upcoming booking</h2>
-                <p class="empty-copy">No active reserved booking is scheduled right now.</p>
+                <div class="panel-card__header">
+                  <span class="eyebrow">Next action</span>
+                  <h2>No reserved booking is scheduled right now</h2>
+                  <p class="page-copy">Create an advance reservation before you arrive to secure a slot.</p>
+                </div>
+                <div class="auth-support-links">
+                  <a class="button button--primary" href="/user/book" data-link>Start booking</a>
+                </div>
               `;
         }
 
-        if (profileRoot) {
-          profileRoot.innerHTML = `
-            <h2>Account snapshot</h2>
+        if (accountRoot) {
+          accountRoot.innerHTML = `
+            <div class="panel-card__header">
+              <span class="eyebrow">Account standing</span>
+              <h2>Restriction and profile visibility</h2>
+              <p class="page-copy">Customer status stays visible so booking eligibility is never ambiguous.</p>
+            </div>
             <div class="detail-list">
-              <div><span>Name</span><strong>${data.fullName}</strong></div>
+              <div><span>Restriction</span><strong>${data.blocklisted ? "Restricted" : "Good standing"}</strong></div>
+              <div><span>Vehicle on file</span><strong>${data.vehicleType} - ${data.plateNumber}</strong></div>
               <div><span>Email</span><strong>${data.email}</strong></div>
-              <div><span>Vehicle</span><strong>${data.vehicleType} - ${data.plateNumber}</strong></div>
-              <div><span>Account standing</span><strong>${data.blocklisted ? "Restricted" : "Good standing"}</strong></div>
             </div>
             <div class="auth-support-links">
-              <a class="button button--secondary" href="/user/profile" data-link>Manage profile</a>
+              <a class="button button--secondary" href="/user/profile" data-link>Open profile</a>
             </div>
           `;
+        }
+
+        if (profileRoot) {
+          profileRoot.innerHTML = renderPanelCard({
+            eyebrow: "Customer profile",
+            title: "Identity and vehicle snapshot",
+            description: "Use the saved profile details as the base for your future booking steps.",
+            content: `
+              <div class="detail-list">
+                <div><span>Name</span><strong>${data.fullName}</strong></div>
+                <div><span>Email</span><strong>${data.email}</strong></div>
+                <div><span>Vehicle</span><strong>${data.vehicleType} - ${data.plateNumber}</strong></div>
+              </div>
+            `,
+            footer: `
+              <div class="auth-support-links">
+                <a class="button button--secondary" href="/user/profile" data-link>Manage profile</a>
+              </div>
+            `
+          });
         }
 
         if (rateRoot) {
           const threeHourSample = Number(data.currentHourlyRate || 0) * 3;
-          rateRoot.innerHTML = `
-            <h2>Parking cost preview</h2>
-            <p class="page-copy">The current rate is <strong>${formatCurrency(data.currentHourlyRate)}</strong> per hour.</p>
-            <p class="page-copy">A 3-hour stay currently estimates to <strong>${formatCurrency(threeHourSample)}</strong>.</p>
-            <div class="auth-support-links">
-              <a class="button button--secondary" href="/user/parking-cost" data-link>Open calculator</a>
-            </div>
-          `;
+          rateRoot.innerHTML = renderPanelCard({
+            eyebrow: "Parking cost",
+            title: "Current pricing preview",
+            description: "Review the active hourly rate before moving into the booking flow.",
+            content: `
+              <div class="detail-list">
+                <div><span>Hourly rate</span><strong>${formatCurrency(data.currentHourlyRate)}</strong></div>
+                <div><span>3-hour sample</span><strong>${formatCurrency(threeHourSample)}</strong></div>
+              </div>
+            `,
+            footer: `
+              <div class="auth-support-links">
+                <a class="button button--secondary" href="/user/parking-cost" data-link>Open calculator</a>
+              </div>
+            `
+          });
         }
       } catch (error) {
         if (kpiRoot) {
@@ -133,6 +187,10 @@ export function createUserDashboardPage({ session, pathname }) {
 
         if (nextBookingRoot) {
           nextBookingRoot.innerHTML = "";
+        }
+
+        if (accountRoot) {
+          accountRoot.innerHTML = "";
         }
 
         if (profileRoot) {

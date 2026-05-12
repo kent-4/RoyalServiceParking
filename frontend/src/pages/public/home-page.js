@@ -6,52 +6,52 @@ const experienceCards = [
   {
     href: "/register",
     eyebrow: "Advance booking",
-    title: "Register and reserve before you arrive.",
+    title: "Create a verified customer account.",
     description:
-      "Create a verified customer account, manage your vehicle details, and secure a slot ahead of time.",
+      "Start with registration so your vehicle, contact details, and future reservations stay tied to one verified account.",
     meta: "For new customers"
   },
   {
     href: "/login?role=user",
     eyebrow: "Customer access",
-    title: "Return to your user portal.",
+    title: "Return to the customer workspace.",
     description:
-      "Review reservations, booking history, notifications, restriction status, and upcoming parking sessions.",
+      "Open your bookings, notifications, restriction status, and profile from the same shared sign-in route.",
     meta: "For verified users"
   },
   {
     href: "/login?role=cashier",
     eyebrow: "Operations",
-    title: "Open the cashier workspace.",
+    title: "Handle on-site cashier operations.",
     description:
-      "Check arrivals, complete parking sessions, and handle time-sensitive reservations from the operational portal.",
+      "Review arrivals, complete parking sessions, and issue receipts without exposing staff actions to the customer journey.",
     meta: "For staff on site"
   },
   {
     href: "/login?role=admin",
     eyebrow: "Management",
-    title: "Enter the admin workspace.",
+    title: "Oversee pricing, users, and reports.",
     description:
-      "Oversee users, bookings, pricing, restrictions, and reporting while backend rules remain authoritative.",
+      "Monitor bookings, pricing, restrictions, and exports from the management workspace while backend rules stay authoritative.",
     meta: "For authorized administrators"
   }
 ];
 
 const capabilityCards = [
   {
-    title: "Verified account booking",
+    title: "Verified account before booking",
     description:
-      "Customer reservations remain tied to verified email accounts before the booking flow is unlocked."
+      "Advance booking stays gated behind registration and email verification instead of walk-in discovery."
   },
   {
-    title: "Arrival window enforcement",
+    title: "One-hour arrival rule stays visible",
     description:
-      "The product keeps the existing one-hour no-show rule visible from the first public touchpoint."
+      "Public messaging keeps the no-show and temporary restriction policy clear before a customer commits to the flow."
   },
   {
-    title: "Role-specific workspaces",
+    title: "Shared sign-in, separate workspaces",
     description:
-      "Public, user, cashier, and admin entry points stay separated in the new frontend just like the backend routes."
+      "The login route is unified, but customer, cashier, and admin experiences stay role-separated after authentication."
   }
 ];
 
@@ -86,59 +86,66 @@ export function createPublicHomePage({ session, pathname }) {
       <main class="app-main">
         <section class="hero-shell hero-shell--public">
           <div class="hero-shell__content">
-            <span class="eyebrow">Premium parking operations</span>
+            <span class="eyebrow">Royal Service Parking</span>
             <h1 class="hero-title" tabindex="-1" data-page-heading>
-              Reserve earlier, arrive smoother, manage parking operations with clearer role-based entry points.
+              Reserve before you arrive, then move through check-in and completion with clear role-based access.
             </h1>
             <p class="page-copy page-copy--lead">
-              Royal Service Parking is being rebuilt as a plain JavaScript frontend backed by Spring Boot. The customer journey stays guided, while cashier and admin access remains operationally separate.
+              Royal Service Parking is the public front door to a role-based parking platform. Customers start with a verified account, while cashier and admin entry points remain visible but secondary to the booking journey.
             </p>
             <div class="hero-actions">
               <a class="button button--primary" href="${primaryAction.href}" data-link>${primaryAction.label}</a>
               <a class="button button--secondary" href="/login" data-link>Login</a>
               <a class="button button--ghost" href="/login?role=cashier" data-link>Cashier access</a>
             </div>
-            <div class="hero-highlights">
-              <div class="hero-highlight">
-                <strong>104 seeded slots</strong>
-                <span>Four levels with level-based selection in the current product model.</span>
+            <div class="hero-stat-grid">
+              <div class="hero-stat">
+                <strong>Verified account required</strong>
+                <span>Customer booking opens only after registration and email verification.</span>
               </div>
-              <div class="hero-highlight">
+              <div class="hero-stat">
                 <strong>1-hour arrival window</strong>
-                <span>No-show policy remains explicit from the public entry point onward.</span>
+                <span>No-show handling and temporary restrictions remain visible from the first page.</span>
               </div>
-              <div class="hero-highlight">
-                <strong>Session-based auth</strong>
-                <span>Customer and staff access stay aligned with backend authorization rules.</span>
+              <div class="hero-stat">
+                <strong>Shared login route</strong>
+                <span>The backend still routes authenticated users into the correct workspace automatically.</span>
               </div>
             </div>
           </div>
           <div class="hero-shell__panel">
-            <div class="policy-card">
-              <span class="metric-card__label">Reservation flow</span>
-              <strong>Customer onboarding stays structured.</strong>
+            <div class="policy-card policy-card--primary">
+              <span class="metric-card__label">Advance booking flow</span>
+              <strong>Customers are guided from registration to reservation, then on-site completion.</strong>
               <ol class="journey-list">
-                <li>Create or verify your account.</li>
-                <li>Reserve a slot before arrival.</li>
-                <li>Check in through the cashier portal.</li>
-                <li>Complete the session and receive final pricing.</li>
+                <li>Create an account and verify the email address.</li>
+                <li>Choose a date, time, level, and exact slot.</li>
+                <li>Arrive on time for cashier check-in.</li>
+                <li>Complete the parking session and receive a receipt.</li>
               </ol>
             </div>
             <div class="policy-card policy-card--warning">
               <span class="metric-card__label">Policy reminder</span>
-              <strong>Missed reservations can trigger temporary restrictions.</strong>
+              <strong>Booking is for advance reservation, not walk-in slot discovery.</strong>
               <p>
-                The rebuild preserves visible no-show guidance so customers understand the one-hour arrival rule before booking.
+                Customers must arrive within the allowed window. Missed reservations can trigger temporary booking restrictions.
               </p>
+            </div>
+            <div class="policy-card">
+              <span class="metric-card__label">Staff and management</span>
+              <div class="access-quick-links">
+                <a href="/login?role=cashier" data-link>Cashier portal</a>
+                <a href="/login?role=admin" data-link>Admin portal</a>
+              </div>
             </div>
           </div>
         </section>
         <section class="public-section">
           <div class="section-heading">
             <span class="eyebrow">Choose your entry point</span>
-            <h2>Public and operational access stays clearly separated.</h2>
+            <h2>Customer booking stays front-and-center while staff access remains available.</h2>
             <p class="page-copy">
-              The first visible milestone focuses on the public site and login routes before moving into registration, verification, and password recovery screens.
+              The rebuilt public experience keeps the premium customer path clear without hiding operational access for staff and administrators.
             </p>
           </div>
           <div class="entry-grid">
@@ -146,21 +153,37 @@ export function createPublicHomePage({ session, pathname }) {
           </div>
         </section>
         <section class="public-section public-section--muted">
-          <div class="section-heading">
-            <span class="eyebrow">Built for the real workflow</span>
-            <h2>Customer guidance and staff speed are both first-class requirements.</h2>
+          <div class="section-split">
+            <div>
+              <span class="eyebrow">Built for the real workflow</span>
+              <h2 class="page-title">Customers need guidance. Staff need separation and speed.</h2>
+              <p class="page-copy">
+                The public site explains the rules up front so the later user, cashier, and admin workspaces can stay more task-focused.
+              </p>
+            </div>
+            <div class="feature-grid">
+              ${capabilityCards
+                .map(
+                  (card) => `
+                    <article class="feature-card">
+                      <h3>${card.title}</h3>
+                      <p>${card.description}</p>
+                    </article>
+                  `
+                )
+                .join("")}
+            </div>
           </div>
-          <div class="feature-grid">
-            ${capabilityCards
-              .map(
-                (card) => `
-                  <article class="feature-card">
-                    <h3>${card.title}</h3>
-                    <p>${card.description}</p>
-                  </article>
-                `
-              )
-              .join("")}
+        </section>
+        <section class="public-section">
+          <div class="policy-band">
+            <div>
+              <span class="eyebrow">Before a customer books</span>
+              <h2>Make the rules clear before the reservation is submitted.</h2>
+            </div>
+            <p>
+              Email verification is required before login, bookings are made in advance, and the one-hour arrival policy remains visible across the public and shared-auth routes.
+            </p>
           </div>
         </section>
       </main>

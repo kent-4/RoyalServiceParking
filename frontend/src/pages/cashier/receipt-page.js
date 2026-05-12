@@ -17,9 +17,21 @@ export function createCashierReceiptPage({ session, pathname, query }) {
       session,
       currentPath: pathname,
       eyebrow: "Cashier receipt",
-      title: "Print-ready parking receipt",
+      title: "Review the print-ready session receipt",
       description:
-        "Review the finalized session record and print a clean receipt without the cashier shell controls.",
+        "Use the finalized session record for handoff, then print the receipt without the operational shell.",
+      headerActions: `
+        ${renderButton({ label: "Back to bookings", href: "/cashier/bookings", tone: "secondary" })}
+      `,
+      notice: `
+        <div class="operations-notice-panel__content">
+          <span class="metric-card__label">Receipt output</span>
+          <h2>This screen is the final printable record after a parking session has been completed.</h2>
+          <p class="page-copy">
+            Confirm the booking, vehicle, time-in, time-out, duration, rate, and total before printing for the customer.
+          </p>
+        </div>
+      `,
       content: `
         <div data-cashier-receipt-alerts></div>
         <section class="receipt-print-page" data-cashier-receipt-root>
@@ -73,8 +85,8 @@ export function createCashierReceiptPage({ session, pathname, query }) {
                 <div class="receipt-row"><span>Vehicle type</span><strong>${receipt.vehicleType}</strong></div>
                 <div class="receipt-row"><span>Date</span><strong>${formatDate(receipt.date)}</strong></div>
                 <div class="receipt-row"><span>Location</span><strong>${receipt.level} - ${receipt.slotName}</strong></div>
-                <div class="receipt-row"><span>Start time</span><strong>${formatTime(receipt.startTime)}</strong></div>
-                <div class="receipt-row"><span>Exit time</span><strong>${formatTime(receipt.exitTime)}</strong></div>
+                <div class="receipt-row"><span>Time in</span><strong>${formatTime(receipt.startTime)}</strong></div>
+                <div class="receipt-row"><span>Time out</span><strong>${formatTime(receipt.exitTime)}</strong></div>
                 <div class="receipt-row"><span>Duration</span><strong>${durationText(receipt)}</strong></div>
                 <div class="receipt-row"><span>Total hours</span><strong>${receipt.totalHours}</strong></div>
                 <div class="receipt-row"><span>Rate per hour</span><strong>${formatCurrency(receipt.hourlyRate)}</strong></div>

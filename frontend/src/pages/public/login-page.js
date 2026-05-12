@@ -117,6 +117,12 @@ function renderRouteMessage({ query }) {
 export function createLoginPage(context) {
   const selectedRole = String(context.query.get("role") ?? "default").toLowerCase();
   const copy = roleCopy[selectedRole] ?? roleCopy.default;
+  const roleHints = [
+    { key: "default", label: "All roles", href: "/login" },
+    { key: "user", label: "Customer", href: "/login?role=user" },
+    { key: "cashier", label: "Cashier", href: "/login?role=cashier" },
+    { key: "admin", label: "Admin", href: "/login?role=admin" }
+  ];
 
   return {
     html: `
@@ -135,6 +141,13 @@ export function createLoginPage(context) {
                   ${copy.bullets.map((item) => `<li>${item}</li>`).join("")}
                 </ul>
               </div>
+              <div class="auth-policy-card">
+                <span class="metric-card__label">How the shared login behaves</span>
+                <p>
+                  This page is publicly reachable, but the backend still decides whether the credentials belong to the customer,
+                  cashier, or admin workspace after authentication.
+                </p>
+              </div>
               <div class="auth-support-links">
                 <a class="button button--ghost" href="/" data-link>Back to home</a>
                 ${
@@ -146,8 +159,23 @@ export function createLoginPage(context) {
             </aside>
             <div class="auth-card auth-card--elevated">
               <span class="eyebrow">${copy.eyebrow}</span>
-              <h2 class="auth-card__title">Sign in</h2>
+              <h2 class="auth-card__title">Shared sign in</h2>
               <p class="page-copy">${copy.helperText}</p>
+              <div class="role-hint-grid" aria-label="Role hints">
+                ${roleHints
+                  .map(
+                    (role) => `
+                      <a
+                        class="role-hint-chip ${selectedRole === role.key ? "is-active" : ""}"
+                        href="${role.href}"
+                        data-link
+                      >
+                        ${role.label}
+                      </a>
+                    `
+                  )
+                  .join("")}
+              </div>
               ${renderRouteMessage({ query: context.query })}
               <form class="stack-sm" data-login-form novalidate>
                 <div class="field-group">
@@ -188,6 +216,12 @@ export function createLoginPage(context) {
                   <div class="auth-inline-links">
                     ${copy.footerLinks}
                   </div>
+                </div>
+                <div class="auth-policy-card auth-policy-card--compact">
+                  <span class="metric-card__label">Before you continue</span>
+                  <p>
+                    Customers still need a verified account before login, while cashier and admin access stays controlled by backend authorization.
+                  </p>
                 </div>
                 <div class="form-feedback" role="status" aria-live="polite" data-form-feedback></div>
                 <button class="button button--primary button--block" type="submit" data-submit-button>

@@ -12,9 +12,22 @@ export function createCashierParkingRatePage({ session, pathname }) {
       session,
       currentPath: pathname,
       eyebrow: "Parking rate",
-      title: "Review the active parking rate",
+      title: "Keep the active hourly rate visible during cashier operations",
       description:
-        "Use the backend’s current hourly rate as the source of truth during arrival, payment, and receipt workflows.",
+        "Use the current backend rate as a read-only reference during arrival explanations, payment review, and receipt confirmation.",
+      headerActions: `
+        ${renderButton({ label: "Open bookings", href: "/cashier/bookings", tone: "primary" })}
+        ${renderButton({ label: "Dashboard", href: "/cashier/dashboard", tone: "ghost" })}
+      `,
+      notice: `
+        <div class="operations-notice-panel__content">
+          <span class="metric-card__label">Read-only pricing</span>
+          <h2>Cashiers can review the active rate here, but rate management stays in the admin workflow.</h2>
+          <p class="page-copy">
+            The same backend rate is reused by booking completion and receipt generation, so this page is the right place to verify pricing at the desk.
+          </p>
+        </div>
+      `,
       content: `
         <section class="dashboard-grid cashier-rate-grid" data-cashier-rate-panels>
           ${renderLoadingPanelCards({ count: 2 })}
@@ -33,31 +46,37 @@ export function createCashierParkingRatePage({ session, pathname }) {
         if (panelsRoot) {
           panelsRoot.innerHTML = `
             ${renderPanelCard({
-              title: "Current hourly rate",
+              eyebrow: "Current rate",
+              title: "Active hourly pricing",
+              className: "operations-card-accent",
               content: `
-                <span class="metric-card__label">Active backend rate</span>
+                <span class="metric-card__label">Backend source of truth</span>
                 <strong class="panel-card__value">${formatCurrency(hourlyRate)}</strong>
-                <p class="page-copy">This is the same rate used in booking completion and receipt totals.</p>
+                <p class="page-copy">This exact rate is used by booking completion and the final printed receipt.</p>
                 <div class="detail-list">
-                  <div><span>Example for 1 hour</span><strong>${formatCurrency(hourlyRate)}</strong></div>
-                  <div><span>Example for 4 hours</span><strong>${formatCurrency(hourlyRate * 4)}</strong></div>
-                  <div><span>Example for 12 hours</span><strong>${formatCurrency(hourlyRate * 12)}</strong></div>
+                  <div><span>1-hour example</span><strong>${formatCurrency(hourlyRate)}</strong></div>
+                  <div><span>4-hour example</span><strong>${formatCurrency(hourlyRate * 4)}</strong></div>
+                  <div><span>12-hour example</span><strong>${formatCurrency(hourlyRate * 12)}</strong></div>
                 </div>
               `
             })}
             ${renderPanelCard({
-              title: "Cashier note",
+              eyebrow: "Pricing reminders",
+              title: "What the cashier should remember",
               content: `
-                <ul class="journey-list">
-                  <li>Cashiers can review the active rate but should not change it from this area.</li>
-                  <li>Partial hours are rounded up by the backend during booking completion.</li>
-                  <li>Rate management remains an admin responsibility in the rebuild plan.</li>
-                </ul>
-              `,
-              footer: `
-                <div class="auth-support-links">
-                  ${renderButton({ label: "Back to dashboard", href: "/cashier/dashboard", tone: "secondary" })}
-                  ${renderButton({ label: "Open bookings", href: "/cashier/bookings", tone: "ghost" })}
+                <div class="operations-panel-list">
+                  <article>
+                    <strong>Read-only role</strong>
+                    <p>Cashiers can verify the active rate here but should not change it from this workspace.</p>
+                  </article>
+                  <article>
+                    <strong>Rounded billing</strong>
+                    <p>Partial hours are rounded up by the backend during session completion.</p>
+                  </article>
+                  <article>
+                    <strong>Receipt alignment</strong>
+                    <p>The printed receipt uses the same hourly rate and completion totals shown in the cashier payment flow.</p>
+                  </article>
                 </div>
               `
             })}

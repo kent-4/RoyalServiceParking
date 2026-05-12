@@ -15,21 +15,31 @@ export function createForgotPasswordPage(context) {
               <span class="eyebrow">Password recovery</span>
               <h1 class="page-title" tabindex="-1" data-page-heading>Request a password reset link</h1>
               <p class="page-copy page-copy--lead">
-                Only verified customer accounts can request password recovery. The backend remains responsible for token issuance and invalidation.
+                Only verified customer accounts can request password recovery. The backend still owns token issuance, delivery, and invalidation.
               </p>
               <div class="auth-story-card">
                 <h2>Before you continue</h2>
                 <ul class="auth-story-list">
                   <li>Use the verified email tied to your customer account.</li>
                   <li>Reset links are delivered through the backend email service.</li>
-                  <li>If the token expires, request a fresh link from this screen.</li>
+                  <li>If the link expires, request a fresh email from this route.</li>
                 </ul>
+              </div>
+              <div class="auth-policy-card">
+                <span class="metric-card__label">Eligible accounts only</span>
+                <p>
+                  If the account is not verified yet, the recovery flow stops here and the customer needs to complete verification first.
+                </p>
               </div>
             </aside>
             <div class="auth-card auth-card--elevated">
               <span class="eyebrow">Recovery form</span>
               <h2 class="auth-card__title">Enter your account email</h2>
-              <p class="page-copy">We’ll ask the backend to send a reset link if the account is verified.</p>
+              <p class="page-copy">We will ask the backend to send a reset link if the account is verified.</p>
+              <div class="auth-policy-card auth-policy-card--compact">
+                <span class="metric-card__label">What happens next</span>
+                <p>If the account is eligible, the next page confirms the request and the email service handles delivery.</p>
+              </div>
               <form class="stack-sm" data-forgot-password-form novalidate>
                 <div class="field-group">
                   <label for="forgot-email">Email address</label>
