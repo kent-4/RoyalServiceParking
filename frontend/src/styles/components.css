@@ -816,8 +816,8 @@
   width: min(100% - 2rem, var(--max-shell-width));
   margin: 0 auto;
   padding: var(--space-4) 0;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-4);
 }
@@ -826,11 +826,19 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-3);
+  min-width: 0;
 }
 
 .user-nav__brand-copy {
   display: grid;
   gap: 2px;
+  min-width: 0;
+}
+
+.user-nav__brand-copy strong,
+.user-nav__brand-copy p,
+.user-nav__brand-copy small {
+  white-space: nowrap;
 }
 
 .user-nav__brand p {
@@ -851,14 +859,35 @@
 .user-nav__actions {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.user-nav__links {
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.user-nav__links::-webkit-scrollbar {
+  display: none;
+}
+
+.user-nav__actions {
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .user-nav__links a {
+  display: inline-flex;
+  align-items: center;
   padding: var(--space-2) var(--space-3);
   border-radius: 999px;
   color: var(--color-text-muted);
+  flex-shrink: 0;
+  white-space: nowrap;
   transition: background-color 120ms ease, color 120ms ease;
 }
 
@@ -871,6 +900,11 @@
   background: rgba(15, 76, 129, 0.1);
   color: var(--color-primary);
   font-weight: 700;
+}
+
+.user-nav__actions .status-chip,
+.user-nav__actions .button {
+  flex-shrink: 0;
 }
 
 .page-header--user {
@@ -2406,7 +2440,6 @@
   .auth-form__meta,
   .entry-card__footer,
   .public-footer__inner,
-  .user-nav,
   .detail-list div,
   .cost-breakdown-item,
    .page-header--user,
@@ -2421,7 +2454,23 @@
   }
 
   .user-nav {
+    display: flex;
+    flex-direction: column;
     align-items: flex-start;
+  }
+
+  .user-nav__links,
+  .user-nav__actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    overflow: visible;
+    white-space: normal;
+  }
+
+  .user-nav__brand-copy strong,
+  .user-nav__brand-copy p,
+  .user-nav__brand-copy small {
+    white-space: normal;
   }
 
   .page-header__actions {

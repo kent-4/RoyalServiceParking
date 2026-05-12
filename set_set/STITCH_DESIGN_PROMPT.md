@@ -1060,7 +1060,7 @@ Public home page:
 - branded hero
 - service overview
 - no-show policy visibility
-- role entry cards for register, user login, cashier login, admin login
+- role-aware public entry cards for register and shared login
 - premium but practical first impression
 
 Shared login page:

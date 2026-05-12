@@ -47,9 +47,7 @@ The app is designed to manage the full lifecycle of a parking reservation:
 
 - View landing page / homepage
 - Navigate to user registration
-- Navigate to user login
-- Navigate to cashier login
-- Navigate to admin login
+- Navigate to the shared login page
 
 ### Customer / User
 
@@ -105,17 +103,15 @@ The app is designed to manage the full lifecycle of a parking reservation:
 Observed behavior:
 
 - Landing page branded as `Royal Service Parking`
-- Shows separate entry points for:
+- Shows public entry points for:
   - Advance booking / registration
-  - User login
-  - Admin login
-  - Cashier login
+  - Shared account login
 - Guest booking shortcut redirects to registration first
 
 Rebuild module requirements:
 
 - Frontend marketing/home page
-- role-specific login entry points
+- one shared login entry point for returning accounts
 - clear CTA for advance booking
 - optional brand assets / carousel / hero presentation
 - public-facing API consumption only where needed
@@ -945,9 +941,7 @@ Public / shared frontend routes/screens:
 - Home page
 - Register page
 - Register success page
-- User login page
-- Cashier login page
-- Admin login page
+- Shared login page
 - Email verification result page
 - Forgot-password page
 - Forgot-password confirmation page
