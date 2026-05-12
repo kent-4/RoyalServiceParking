@@ -894,6 +894,20 @@
   gap: var(--space-5);
 }
 
+.page-header--admin {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  border-radius: 28px;
+  border: 1px solid rgba(15, 76, 129, 0.12);
+  background:
+    radial-gradient(circle at top right, rgba(255, 203, 5, 0.16), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.96));
+  box-shadow: 0 18px 40px rgba(15, 76, 129, 0.08);
+}
+
 .page-header__copy {
   min-width: 0;
 }
@@ -907,6 +921,10 @@
 
 .page-header__actions--operations {
   align-items: stretch;
+}
+
+.page-header__actions--admin {
+  align-items: center;
 }
 
 .user-notice-panel {
@@ -1040,6 +1058,126 @@
 .operations-card-accent {
   border-color: rgba(15, 76, 129, 0.18);
   background: linear-gradient(180deg, rgba(15, 76, 129, 0.06), rgba(255, 255, 255, 0.98));
+}
+
+.admin-overview-grid,
+.admin-account-layout {
+  align-items: start;
+}
+
+.admin-overview-grid {
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+}
+
+.admin-account-layout {
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+}
+
+.admin-account-hero {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.admin-account-hero--compact {
+  align-items: center;
+}
+
+.admin-account-hero__copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-account-hero__copy h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 2vw, 2rem);
+}
+
+.admin-account-hero__copy .page-copy {
+  margin-top: 0;
+}
+
+.admin-avatar-badge {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(15, 76, 129, 0.96), rgba(10, 52, 87, 0.96));
+  border: 1px solid rgba(255, 203, 5, 0.32);
+  box-shadow: 0 16px 30px rgba(15, 76, 129, 0.16);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+
+.admin-avatar-badge--rate {
+  font-size: 0.75rem;
+}
+
+.admin-preview-grid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin-top: var(--space-4);
+}
+
+.admin-preview-grid article {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(15, 76, 129, 0.12);
+}
+
+.admin-preview-grid span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-helper);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-preview-grid strong {
+  font-size: 1.1rem;
+}
+
+.admin-policy-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-policy-list li {
+  padding: var(--space-4);
+  border-radius: 18px;
+  border: 1px solid rgba(209, 213, 219, 0.78);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--color-text-muted);
+}
+
+.admin-policy-list strong {
+  color: var(--color-text);
+}
+
+.admin-note-surface {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: 18px;
+  border: 1px solid rgba(15, 76, 129, 0.12);
+  background: rgba(15, 76, 129, 0.05);
+}
+
+.admin-note-surface p {
+  margin: 0;
+  color: var(--color-text-muted);
 }
 
 .status-hero {
@@ -1429,6 +1567,52 @@
 
 .role-sidebar__logout {
   margin-top: auto;
+}
+
+.role-sidebar--admin {
+  background:
+    radial-gradient(circle at top right, rgba(255, 203, 5, 0.18), transparent 22%),
+    linear-gradient(180deg, #052c4f 0%, #0f4c81 52%, #0d3c64 100%);
+  border-color: rgba(15, 76, 129, 0.48);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.role-sidebar--admin .eyebrow,
+.role-sidebar--admin .role-sidebar__header p,
+.role-sidebar--admin .role-sidebar__item small {
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.role-sidebar--admin .role-sidebar__nav a {
+  color: rgba(255, 255, 255, 0.82);
+  border: 1px solid transparent;
+}
+
+.role-sidebar--admin .role-sidebar__nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.role-sidebar--admin .role-sidebar__nav a.is-active {
+  background: rgba(255, 203, 5, 0.16);
+  border-color: rgba(255, 203, 5, 0.28);
+  color: #fff;
+}
+
+.role-sidebar--admin .role-sidebar__item--disabled {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.role-sidebar--admin .role-sidebar__logout.button--secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.role-sidebar--admin .role-sidebar__logout.button--secondary:hover {
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .empty-state {
@@ -2187,7 +2371,8 @@
   .detail-list div,
   .cost-breakdown-item,
    .page-header--user,
-   .page-header--operations {
+   .page-header--operations,
+   .page-header--admin {
     flex-direction: column;
   }
 
@@ -2206,6 +2391,11 @@
   }
 
   .operations-split-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-overview-grid,
+  .admin-account-layout {
     grid-template-columns: 1fr;
   }
 
@@ -2237,6 +2427,7 @@
   .notification-toolbar,
   .notification-card__header,
   .notification-card__meta,
+  .admin-account-hero,
   .record-card__header,
   .record-card__footer,
   .receipt-page__actions,

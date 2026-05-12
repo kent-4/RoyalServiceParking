@@ -196,7 +196,7 @@ Notes / blockers: `Phase 4 cashier routes are now functionally rebuilt and visua
 
 Owner: `Codex`
 Last updated: `2026-05-12`
-Notes / blockers: `The rebuilt admin shell, dashboard, users page, user-details page, bookings oversight table, parking-rate management screen, and blocklist review/unblock flow are now live in the JavaScript frontend and wired through dedicated /api/admin/dashboard, /api/admin/users*, /api/admin/bookings, /api/admin/parking-rates/current, and /api/admin/blocklist* endpoints. The only remaining Phase 5 item is the still-decision-gated manual blocklist-add flow, plus responsive/runtime verification of the rebuilt admin routes.`
+Notes / blockers: `The rebuilt admin shell, dashboard, users page, user-details page, bookings oversight table, parking-rate management screen, and blocklist review/unblock flow are now live in the JavaScript frontend and wired through dedicated /api/admin/dashboard, /api/admin/users*, /api/admin/bookings, /api/admin/parking-rates/current, and /api/admin/blocklist* endpoints. A follow-up Stitch-driven refinement pass has now also tightened the runtime admin sidebar, control-center header, account-detail view, blocklist review, and rate-management presentation toward the generated admin boards in project 2455191244461890766 while preserving the current backend data contracts. The only remaining Phase 5 item is the still-decision-gated manual blocklist-add flow, plus responsive/runtime verification of the rebuilt admin routes.`
 
 ## 10. Phase 6: Reports and Exports
 
@@ -257,6 +257,18 @@ Last updated: `2026-05-10`
 Notes / blockers: `Frontend npm install, lint, and production build passed. Backend compile could not be verified in this environment because Maven is running against a JDK that does not support Java 21.`
 
 ## 13. Current Next Tasks
+
+- Perform responsive/runtime verification across the public, user, cashier, and admin portals with emphasis on tablet cashier workflows and admin table/card transitions.
+- Manually verify live receipt printing, role redirects, and report export/download flows against a running backend.
+- Decide whether the first rebuild pass includes manual admin blocklist creation or keeps review/unblock-only behavior.
+
+## 14. Handoff Note
+
+- Stitch project in active use: `2455191244461890766`
+- Stitch design system asset in use: `assets/9f7194fc301747c79dcb48130ecbcc7f`
+- New admin design boards generated this session: `Blocklist Management - Admin Portal`, `Rate Management - Admin Portal`, and `Customer Detail - James Sterling - Admin Portal`
+- Runtime implementation pass completed this session: admin sidebar/shell refinement plus live updates to admin dashboard, account-detail, rate-management, and blocklist pages
+- Remaining practical work: browser-level responsive verification and live backend validation for report exports, receipt printing, and role flows
 
 - [ ] Run responsive browser verification on the Stitch-aligned public/shared-auth routes
 - [ ] Manually verify the register, verify, forgot-password, and reset-password flows against a live backend runtime

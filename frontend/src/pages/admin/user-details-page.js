@@ -1,5 +1,5 @@
 import { renderButton } from "../../components/button/action-button.js";
-import { renderPanelCard } from "../../components/card/panel-card.js";
+import { renderKpiCard, renderPanelCard } from "../../components/card/panel-card.js";
 import { renderErrorState } from "../../components/feedback/error-state.js";
 import { renderLoadingPanelCards } from "../../components/feedback/loading-state.js";
 import { renderStatusBadge } from "../../components/badge/status-badge.js";
@@ -13,6 +13,15 @@ function renderAccountBadge(user) {
     : '<span class="status-badge status-badge--success">Active account</span>';
 }
 
+function buildInitials(fullName) {
+  return String(fullName ?? "")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("") || "CU";
+}
+
 export function createAdminUserDetailsPage({ session, pathname, query }) {
   const userId = query?.get("id") ?? "";
 
@@ -23,10 +32,11 @@ export function createAdminUserDetailsPage({ session, pathname, query }) {
       eyebrow: "Admin users",
       title: "Inspect verified customer account details",
       description:
-        "Review standing, contact information, and vehicle data before bookings, pricing, or blocklist actions are rebuilt.",
+        "Review standing, contact information, and vehicle data before taking pricing, bookings, or restriction actions.",
+      actions: renderButton({ label: "Back to users", href: "/admin/users", tone: "secondary" }),
       content: `
         <div data-admin-user-alerts></div>
-        <section class="dashboard-grid cashier-dashboard-grid" data-admin-user-details>
+        <section class="stack-sm" data-admin-user-details>
           ${renderLoadingPanelCards({ count: 2 })}
         </section>
       `
@@ -47,45 +57,64 @@ export function createAdminUserDetailsPage({ session, pathname, query }) {
 
         if (detailsRoot) {
           detailsRoot.innerHTML = `
-            ${renderPanelCard({
-              content: `
-                <div class="record-card__header">
-                  <div>
-                    <h2>${user.fullName}</h2>
-                    <p class="page-copy">${user.email}</p>
+            <section class="dashboard-grid dashboard-grid--kpi">
+              ${renderKpiCard({ label: "Total bookings", value: user.totalBookings, helper: "All recorded reservations", icon: "BK" })}
+              ${renderKpiCard({ label: "Active bookings", value: user.activeBookings, helper: "Reserved or arrived", icon: "AC" })}
+              ${renderKpiCard({ label: "Missed bookings", value: user.missedBookingsCount, helper: "No-show history", icon: "NS" })}
+              ${renderKpiCard({
+                label: "Account standing",
+                value: user.blocklisted ? "Restricted" : "Active",
+                helper: user.blocklisted ? `Until ${formatDate(user.blocklistUntil)}` : "Good standing",
+                icon: user.blocklisted ? "BL" : "OK"
+              })}
+            </section>
+            <section class="dashboard-grid admin-account-layout">
+              ${renderPanelCard({
+                className: "operations-card-accent",
+                content: `
+                  <div class="admin-account-hero">
+                    <div class="admin-avatar-badge">${buildInitials(user.fullName)}</div>
+                    <div class="admin-account-hero__copy">
+                      <span class="eyebrow">Customer account record</span>
+                      <h2>${user.fullName}</h2>
+                      <p class="page-copy">${user.email}</p>
+                    </div>
+                    ${renderAccountBadge(user)}
                   </div>
-                  ${renderAccountBadge(user)}
-                </div>
-                <div class="detail-list">
-                  <div><span>Phone number</span><strong>${user.phoneNumber}</strong></div>
-                  <div><span>Address</span><strong>${user.address || "Not provided"}</strong></div>
-                  <div><span>Total bookings</span><strong>${user.totalBookings}</strong></div>
-                  <div><span>Active bookings</span><strong>${user.activeBookings}</strong></div>
-                  <div><span>Missed bookings</span><strong>${user.missedBookingsCount}</strong></div>
-                  <div><span>Standing</span><strong>${user.blocklisted ? `Restricted until ${formatDate(user.blocklistUntil)}` : "Good standing"}</strong></div>
-                </div>
-              `
-            })}
-            ${renderPanelCard({
-              title: "Vehicle and account information",
-              content: `
-                <div class="detail-list">
-                  <div><span>Plate number</span><strong>${user.plateNumber}</strong></div>
-                  <div><span>Vehicle type</span><strong>${user.vehicleType}</strong></div>
-                  <div><span>Vehicle model</span><strong>${user.vehicleModel}</strong></div>
-                  <div><span>Vehicle color</span><strong>${user.vehicleColor}</strong></div>
-                  <div><span>Verification</span><strong>${user.verified ? "Verified" : "Pending"}</strong></div>
-                  <div><span>Admin note</span><strong>${user.blocklisted ? "This account is currently listed in the admin blocklist screen." : "Use the blocklist screen if this account later needs a manual restriction review."}</strong></div>
-                </div>
-              `,
-              footer: `
-                <div class="auth-support-links">
-                  ${user.blocklisted ? renderButton({ label: "Open blocklist", href: "/admin/blocklist", tone: "primary" }) : ""}
-                  ${renderButton({ label: "Back to users", href: "/admin/users", tone: "secondary" })}
-                  ${renderButton({ label: "Back to dashboard", href: "/admin/dashboard", tone: "ghost" })}
-                </div>
-              `
-            })}
+                  <div class="detail-list">
+                    <div><span>Phone number</span><strong>${user.phoneNumber}</strong></div>
+                    <div><span>Address</span><strong>${user.address || "Not provided"}</strong></div>
+                    <div><span>Plate number</span><strong>${user.plateNumber}</strong></div>
+                    <div><span>Standing</span><strong>${user.blocklisted ? `Restricted until ${formatDate(user.blocklistUntil)}` : "Good standing"}</strong></div>
+                  </div>
+                `,
+                footer: `
+                  <div class="auth-support-links">
+                    ${user.blocklisted ? renderButton({ label: "Open blocklist", href: "/admin/blocklist", tone: "primary" }) : ""}
+                    ${renderButton({ label: "Open bookings", href: "/admin/bookings", tone: "secondary" })}
+                  </div>
+                `
+              })}
+              ${renderPanelCard({
+                title: "Vehicle and verification",
+                description: "Vehicle data remains read-only from the admin record view so staff actions stay auditable.",
+                content: `
+                  <div class="identity-list">
+                    <div><span>Vehicle type</span><strong>${user.vehicleType}</strong></div>
+                    <div><span>Vehicle model</span><strong>${user.vehicleModel}</strong></div>
+                    <div><span>Vehicle color</span><strong>${user.vehicleColor}</strong></div>
+                    <div><span>Verification</span><strong>${user.verified ? "Verified customer" : "Pending verification"}</strong></div>
+                    <div><span>Admin note</span><strong>${user.blocklisted ? "This account is currently visible in the active blocklist review." : "Use the blocklist screen if an admin override is later required."}</strong></div>
+                  </div>
+                `,
+                footer: `
+                  <div class="auth-support-links">
+                    ${renderButton({ label: "Back to users", href: "/admin/users", tone: "secondary" })}
+                    ${renderButton({ label: "Return to dashboard", href: "/admin/dashboard", tone: "ghost" })}
+                  </div>
+                `
+              })}
+            </section>
           `;
         }
       } catch (error) {

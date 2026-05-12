@@ -74,30 +74,38 @@ export function createAdminBlocklistPage({ session, pathname }) {
       title: "Review active account restrictions",
       description:
         "Monitor currently blocklisted users, review restriction timing, and manually remove restrictions when an admin decision overrides the automatic policy.",
+      actions: `
+        ${renderButton({ label: "Open users", href: "/admin/users", tone: "secondary" })}
+        ${renderButton({ label: "Back to dashboard", href: "/admin/dashboard", tone: "ghost" })}
+      `,
       content: `
         <section class="dashboard-grid dashboard-grid--kpi" data-admin-blocklist-summary>
           ${renderLoadingPanelCards({ count: 3 })}
         </section>
-        <section class="dashboard-grid booking-flow-grid">
+        <section class="dashboard-grid admin-overview-grid">
           ${renderPanelCard({
+            className: "operations-card-accent",
             title: "Restriction policy",
             content: `
-              <ul class="journey-list">
-                <li>This screen manages active restrictions only. Automatic blocklisting still comes from backend no-show rules.</li>
-                <li>Manual unblock is available now for admin override cases.</li>
-                <li>Manual blocklist-add remains pending the documented product decision and is intentionally not exposed yet.</li>
+              <ul class="admin-policy-list">
+                <li><strong>Automatic policy:</strong> This screen manages active restrictions only. Automatic blocklisting still comes from backend no-show rules.</li>
+                <li><strong>Manual override:</strong> Manual unblock is available now for approved admin override cases.</li>
+                <li><strong>Deferred scope:</strong> Manual blocklist-add remains pending the documented product decision and is intentionally not exposed yet.</li>
               </ul>
             `
           })}
           ${renderPanelCard({
             title: "Admin note",
             content: `
-              <p class="page-copy">Use user details before unblocking an account so missed-booking history and booking context stay visible.</p>
+              <div class="admin-note-surface">
+                <strong>Review before override</strong>
+                <p>Open the customer detail view before unblocking an account so missed-booking history, vehicle data, and current booking context remain visible.</p>
+              </div>
             `,
             footer: `
               <div class="auth-support-links">
-                ${renderButton({ label: "Back to dashboard", href: "/admin/dashboard", tone: "secondary" })}
-                ${renderButton({ label: "Open users", href: "/admin/users", tone: "ghost" })}
+                ${renderButton({ label: "Review users", href: "/admin/users", tone: "secondary" })}
+                ${renderButton({ label: "Open bookings", href: "/admin/bookings", tone: "ghost" })}
               </div>
             `
           })}
@@ -126,9 +134,9 @@ export function createAdminBlocklistPage({ session, pathname }) {
         }
 
         summaryRoot.innerHTML = [
-          renderKpiCard({ label: "Restricted users", value: currentResponse.totalResults }),
-          renderKpiCard({ label: "Expiring within 7 days", value: currentResponse.expiringSoonCount }),
-          renderKpiCard({ label: "Missed bookings in scope", value: currentResponse.totalMissedBookings })
+          renderKpiCard({ label: "Restricted users", value: currentResponse.totalResults, helper: "Currently active restrictions", icon: "BL" }),
+          renderKpiCard({ label: "Expiring within 7 days", value: currentResponse.expiringSoonCount, helper: "Time-based restrictions nearing release", icon: "EX" }),
+          renderKpiCard({ label: "Missed bookings in scope", value: currentResponse.totalMissedBookings, helper: "No-show volume behind the current list", icon: "NS" })
         ].join("");
       }
 

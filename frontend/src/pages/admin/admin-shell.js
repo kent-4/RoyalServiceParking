@@ -2,15 +2,18 @@ import { renderRoleSidebar } from "../../components/sidebar/role-sidebar.js";
 import { logout } from "../../services/auth-service.js";
 import { setAuthState } from "../../state/auth-store.js";
 
-export function renderAdminShell({ session, currentPath, eyebrow, title, description, content }) {
+export function renderAdminShell({ session, currentPath, eyebrow, title, description, actions = "", content }) {
   return `
     <main class="role-shell role-shell--admin">
       ${renderRoleSidebar(session, currentPath)}
       <section class="role-shell__content role-shell__content--admin">
-        <header class="page-header">
-          <span class="eyebrow">${eyebrow}</span>
-          <h1 class="page-title" tabindex="-1" data-page-heading>${title}</h1>
-          <p class="page-copy page-copy--lead">${description}</p>
+        <header class="page-header page-header--admin">
+          <div class="page-header__copy">
+            <span class="eyebrow">${eyebrow}</span>
+            <h1 class="page-title" tabindex="-1" data-page-heading>${title}</h1>
+            <p class="page-copy page-copy--lead">${description}</p>
+          </div>
+          ${actions ? `<div class="page-header__actions page-header__actions--admin">${actions}</div>` : ""}
         </header>
         ${content}
       </section>
