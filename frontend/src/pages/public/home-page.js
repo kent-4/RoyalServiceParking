@@ -12,28 +12,12 @@ const experienceCards = [
     meta: "For new customers"
   },
   {
-    href: "/login?role=user",
-    eyebrow: "Customer access",
-    title: "Return to the customer workspace.",
+    href: "/login",
+    eyebrow: "Returning account",
+    title: "Sign in through one shared login.",
     description:
-      "Open your bookings, notifications, restriction status, and profile from the same shared sign-in route.",
-    meta: "For verified users"
-  },
-  {
-    href: "/login?role=cashier",
-    eyebrow: "Operations",
-    title: "Handle on-site cashier operations.",
-    description:
-      "Review arrivals, complete parking sessions, and issue receipts without exposing staff actions to the customer journey.",
-    meta: "For staff on site"
-  },
-  {
-    href: "/login?role=admin",
-    eyebrow: "Management",
-    title: "Oversee pricing, users, and reports.",
-    description:
-      "Monitor bookings, pricing, restrictions, and exports from the management workspace while backend rules stay authoritative.",
-    meta: "For authorized administrators"
+      "Use one sign-in route for returning access and let the backend open the correct workspace after authentication.",
+    meta: "For existing accounts"
   }
 ];
 
@@ -49,9 +33,9 @@ const capabilityCards = [
       "Public messaging keeps the no-show and temporary restriction policy clear before a customer commits to the flow."
   },
   {
-    title: "Shared sign-in, separate workspaces",
+    title: "One sign-in, automatic destination",
     description:
-      "The login route is unified, but customer, cashier, and admin experiences stay role-separated after authentication."
+      "Returning accounts use one login page while backend authorization still controls what opens after authentication."
   }
 ];
 
@@ -91,12 +75,11 @@ export function createPublicHomePage({ session, pathname }) {
               Secure your spot before you arrive.
             </h1>
             <p class="page-copy page-copy--lead">
-              Royal Service Parking is the public front door to a single-facility booking and operations platform. Customers begin with a verified account, while cashier and admin access remain visible but secondary to the reservation journey.
+              Royal Service Parking is the public front door to a single-facility booking platform. Customers begin with a verified account and return through one shared sign-in flow.
             </p>
             <div class="hero-actions">
               <a class="button button--primary" href="${primaryAction.href}" data-link>${session.authenticated ? primaryAction.label : "Book my spot"}</a>
-              <a class="button button--secondary" href="/login" data-link>Member login</a>
-              <a class="button button--ghost" href="/login?role=cashier" data-link>Staff access</a>
+              <a class="button button--secondary" href="/login" data-link>Sign in</a>
             </div>
             <div class="hero-stat-grid">
               <div class="hero-stat">
@@ -113,7 +96,7 @@ export function createPublicHomePage({ session, pathname }) {
               </div>
               <div class="hero-stat">
                 <strong>Shared login route</strong>
-                <span>The backend still routes authenticated users into the correct workspace automatically.</span>
+                <span>Returning accounts use one sign-in route and are redirected automatically after authentication.</span>
               </div>
             </div>
           </div>
@@ -136,20 +119,20 @@ export function createPublicHomePage({ session, pathname }) {
               </p>
             </div>
             <div class="policy-card">
-              <span class="metric-card__label">Staff and management</span>
-              <div class="access-quick-links">
-                <a href="/login?role=cashier" data-link>Cashier portal</a>
-                <a href="/login?role=admin" data-link>Admin portal</a>
-              </div>
+              <span class="metric-card__label">Returning accounts</span>
+              <strong>Use one shared sign-in page to continue where your account belongs.</strong>
+              <p>
+                The public experience stays focused on registration, booking rules, and customer guidance before authentication.
+              </p>
             </div>
           </div>
         </section>
         <section class="public-section">
           <div class="section-heading">
             <span class="eyebrow">Choose your entry point</span>
-            <h2>Customer booking stays front-and-center while staff access remains available.</h2>
+            <h2>Keep the customer journey simple before the booking is made.</h2>
             <p class="page-copy">
-              The rebuilt public experience keeps the premium customer path clear without hiding operational access for staff and administrators.
+              The rebuilt public experience keeps registration, policy clarity, and account sign-in front-and-center.
             </p>
           </div>
           <div class="entry-grid">
@@ -160,9 +143,9 @@ export function createPublicHomePage({ session, pathname }) {
           <div class="section-split">
             <div>
               <span class="eyebrow">Built for the real workflow</span>
-              <h2 class="page-title">Customers need guidance. Staff need separation and speed.</h2>
+              <h2 class="page-title">Customers need clarity before they reserve.</h2>
               <p class="page-copy">
-                The public site explains the rules up front so the later user, cashier, and admin workspaces can stay more task-focused.
+                The public site explains verification, booking expectations, and arrival policy up front so later account flows can stay focused.
               </p>
             </div>
             <div class="feature-grid">

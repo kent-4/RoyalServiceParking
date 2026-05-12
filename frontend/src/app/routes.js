@@ -106,8 +106,8 @@ export const routes = [
         iconText: "OK",
         title: "Your password has been reset",
         description:
-          "The backend accepted the new password. You can now use it to sign in to the user portal.",
-        detail: "Return to the user login screen and continue with the updated credentials.",
+          "The backend accepted the new password. You can now use it to sign in again through the shared login page.",
+        detail: "Return to the login screen and continue with the updated credentials.",
         actions: [
           { href: "/login?reset=true", label: "Proceed to login", variant: "button--primary" },
           { href: "/", label: "Back to home" }
@@ -129,17 +129,17 @@ export const routes = [
   {
     path: "/login/user",
     access: "guest",
-    redirectTo: "/login?role=user"
+    redirectTo: "/login"
   },
   {
     path: "/login/cashier",
     access: "guest",
-    redirectTo: "/login?role=cashier"
+    redirectTo: "/login"
   },
   {
     path: "/login/admin",
     access: "guest",
-    redirectTo: "/login?role=admin"
+    redirectTo: "/login"
   },
   {
     path: "/user",
